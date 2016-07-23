@@ -8,10 +8,16 @@
 
 #define KEY_SIZE	16
 
+#define RIJNDAEL	4
+
 enum operation {
 	FIRST,
 	STD,
 	LAST
+};
+
+enum mode {
+	ECB
 };
 
 uint8_t rcon[256] = {
@@ -57,22 +63,13 @@ uint8_t key[16] = { 0x54, 0x68, 0x61, 0x74, 0x73, 0x20, 0x6d, 0x79, 0x20, 0x4b, 
 		0x6e, 0x67, 0x20, 0x46, 0x75 };
 
 uint8_t expansion[14][32];
-		
-uint8_t expanded_1[16];
-uint8_t expanded_2[16];
-uint8_t expanded_3[16];
-uint8_t expanded_4[16];
-uint8_t expanded_5[16];
-uint8_t expanded_6[16];
-uint8_t expanded_7[16];
-uint8_t expanded_8[16];
-uint8_t expanded_9[16];
-uint8_t expanded_10[16];
-		
+
 uint8_t datablock[16] = { 0x54,0x77,0x6F,0x20,0x4F,0x6E,0x65,0x20,0x4E,0x69,0x6E,
 		0x65,0x20,0x54,0x77,0x6F };
-uint8_t datablock2[16] = { 0x58,0x47,0x08,0x8B,0x15,0xB6,0x1C,0xBA,0x59,0xD4,0xE2,
-		0xE8,0xCD,0x39,0xDF,0xCE };
+
+uint8_t datablock_2[32] = { 0x54,0x77,0x6F,0x20,0x4F,0x6E,0x65,0x20,0x4E,0x69,0x6E,
+		0x65,0x20,0x54,0x77,0x6F, 0x54,0x77,0x6F,0x20,0x4F,0x6E,0x65,0x20,0x4E,0x69,0x6E,
+		0x35,0x20,0x54,0x77,0x6F };
 
 void hex_dump(const char *def, uint8_t *data, uint16_t len, uint16_t br)
 {
@@ -183,8 +180,7 @@ matrix_inverse(uint8_t *out, uint8_t *in)
 		out[4*i + 3] = in[i+12];
 	}
 }
-#define RIJNDAEL	4
-void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2, 
+void ECB_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 				enum operation op)
 {
 	int i;
@@ -220,26 +216,59 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 	matrix_inverse(out, state);
 }
 
+void
+AES_expand_keys(uint16_t k)
+{
+	int i;
+	if (k == 128)
+		k = 10;
+	else if (k == 192)
+		k = 12;
+	else if (k == 256)
+		k = 14;
+
+	key_expand(expansion[0], key, 1);
+	for (i = 1; i < k; i++)
+		key_expand(expansion[i], expansion[i-1], rcon[i+1]);
+}
+
+struct AES_context {
+	enum mode mode;
+	uint16_t key_size;
+};
+
+void
+AES_encrypt(uint8_t *out, struct AES_context *ctx, uint16_t block_nr)
+{
+	int i, block;
+	AES_expand_keys(ctx->key_size);
+
+	for (block = 0; block < block_nr; block ++) {
+
+		ECB_encrypt(out+16*block, key, expansion[0], FIRST);
+
+		for (i = 1; i < 9; i++) {
+			ECB_encrypt(out+16*block, key, expansion[i], STD);
+		}
+
+		ECB_encrypt(out+16*block, NULL, expansion[9], LAST);
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	int i;
+	uint16_t key_size = 16;
+	struct AES_context *ctx = malloc(sizeof(struct AES_context));
 
-	hex_dump("plaintext ", datablock, KEY_SIZE, 16);
+	ctx->key_size = 128;
+	ctx->mode = ECB;
 
-	key_expand(expansion[0], key, 1);
-	for (i = 1; i < 10; i++)
-		key_expand(expansion[i], expansion[i-1], rcon[i+1]);
+	hex_dump("plaintext", datablock_2, 32, 16);
 
-	AES_encrypt(datablock, key, expansion[0], FIRST);
+	AES_encrypt(datablock_2, ctx, sizeof(datablock_2)/16);
 
-	for (i = 1; i < 9; i++) {
-		AES_encrypt(datablock, key, expansion[i], STD);
-	}
-
-	AES_encrypt(datablock, NULL, expansion[9], LAST);
-	hex_dump("ciphertext ", datablock, KEY_SIZE, 16);
-
-	
+	hex_dump("ciphertext ", datablock_2, 32, 16);
 	
 	return 0;
 }
