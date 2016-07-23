@@ -3,6 +3,8 @@
 all:
 	$(MAKE) -C AES/ECB/c
 	$(MAKE) -C AES/CBC/c
+	$(MAKE) -C AES/OFB/c
 	$(MAKE) -C AES/AES
 	gcc -o build/ecb AES/ECB/c/AES_ECB.o AES/AES/AES.o
 	gcc -o build/cbc AES/CBC/c/AES_CBC.o AES/AES/AES.o
+	gcc -o build/ofb AES/OFB/c/AES_OFB.o AES/AES/AES.o
