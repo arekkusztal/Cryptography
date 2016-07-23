@@ -3,8 +3,35 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "AES.h"
+
 
 #define KEY_SIZE	16
+
+enum operation {
+	FIRST,
+	STD,
+	LAST
+};
+
+uint8_t rcon[256] = {
+    0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
+    0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39,
+    0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a,
+    0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8,
+    0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef,
+    0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc,
+    0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b,
+    0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3,
+    0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94,
+    0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20,
+    0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35,
+    0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd, 0x61, 0xc2, 0x9f,
+    0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d, 0x01, 0x02, 0x04,
+    0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a, 0x2f, 0x5e, 0xbc, 0x63,
+    0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39, 0x72, 0xe4, 0xd3, 0xbd,
+    0x61, 0xc2, 0x9f, 0x25, 0x4a, 0x94, 0x33, 0x66, 0xcc, 0x83, 0x1d, 0x3a, 0x74, 0xe8, 0xcb, 0x8d
+};
 
  uint8_t s_box[256] = 
  {
@@ -28,6 +55,8 @@
  
 uint8_t key[16] = { 0x54, 0x68, 0x61, 0x74, 0x73, 0x20, 0x6d, 0x79, 0x20, 0x4b, 0x75,
 		0x6e, 0x67, 0x20, 0x46, 0x75 };
+
+uint8_t expansion[14][32];
 		
 uint8_t expanded_1[16];
 uint8_t expanded_2[16];
@@ -142,135 +171,74 @@ void rijndeal_mix_help(uint8_t *state, uint16_t off)
 		state[i*4+off] = column[i];
 	}	
 }
-enum operation {
-	FIRST,
-	STD,
-	LAST
-};
 
+static inline void
+matrix_inverse(uint8_t *out, uint8_t *in)
+{
+	int i;
+	for (i = 0;i<4;i++) {
+		out[4*i] = in[i];
+		out[4*i + 1] = in[i+4];
+		out[4*i + 2] = in[i+8];
+		out[4*i + 3] = in[i+12];
+	}
+}
+#define RIJNDAEL	4
 void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2, 
 				enum operation op)
 {
 	int i;
 	uint8_t state[16], key_inv[16], key_inv_2[16];
 	
-	for (i = 0;i<4;i++) {
-		state[4*i] = out[i];
-		state[4*i + 1] = out[i+4];
-		state[4*i + 2] = out[i+8];
-		state[4*i + 3] = out[i+12];
-	}
+	matrix_inverse(state, out);
+	matrix_inverse(key_inv_2, key_2);
 	
-	if (op == FIRST)
-	for (i = 0;i<4;i++) {
-		key_inv[4*i] = in[i];
-		key_inv[4*i + 1] = in[i+4];
-		key_inv[4*i + 2] = in[i+8];
-		key_inv[4*i + 3] = in[i+12];
-	}
-	
-	for (i = 0;i<4;i++) {
-		key_inv_2[4*i] = key_2[i];
-		key_inv_2[4*i + 1] = key_2[i+4];
-		key_inv_2[4*i + 2] = key_2[i+8];
-		key_inv_2[4*i + 3] = key_2[i+12];
-	}
-	for (i=0;i<KEY_SIZE; i++) {
-		if (op == FIRST)
+	if (op == FIRST) {
+		matrix_inverse(key_inv, in);
+		for (i=0;i<KEY_SIZE; i++) {
 			state[i] ^= key_inv[i];
+		}
+	}
+
+	for (i=0;i<KEY_SIZE; i++) {
 		state[i] = s_box[state[i]];
 	}
-	hex_dump("State 0", state, KEY_SIZE, 4);
-	for (i =1; i<4; i++) {
-		rol(&state[4*i], i);
+
+	for (i =1; i< RIJNDAEL; i++) {
+		rol(&state[RIJNDAEL*i], i);
 	}
-	hex_dump("State 1", state, KEY_SIZE, 4);
 	
 	if (op != LAST) {
-		rijndeal_mix_help(state, 0);
-		rijndeal_mix_help(state, 1);
-		rijndeal_mix_help(state, 2);
-		rijndeal_mix_help(state, 3);
+		for (i = 0; i< RIJNDAEL; i++)
+			rijndeal_mix_help(state, i);
 	}
-	
-	hex_dump("State 2", state, KEY_SIZE, 4);
 	
 	for (i =0 ;i <16; i++) {
 		state[i] = state[i] ^ key_inv_2[i];
 	}
-	
-	for (i = 0;i<4;i++) {
-		out[4*i] = state[i];
-		out[4*i + 1] = state[i+4];
-		out[4*i + 2] = state[i+8];
-		out[4*i + 3] = state[i+12];
-	}
-	
-	hex_dump("Inverted key 1", key_inv, KEY_SIZE, 4);
-	hex_dump("First round encryption", out, KEY_SIZE, 4);
+
+	matrix_inverse(out, state);
 }
 
 int main(int argc, char *argv[])
 {
 	int i;
 
-	key_expand(expanded_1, key, 1);
-	//hex_dump("Expanded key 1", expanded_1, KEY_SIZE, 16);
-	
-	key_expand(expanded_2, expanded_1, 2);
-	//hex_dump("Expanded key 2", expanded_2, KEY_SIZE, 16);
-	
-	key_expand(expanded_3, expanded_2, 4);
-	//hex_dump("Expanded key 3", expanded_3, KEY_SIZE, 16);
-	
-	key_expand(expanded_4, expanded_3, 8);
-	//hex_dump("Expanded key 4", expanded_4, KEY_SIZE, 16);
-	
-	key_expand(expanded_5, expanded_4, 0x10);
-	//hex_dump("Expanded key 5", expanded_5, KEY_SIZE, 16);
-	
-	key_expand(expanded_6, expanded_5, 0x20);
-	//hex_dump("Expanded key 6", expanded_6, KEY_SIZE, 16);
+	hex_dump("plaintext ", datablock, KEY_SIZE, 16);
 
-	key_expand(expanded_7, expanded_6, 0x40);
-	//hex_dump("Expanded key 7", expanded_7, KEY_SIZE, 16);
-	
-	key_expand(expanded_8, expanded_7, 0x80);
-	//hex_dump("Expanded key 8", expanded_8, KEY_SIZE, 16);
-	
-	key_expand(expanded_9, expanded_8, 0x1B);
-	//hex_dump("Expanded key 9", expanded_9, KEY_SIZE, 16);
-	
-	key_expand(expanded_10, expanded_9, 0x36);
-	//hex_dump("Expanded key 10", expanded_10, KEY_SIZE, 16);
-	
-	
-	
-	
-	AES_encrypt(datablock, key, expanded_1, FIRST);	
-	hex_dump("DATABLOCK(1) ----------- ", datablock, KEY_SIZE, 16);
-	AES_encrypt(datablock, NULL, expanded_2, STD);	
-	hex_dump("DATABLOCK(2) ----------- ", datablock, KEY_SIZE, 16);
-	AES_encrypt(datablock, NULL, expanded_3, STD);	
-	hex_dump("DATABLOCK(3) ----------- ", datablock, KEY_SIZE, 16);	
-	AES_encrypt(datablock, NULL, expanded_4, STD);	
-	hex_dump("DATABLOCK(4) ----------- ", datablock, KEY_SIZE, 16);
-	AES_encrypt(datablock, NULL, expanded_5, STD);	
-	hex_dump("DATABLOCK(5) ----------- ", datablock, KEY_SIZE, 16);
-	AES_encrypt(datablock, NULL, expanded_6, STD);	
-	hex_dump("DATABLOCK(6) ----------- ", datablock, KEY_SIZE, 16);
-	AES_encrypt(datablock, NULL, expanded_7, STD);	
-	hex_dump("DATABLOCK(7) ----------- ", datablock, KEY_SIZE, 16);
-	AES_encrypt(datablock, NULL, expanded_8, STD);	
-	hex_dump("DATABLOCK(8) ----------- ", datablock, KEY_SIZE, 16);
-	AES_encrypt(datablock, NULL, expanded_9, STD);	
-	hex_dump("DATABLOCK(9) ----------- ", datablock, KEY_SIZE, 16);
-	AES_encrypt(datablock, NULL, expanded_10, LAST);	
-	hex_dump("DATABLOCK(10) ----------- ", datablock, KEY_SIZE, 16);
-	
-	
-//	uint8_t r[4] = { 0xEB, 0x93, 0xC7, 0x20 };
-//	gmix_column(r);
+	key_expand(expansion[0], key, 1);
+	for (i = 1; i < 10; i++)
+		key_expand(expansion[i], expansion[i-1], rcon[i+1]);
+
+	AES_encrypt(datablock, key, expansion[0], FIRST);
+
+	for (i = 1; i < 9; i++) {
+		AES_encrypt(datablock, key, expansion[i], STD);
+	}
+
+	AES_encrypt(datablock, NULL, expansion[9], LAST);
+	hex_dump("ciphertext ", datablock, KEY_SIZE, 16);
+
 	
 	
 	return 0;
