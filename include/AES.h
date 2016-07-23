@@ -17,8 +17,9 @@ enum operation {
 struct AES_context {
 	enum mode mode;
 	uint16_t key_size;
+	uint8_t *key;
 };
-
+extern uint8_t expansion[14][32];
 extern uint8_t s_box[256];
 extern uint8_t rcon[256];
 
@@ -31,6 +32,8 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 				enum operation op);
 void key_expand(uint8_t *out, uint8_t *in, uint16_t rcon);
 void
-AES_expand_keys(uint16_t k);
+AES_expand_keys(uint8_t *key, uint16_t k);
+void hex_dump(const char *def, uint8_t *data, uint16_t len,
+		uint16_t br);
 
 #endif

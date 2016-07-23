@@ -43,6 +43,9 @@ uint8_t s_box[256] =
    0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
 };
 
+
+uint8_t expansion[14][32];
+
 void rol(uint8_t *data, uint16_t bg)
 {
 	int i;
@@ -98,6 +101,59 @@ matrix_inverse(uint8_t *out, uint8_t *in)
 	}
 }
 
+void key_expand(uint8_t *out, uint8_t *in, uint16_t rcon)
+{
+
+	int i;
+
+	uint8_t gw3[4], w4[4], w5[4], w6[4], w7[4];
+	memcpy(gw3, &in[12], 4);
+	rol(gw3,1);
+
+	for (i =0; i< 4;i++) {
+		gw3[i] = s_box[gw3[i]];
+
+	}
+	gw3[0] ^= rcon;
+
+	for (i=0;i<4;i++) {
+		w4[i] = gw3[i] ^ in[i];
+	}
+	for (i=0;i<4;i++) {
+		w5[i] = w4[i] ^ in[i+4];
+	}
+
+	for (i=0;i<4;i++) {
+		w6[i] = w5[i] ^ in[i+8];
+	}
+
+	for (i=0;i<4;i++) {
+		w7[i] = w6[i] ^ in[i+12];
+	}
+
+	memcpy(out, w4, 4);
+	memcpy(out+4, w5, 4);
+	memcpy(out+8, w6, 4);
+	memcpy(out+12, w7, 4);
+
+}
+
+void
+AES_expand_keys(uint8_t *key, uint16_t k)
+{
+	int i;
+	if (k == 128)
+		k = 10;
+	else if (k == 192)
+		k = 12;
+	else if (k == 256)
+		k = 14;
+
+	key_expand(expansion[0], key, 1);
+	for (i = 1; i < k; i++)
+		key_expand(expansion[i], expansion[i-1], rcon[i+1]);
+}
+
 void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 				enum operation op)
 {
@@ -132,4 +188,19 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 	}
 
 	matrix_inverse(out, state);
+}
+
+/* TO BE MOVED */
+void hex_dump(const char *def, uint8_t *data, uint16_t len,
+		uint16_t br)
+{
+	uint16_t i;
+
+	printf("\n%s:\n", def);
+	for (i = 0; i < len; ++i) {
+		if (i && ( i % br ==0 ))
+			printf("\n");
+		printf("0x%02X ",data[i]);
+	}
+	printf("\n");
 }
