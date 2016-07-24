@@ -1,0 +1,4 @@
+*** Basis for near future development ***
+* SIMD architecture specific extensions
+* SSE.y, AVXx for x86
+* AltiVec for PowerPC

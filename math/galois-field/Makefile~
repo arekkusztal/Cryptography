@@ -1,0 +1,4 @@
+SCR-y += GF_mult.o
+
+all: $(SRC-y)
+	gcc -o $@ GF_mult.c
