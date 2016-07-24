@@ -1,7 +1,3 @@
-CFLAGS=-I$(PWD)/include
-
-export CFLAGS
-
 all:
 	$(MAKE) -C AES/ECB/c
 	$(MAKE) -C AES/CBC/c
@@ -20,3 +16,10 @@ all:
 .PHONY:
 clean:
 	rm build/*
+	$(MAKE) -C AES/ECB/c clean
+	$(MAKE) -C AES/CBC/c clean
+	$(MAKE) -C AES/OFB/c clean
+	$(MAKE) -C AES/CFB/c clean
+	$(MAKE) -C AES/CTR/c clean
+	$(MAKE) -C AES/GCM/c clean
+	$(MAKE) -C AES/AES clean

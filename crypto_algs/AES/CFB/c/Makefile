@@ -3,5 +3,5 @@ all:
 	
 .PHONY:
 clean:
-	rm ex
+	rm *.o
 

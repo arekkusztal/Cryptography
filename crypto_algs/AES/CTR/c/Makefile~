@@ -1,5 +1,5 @@
 all:
-	gcc -c AES_OFB.c $(CFLAGS)
+	gcc -c AES_CTR.c $(CFLAGS)
 	
 .PHONY:
 clean:
