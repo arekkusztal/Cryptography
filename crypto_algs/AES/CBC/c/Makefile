@@ -1,5 +1,3 @@
-CFLAGS=-I$(HOME)/Cryptography/include
-
 all:
 	gcc -c AES_CBC.c $(CFLAGS)
 	

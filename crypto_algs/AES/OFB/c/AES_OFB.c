@@ -13,8 +13,6 @@ AES_OFB_encrypt(uint8_t *out, struct AES_context *ctx, uint16_t block_nr)
 	AES_expand_keys(ctx->key, ctx->key_size);
 
 	for (block = 0; block < block_nr; block ++) {
-
-		hex_dump("iv ", iv, sizeof(datablock), 16);
 		AES_encrypt(iv, ctx->key, expansion[0], FIRST);
 
 		for (i = 1; i < 9; i++) {
@@ -23,10 +21,9 @@ AES_OFB_encrypt(uint8_t *out, struct AES_context *ctx, uint16_t block_nr)
 
 		AES_encrypt(iv, NULL, expansion[9], LAST);
 
-		hex_dump("iv ", iv, sizeof(datablock), 16);
 		for (i =0; i< 16; i++)
 		{
-			out[i] ^= iv[i];
+			(out+16*block)[i] ^= iv[i];
 		}
 	}
 }
