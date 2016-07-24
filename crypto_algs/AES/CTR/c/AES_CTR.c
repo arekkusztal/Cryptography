@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 	struct AES_context *ctx = malloc(sizeof(struct AES_context));
 
 	ctx->key_size = 128;
-	ctx->mode = CBC;
+	ctx->mode = CTR;
 	ctx->key = skey;
 
 	hex_dump("plaintext", datablock, sizeof(datablock), 16);

@@ -7,7 +7,9 @@ enum mode {
 	ECB,
 	CBC,
 	OFB,
-	CFB
+	CFB,
+	CTR,
+	GCM
 };
 
 enum operation {

@@ -90,3 +90,9 @@ int main()
       free(r);
       return 0;
 }
+
+
+/* REFERENCES
+ * 1. http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/gcm/gcm-spec.pdf
+ * */
+
