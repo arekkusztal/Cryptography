@@ -94,5 +94,6 @@ int main()
 
 /* REFERENCES
  * 1. http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/gcm/gcm-spec.pdf
+ * 2. Some other BSD source files
  * */
 

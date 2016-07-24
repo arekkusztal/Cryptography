@@ -15,7 +15,7 @@ all:
 	
 .PHONY:
 clean:
-	rm build/*
+	rm -f build/*
 	$(MAKE) -C AES/ECB/c clean
 	$(MAKE) -C AES/CBC/c clean
 	$(MAKE) -C AES/OFB/c clean

@@ -4,4 +4,4 @@ ex: $(SRC-y)
 	gcc -o $@ GF_mult.c -g
 .PHONY:
 clean:
-	rm ex
+	rm -f ex

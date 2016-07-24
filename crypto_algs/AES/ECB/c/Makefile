@@ -2,4 +2,4 @@ all:
 	gcc -c AES_ECB.c $(CFLAGS)
 .PHONY:
 clean:
-	rm *.o
+	rm -f *.o
