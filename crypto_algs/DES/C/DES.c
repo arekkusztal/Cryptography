@@ -76,6 +76,8 @@ int S8[] = {13,  2,  8,  4,  6, 15, 11,  1, 10,  9,  3, 14,  5,  0, 12,  7,
 			 7, 11,  4,  1,  9, 12, 14,  2,  0,  6, 10, 13, 15,  3,  5,  8,
 			 2,  1, 14,  7,  4, 10,  8, 13, 15, 12,  9,  0,  3,  5,  6, 11};
 
+uint8_t sel[48];
+
 uint8_t PC_1[] = {
 		57, 49, 41, 33, 25, 17, 9,
 		1, 58, 50, 42, 34, 26, 18,
@@ -127,6 +129,7 @@ uint8_t K[] = {
 };
 
 uint8_t kplus[8];
+uint8_t ectB[8];
 
 uint8_t Kp[56];
 uint8_t C[17][28];
@@ -197,6 +200,77 @@ void E_Bit_sel(uint8_t *data)
 		else if (E_Bit[i] % 8 == 0){
 			EX_R[0][i/8] |= (data[E_Bit[i]/8] & 1) << t--;
 		}
+	}
+}
+
+void
+expand_binary(uint8_t *out,uint8_t *in)
+{
+	int i;
+	printf("\n");
+	for (i =0;i<48; i++){
+		sel[i] = ( (in[i >> 3] >> (7 - (i & 7))) & 1);
+	}
+}
+
+void
+weird(uint8_t *out, uint8_t *in)
+{
+	int i;
+	uint8_t A = 0,B = 0;
+	uint32_t temp = 0;
+	for (i=0;i<8;i++) {
+		A |= (in[i*6] << 1) | (in[i*6+5]);
+		B |= (in[i*6 + 1] << 3 ) | (in[i*6 + 2] << 2 ) | (in[i*6 + 3] << 1 ) | (in[i*6 + 4] );
+		printf("\nA: %d",A);
+		printf("\nB: %d",B);
+		if (i == 0) {
+			temp = S1[A*16+B];
+			//*out |= (temp << (4));
+			out[0] |= temp << 4;
+			printf("\nS(1) = %d", S1[A*16+B]);
+		}
+		else if (i == 1) {
+			temp = S2[A*16+B];
+			out[0] |= temp;
+		//	*out |= (temp << (28 -i*4));
+			printf("\nS(2) = %d", S2[A*16+B]);
+		}
+		else if (i == 2) {
+			temp = S3[A*16+B];
+			out[1] |= temp << 4;
+		//	*out |= (temp << (28 -i*4));
+			printf("\nS(2) = %d", S3[A*16+B]);
+		}
+		else if (i == 3) {
+			temp = S4[A*16+B];
+			out[1] |= temp;
+			printf("\nS(2) = %d", S4[A*16+B]);
+		}
+		else if (i == 4) {
+			temp = S5[A*16+B];
+			out[2] |= temp << 4;
+			printf("\nS(2) = %d", S5[A*16+B]);
+		}
+		else if (i == 5) {
+			temp = S6[A*16+B];
+			out[2] |= temp;
+			printf("\nS(2) = %d", S6[A*16+B]);
+		}
+		else if (i == 6) {
+			temp = S7[A*16+B];
+			out[3] |= temp << 4;
+			printf("\nS(2) = %d", S7[A*16+B]);
+		}
+		else if (i == 7) {
+			temp = S8[A*16+B];
+			out[3] |= temp;
+			printf("\nS(2) = %d", S8[A*16+B]);
+		}
+		temp = 0;
+
+		A =0;
+		B = 0;
 	}
 }
 
@@ -277,5 +351,12 @@ int main()
 
 	print_binary(EX_R[0], 8, 6, "E(R_0)");
 	printf("\n");
+	expand_binary(sel, EX_R[0]);
+
+	uint32_t f = 0;
+	uint8_t f_2[4] = { 0 };
+	hex_dump("sel", sel, 48, 16);
+	weird((uint8_t *)&f_2, sel);
+	print_binary(&f_2,8,4, "f");
 	return 0;
 }
