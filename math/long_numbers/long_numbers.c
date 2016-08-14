@@ -132,20 +132,67 @@ integer *lshift(integer *A)
 	return R;
 }
 
+#define BIT_IN_STREAM(f, arg)	f->data[arg>>3] & (1 << (arg % 8))
+
+integer *mult(integer *A, integer *B)
+{
+	integer *R;
+	int i;
+	uint16_t size;
+	uint16_t ones = 0;
+	integer **args;
+	integer *factor;
+	integer *temp;
+
+//	factor = (A->size < B->size ? A : B); Optimize it for smaller factor, righ now get B
+	factor = B;
+	size = factor->size << 3;
+	printf("\nMult size %hu", size);
+
+	for (i = 0; i< size; i++) {
+		if (BIT_IN_STREAM(factor, i)) {
+			ones++;
+		}
+	}
+
+	R = malloc(sizeof(integer));
+	R->size = (size >> 3 ) * 2;
+	R->data = malloc(sizeof(R->size));
+	R->data = memcpy(R->data, A->data, A->size);
+
+	for (i=0;i<ones - 1;i++) {
+		temp = R;
+		R = lshift(R);
+		/*Dodgy right there, for now i will leave it out */
+		free(temp);
+		if (BIT_IN_STREAM(B, i)) {
+			temp = R;
+			R = add_integer(R, A);
+			free(temp);
+		}
+	}
+
+	hex_dump("Result", R->data, R->size ,32);
+
+	free(args);
+	return NULL;
+}
+
 
 int main(int argc, char *argv[])
 {
 	int i;
 	integer *A, *B, *R;
-	A = set_integer_b16("8001");
-	B = set_integer_b16("8001");
+	A = set_integer_b16("CB1F1FF");
+	B = set_integer_b16("1FF");
 	R = malloc(sizeof(R));
 	uint8_t carry = 0;
 
-	R = add_integer(A, B);
+	//R = add_integer(A, B);
+	R = mult(A, B);
 
 	//R = lshift(A);
-	hex_dump("Addition", R->data, R->size ,32);
+	//hex_dump("Addition", R->data, R->size ,32);
 	return 0;
 }
 
