@@ -59,7 +59,7 @@ set_integer_b16(uint8_t *array) {
 	if (odd)
 		free(temp);
 
-	hex_dump("Long number", R->data, len ,32);
+	hex_dump("Long number (set_integer)", R->data, len ,32);
 
 	return R;
 }
@@ -69,55 +69,83 @@ integer *add_integer(integer *A, integer *B) {
 	integer *R;
 	uint16_t i;
 	uint8_t carry;
-
-
-//	hex_dump("Addition", A->data, A->size ,32);
-//	hex_dump("Addition", B->data, B->size ,32);
+	/* To make it really easy */
+	uint8_t *a, *b;
 
 	R = malloc(sizeof(integer));
-	R->size = A->size + 1;
+	R->size = (A->size > B->size ? A->size : B->size) + 1;
 	R->data = malloc(R->size+1);
+	a = malloc(R->size+1);
+	b = malloc(R->size+1);
+
+	memset(R->data, 0, R->size);
+	memset(a, 0, R->size);
+	memset(b, 0, R->size);
 
 	memcpy(R->data, A->data, A->size);
+	memcpy(a, A->data, A->size);
+	memcpy(b, B->data, B->size);
 
 	carry = 0;
 	for (i =0 ;i< R->size ; i++) {
-		uint8_t t_1 = A->data[i], t_2 = B->data[i];
-		R->data[i] += B->data[i] + carry;
-		if (R->data[i] <= t_1 || R->data[i] <= t_2)
+		uint8_t t_1 = a[i], t_2 = b[i];
+		R->data[i] += b[i] + carry;
+		if ((R->data[i] <= t_1 || R->data[i] <= t_2) && t_1 && t_2)
 			carry = 1;
 		else
 			carry = 0;
 	}
 
+	free(a);
+	free(b);
 
 	return R;
 }
 
-uint8_t I_1[4] = { 0xFF, 0xFC, 0xFF, 0x80 };
-uint8_t I_2[4] = { 0xFF, 0xFC, 0xFF, 0x80 };
+integer *lshift(integer *A)
+{
+	integer *R;
+	uint16_t size;
+	uint16_t i;
+	uint8_t carry = 0;
 
+	if (A->data[A->size-1] & 0x80)
+		size = A->size + 1;
+	else
+		size = A->size;
+
+	R = malloc(sizeof(integer));
+	R->data = malloc(size);
+	R->size = size;
+
+	R->data[0] = (A->data[0] << 1);
+	carry = !!(A->data[0] & 0x80);
+
+	for (i =1; i<A->size; i++) {
+		R->data[i] = (A->data[i] << 1) + carry;
+		carry = !!(A->data[i] & 0x80);
+	}
+
+	if (A->data[A->size-1] & 0x80)
+		R->data[R->size-1] = 1;
+
+	return R;
+}
 
 
 int main(int argc, char *argv[])
 {
 	int i;
 	integer *A, *B, *R;
-	A = set_integer_b16("8001FFCDEF5430875948574985743985749385743987532895783275983279");
-	B = set_integer_b16("CAB575711AF24124879847219882374983724983279238479328749328749238");
+	A = set_integer_b16("8001");
+	B = set_integer_b16("8001");
 	R = malloc(sizeof(R));
 	uint8_t carry = 0;
 
 	R = add_integer(A, B);
 
-
-
-
+	//R = lshift(A);
 	hex_dump("Addition", R->data, R->size ,32);
-	printf("\naddition int: %d",*(int *)&I_1[0]);
-
-
-
 	return 0;
 }
 
