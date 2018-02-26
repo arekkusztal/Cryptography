@@ -4,18 +4,7 @@
 #include <string.h>
 
 void hex_dump(const char *def, uint8_t *data, uint16_t len,
-		uint16_t br)
-{
-	uint16_t i;
-
-	printf("\n%s:", def);
-	for (i = 0; i < len; ++i) {
-		if (i && ( i % br ==0 ))
-			printf("\n");
-		printf("%x",data[i]);
-	}
-
-}
+		uint16_t br);
 
 void print_binary(void *p, int size, int chunks, const char *name)
 {
@@ -127,6 +116,15 @@ uint8_t P_2[8];
 uint8_t K[] = {
 		0x13, 0x34, 0x57, 0x79, 0x9B, 0xBC, 0xDF, 0xF1
 };
+
+int PERM[] =    {16,  7, 20, 21,
+									29, 12, 28, 17,
+									 1, 15, 23, 26,
+									 5, 18, 31, 10,
+									 2,  8, 24, 14,
+									32, 27,  3,  9,
+									19, 13, 30,  6,
+									22, 11,  4, 25};
 
 uint8_t kplus[8];
 uint8_t ectB[8];
@@ -273,7 +271,7 @@ weird(uint8_t *out, uint8_t *in)
 		B = 0;
 	}
 }
-
+/*
 int main()
 {
 
@@ -300,15 +298,11 @@ int main()
 	for (i =1; i<=16; i++)
 	{
 		if (i == 1 || i == 2 || i ==9 || i ==16) {
-		/*	rotate(C[i], C[i-1], 28, 1);
-			rotate(D[i], D[i-1], 28, 1);*/
 			rotate(CD[i], CD[i-1], 28, 1);
 			rotate(&CD[i][28], &CD[i-1][28], 28, 1);
 		}
 		else
 		{
-			/*rotate(C[i], C[i-1], 28, 2);
-			rotate(D[i], D[i-1], 28, 2); */
 			rotate(CD[i], CD[i-1], 28, 2);
 			rotate(&CD[i][28], &CD[i-1][28], 28, 2);
 		}
@@ -359,4 +353,4 @@ int main()
 	weird((uint8_t *)&f_2, sel);
 	print_binary(&f_2,8,4, "f");
 	return 0;
-}
+} */

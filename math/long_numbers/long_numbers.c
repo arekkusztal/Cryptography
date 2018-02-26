@@ -90,7 +90,7 @@ integer *add_integer(integer *A, integer *B) {
 	for (i =0 ;i< R->size ; i++) {
 		uint8_t t_1 = a[i], t_2 = b[i];
 		R->data[i] += b[i] + carry;
-		if ((R->data[i] <= t_1 || R->data[i] <= t_2) && t_1 && t_2)
+		if ((R->data[i] <= t_1 || R->data[i] <= t_2))
 			carry = 1;
 		else
 			carry = 0;
@@ -183,16 +183,16 @@ int main(int argc, char *argv[])
 {
 	int i;
 	integer *A, *B, *R;
-	A = set_integer_b16("CB1F1FF");
-	B = set_integer_b16("1FF");
+	A = set_integer_b16("8001");
+	B = set_integer_b16("8001");
 	R = malloc(sizeof(R));
 	uint8_t carry = 0;
 
-	//R = add_integer(A, B);
-	R = mult(A, B);
+	R = add_integer(A, B);
+	//R = mult(A, B);
 
 	//R = lshift(A);
-	//hex_dump("Addition", R->data, R->size ,32);
+	hex_dump("Addition", R->data, R->size ,32);
 	return 0;
 }
 

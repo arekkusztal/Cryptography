@@ -1,0 +1,5 @@
+SUBDIRS+=C
+
+.PHONY: $(SUBDIRS)
+$(SUBDIRS):
+	$(MAKE) -C $@

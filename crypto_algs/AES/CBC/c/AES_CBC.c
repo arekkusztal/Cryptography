@@ -34,7 +34,7 @@ AES_CBC_encrypt(uint8_t *out, struct AES_context *ctx, uint16_t block_nr)
 		AES_encrypt(out+16*block, NULL, expansion[9], LAST);
 	}
 }
-
+/*
 int main(int argc, char *argv[])
 {
 	int i;
@@ -53,3 +53,4 @@ int main(int argc, char *argv[])
 	
 	return 0;
 }
+*/
