@@ -1,0 +1,5 @@
+SUBDIRS+=AES
+
+.PHONY: $(SUBDIRS)
+$(SUBDIRS):
+	$(MAKE) -C $@

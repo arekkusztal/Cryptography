@@ -1,0 +1,5 @@
+SUBDIRS+=block
+
+.PHONY: $(SUBDIRS)
+$(SUBDIRS):
+	$(MAKE) -C $@

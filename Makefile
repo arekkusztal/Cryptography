@@ -2,15 +2,21 @@ CFLAGS=-I$(PWD)/include
 BUILD=$(CRYPTO_LIB)/build
 LIB_OBJ=$(BUILD)/lib_obj
 MFLAGS=--no-print-directory
+TEST_BUILD=$(CRYPTO_LIB)/test/build
 LIB-X=lib
 
 DIRS+=crypto_algs
+DIRS+=test
+
 GCC=gcc
 
 LIB_OBJ_FILES = $(wildcard $(LIB_OBJ)/*.o)
 
 export CFLAGS
 export LIB_OBJ
+export GCC
+export TEST_BUILD
+
 all: $(LIB-X)
 
 $(LIB-X): $(DIRS)
@@ -31,7 +37,11 @@ SETUP:
 .PHONY:
 #clean: $(LIB_OBJ)
 #	rm -f $^/*.o
-clean:
-	rm build/ -rf
+clean: $(BUILD) $(TEST_BUILD)
+
+.PHONY: $(BUILD) $(TEST_BUILD)
+$(BUILD) $(TEST_BUILD):
+	rm -rf $@
+	@echo "== rm:" $@
 	
 	
