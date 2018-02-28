@@ -51,8 +51,8 @@ void rol(uint8_t *data, uint16_t bg)
 	int i;
 
 	uint8_t temp[4];
-	for (i=bg;i<bg+4; i++) {
-		temp[i-bg] = data[i & 3];
+	for (i = bg; i < bg + 4; i++) {
+		temp[i - bg] = data[i & 3];
 	}
 	memcpy(data, temp, 4);
 }
@@ -138,20 +138,22 @@ void key_expand(uint8_t *out, uint8_t *in, uint16_t rcon)
 
 }
 
-void
-AES_expand_keys(uint8_t *key, uint16_t k)
+void *
+AES_expand_keys(struct AES_context *ctx)
 {
-	int i;
-	if (k == 128)
-		k = 10;
-	else if (k == 192)
-		k = 12;
-	else if (k == 256)
-		k = 14;
+	int i, rounds;
+	if (ctx->key_size == AES_KEY_SZ_16)
+		rounds = AES_KEY_ROUND_10;
+	else if (ctx->key_size == AES_KEY_SZ_24)
+		rounds = AES_KEY_ROUND_12;
+	else if (ctx->key_size == AES_KEY_SZ_32)
+		rounds = AES_KEY_ROUND_14;
 
-	key_expand(expansion[0], key, 1);
-	for (i = 1; i < k; i++)
-		key_expand(expansion[i], expansion[i-1], rcon[i+1]);
+	key_expand(ctx->expansion[0], ctx->key, 1);
+	for (i = 1; i < rounds; i++)
+		key_expand(ctx->expansion[i], ctx->expansion[i-1], rcon[i+1]);
+
+	return ctx->expansion;
 }
 
 void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,

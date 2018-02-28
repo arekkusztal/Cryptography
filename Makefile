@@ -6,6 +6,7 @@ TEST_BUILD=$(CRYPTO_LIB)/test/build
 LIB-X=lib
 
 DIRS+=crypto_algs
+DIRS+=crypto_modes
 DIRS+=test
 
 GCC=gcc
@@ -27,12 +28,18 @@ $(DIRS): SETUP
 	$(MAKE) -C $@ $(MFLAGS)
 	
 .PHONY: SETUP
-SETUP:
+SETUP: CHECK_ENV
 	@if [ ! -d $(BUILD) ]; then \
 		echo "== mkdir: creating build directory"; \
 		mkdir $(BUILD); \
 		mkdir $(LIB_OBJ); \
 	fi
+
+.PHONY: CHECK_ENV
+CHECK_ENV:
+ifndef CRYPTO_LIB
+	$(error  CRYPTO_LIB not defined, should be defined with working directory)
+endif	
 
 .PHONY:
 #clean: $(LIB_OBJ)
