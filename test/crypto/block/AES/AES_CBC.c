@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 	int i;
 	/* Create context */
 	struct CRYPTO_context *ctx = malloc(sizeof(struct CRYPTO_context));
-	struct AES_test_vector *vector = &AES_test_vector_1;
+	struct AES_test_vector *vector = &AES_test_vector_cbc_128;
 
 	memset(ctx, 0, sizeof(*ctx));
 	ctx->key_size = vector->key.len;
@@ -41,15 +41,15 @@ int main(int argc, char *argv[])
 	ctx->crypto_encrypt_block = AES_encrypt_block;
 	ctx->iv = vector->iv;
 	ctx->plaintext = vector->plaintext.data;
-	ctx->blocks_count = vector->plaintext.len/AES_BLOCK_SZ;
+	ctx->blocks_count = vector->plaintext.len / AES_BLOCK_SZ;
 
 	AES_expand_keys((struct AES_context *)ctx);
 
-	hex_dump("plaintext", ctx->plaintext, 32, 16);
+	hex_dump("plaintext", ctx->plaintext, vector->plaintext.len, 16);
 
 	AES_CBC_encrypt_test(ctx);
 
-	hex_dump("ciphertext ", ctx->plaintext, 32, 16);
+	hex_dump("ciphertext ", ctx->plaintext, vector->plaintext.len, 16);
 	
 	free(ctx);
 
