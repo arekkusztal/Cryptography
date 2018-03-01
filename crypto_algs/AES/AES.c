@@ -4,6 +4,8 @@
 #include <string.h>
 #include <AES.h>
 
+#define AES_DEBUG
+
 uint8_t rcon[256] = {
     0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
     0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91, 0x39,
@@ -101,57 +103,107 @@ matrix_inverse(uint8_t *out, uint8_t *in)
 	}
 }
 
-void key_expand(uint8_t *out, uint8_t *in, uint16_t rcon)
+void key_expansion(struct AES_context *ctx)
 {
+	int i = ctx->key_size, key_size = ctx->key_size, j, r = 1;
+	uint8_t *in = ctx->expansion;
+	uint8_t gw3[4];
 
-	int i;
+	while (i < (ctx->key_rounds + 1) * AES_BLOCK_SZ) {
 
-	uint8_t gw3[4], w4[4], w5[4], w6[4], w7[4];
-	memcpy(gw3, &in[12], 4);
+		if (i % key_size == 0) {
+			memcpy(gw3, &in[i - 4], 4);
+
+			rol(gw3,1);
+
+			for (j = 0; j < 4; j++) {
+				gw3[j] = s_box[gw3[j]];
+
+			}
+			gw3[0] ^= rcon[r++];
+
+			for (j = 0; j < 4; j++)
+				ctx->expansion[i+j] = gw3[j] ^ in[i - key_size + j];
+			i+=4;
+
+		}
+		else {
+			if (ctx->key_size == 32 && i % 32 == 16) {
+				for (j = 0; j < 4; j++)
+					ctx->expansion[i+j] = s_box[ctx->expansion[i - 4 + j]] ^ in[i - key_size + j];
+
+			} else {
+				for (j = 0; j < 4; j++)
+					ctx->expansion[i+j] = ctx->expansion[i - 4 + j] ^ in[i - key_size + j];
+			}
+			i+=4;
+		}
+
+
+
+	}
+
+}
+
+void key_expand(struct AES_context *ctx, uint8_t *out, uint8_t *in, uint16_t rcon)
+{
+	int i, j;
+
+	uint8_t gw3[4];
+	uint8_t w[32];
+	memcpy(gw3, &in[ctx->key_size - 4], 4);
+
 	rol(gw3,1);
 
-	for (i =0; i< 4;i++) {
+	for (i = 0; i < 4; i++) {
 		gw3[i] = s_box[gw3[i]];
 
 	}
 	gw3[0] ^= rcon;
 
-	for (i=0;i<4;i++) {
-		w4[i] = gw3[i] ^ in[i];
+	for (i = 0; i < 4; i++) {
+		w[i] = gw3[i] ^ in[i];
 	}
-	for (i=0;i<4;i++) {
-		w5[i] = w4[i] ^ in[i+4];
+	i = 4;
+
+	while (i < ctx->key_size) {
+		if (ctx->key_size == 32 && i % 32 == 16) {
+			for (j = 0; j < 4; j++)
+				w[i + j] = s_box[w[i - 4 + j]] ^ in[i + j];
+			i+=4;
+		}
+		else {
+			for (j =0; j < 4; j++)
+				w[i + j] = w[i - 4 + j] ^ in[i + j];
+			i+=4;
+		}
 	}
 
-	for (i=0;i<4;i++) {
-		w6[i] = w5[i] ^ in[i+8];
+	memcpy(out, w, ctx->key_size);
+}
+
+int AES_get_rcon_numer(enum AES_KEY_ROUNDS key_rounds)
+{
+	switch (key_rounds){
+	case AES_KEY_ROUND_10:
+		return 10;
+	case AES_KEY_ROUND_12:
+		return 8;
+	case AES_KEY_ROUND_14:
+		return 7;
 	}
-
-	for (i=0;i<4;i++) {
-		w7[i] = w6[i] ^ in[i+12];
-	}
-
-	memcpy(out, w4, 4);
-	memcpy(out+4, w5, 4);
-	memcpy(out+8, w6, 4);
-	memcpy(out+12, w7, 4);
-
 }
 
 void *
 AES_expand_keys(struct AES_context *ctx)
 {
-	int i, rounds;
-	if (ctx->key_size == AES_KEY_SZ_16)
-		rounds = AES_KEY_ROUND_10;
-	else if (ctx->key_size == AES_KEY_SZ_24)
-		rounds = AES_KEY_ROUND_12;
-	else if (ctx->key_size == AES_KEY_SZ_32)
-		rounds = AES_KEY_ROUND_14;
+	int i;
 
-	key_expand(ctx->expansion[0], ctx->key, 1);
-	for (i = 1; i < rounds; i++)
-		key_expand(ctx->expansion[i], ctx->expansion[i-1], rcon[i+1]);
+	memcpy(ctx->expansion, ctx->key, ctx->key_size);
+/*	for (i = 1; i <= AES_get_rcon_numer(ctx->key_rounds); i++)
+		key_expand(ctx, &ctx->expansion[ctx->key_size*i],
+				&ctx->expansion[ctx->key_size*(i-1)], rcon[i]); */
+	key_expansion(ctx);
 
 	return ctx->expansion;
 }
@@ -167,25 +219,25 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 
 	if (op == FIRST) {
 		matrix_inverse(key_inv, in);
-		for (i=0;i<16; i++) {
+		for (i = 0; i < 16; i++) {
 			state[i] ^= key_inv[i];
 		}
 	}
 
-	for (i=0;i<16; i++) {
+	for (i = 0; i<16; i++) {
 		state[i] = s_box[state[i]];
 	}
 
-	for (i =1; i< RIJNDAEL; i++) {
+	for (i = 1; i < RIJNDAEL; i++) {
 		rol(&state[RIJNDAEL*i], i);
 	}
 
 	if (op != LAST) {
-		for (i = 0; i< RIJNDAEL; i++)
+		for (i = 0; i < RIJNDAEL; i++)
 			rijndeal_mix_help(state, i);
 	}
 
-	for (i =0 ;i <16; i++) {
+	for (i = 0 ;i < 16; i++) {
 		state[i] = state[i] ^ key_inv_2[i];
 	}
 
@@ -195,13 +247,13 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 void AES_encrypt_block(uint8_t *plaintext, struct CRYPTO_context *ctx)
 {
 	int i;
-	AES_encrypt(plaintext, ctx->key, ctx->expansion[0], FIRST);
+	AES_encrypt(plaintext, ctx->key, ctx->expansion + AES_BLOCK_SZ, FIRST);
 
-	for (i = 1; i < ctx->key_rounds - 1; i++) {
-		AES_encrypt(plaintext, NULL, ctx->expansion[i], STD);
+	for (i = 2; i <= ctx->key_rounds - 1; i++) {
+		AES_encrypt(plaintext, NULL, &ctx->expansion[AES_BLOCK_SZ * i], STD);
 	}
 
-	AES_encrypt(plaintext, NULL, ctx->expansion[ctx->key_rounds - 1], LAST);
+	AES_encrypt(plaintext, NULL, &ctx->expansion[AES_BLOCK_SZ * ctx->key_rounds], LAST);
 }
 
 /* TO BE MOVED */

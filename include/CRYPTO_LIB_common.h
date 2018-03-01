@@ -28,7 +28,7 @@ struct CRYPTO_context {
 	enum mode mode;
 	enum AES_KEY_SZ key_size;
 	enum AES_KEY_ROUNDS key_rounds;
-	uint8_t expansion[14][32];
+	uint8_t expansion[256];
 	uint8_t *key;
 	uint8_t *iv;
 	uint8_t *plaintext;

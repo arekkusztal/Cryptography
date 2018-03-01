@@ -30,21 +30,29 @@ int main(int argc, char *argv[])
 	int i;
 	/* Create context */
 	struct CRYPTO_context *ctx = malloc(sizeof(struct CRYPTO_context));
-	struct AES_test_vector *vector = &AES_test_vector_cbc_128;
+	struct AES_test_vector *vector = &AES_test_vector_cbc_256;
+
+	uint8_t plaintext[512];
+	memcpy(plaintext, vector->plaintext.data, vector->plaintext.len);
 
 	memset(ctx, 0, sizeof(*ctx));
 	ctx->key_size = vector->key.len;
-	ctx->key_rounds =  AES_get_key_rounds(ctx->key_size);
+	ctx->key_rounds = AES_get_key_rounds(ctx->key_size);
 	ctx->mode = vector->mode;
 	ctx->key = vector->key.data;
 	ctx->block_size = AES_BLOCK_SZ;
 	ctx->crypto_encrypt_block = AES_encrypt_block;
 	ctx->iv = vector->iv;
-	ctx->plaintext = vector->plaintext.data;
+	ctx->plaintext = plaintext;
 	ctx->blocks_count = vector->plaintext.len / AES_BLOCK_SZ;
 
 	AES_expand_keys((struct AES_context *)ctx);
 
+
+	for (i = 0; i <= ctx->key_rounds; i++)
+	{
+//		hex_dump("key", &ctx->expansion[i*16], 16, 16);
+	}
 	hex_dump("plaintext", ctx->plaintext, vector->plaintext.len, 16);
 
 	AES_CBC_encrypt_test(ctx);

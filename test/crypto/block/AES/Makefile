@@ -1,4 +1,4 @@
-SOURCES+=AES_ECB
+#SOURCES+=AES_ECB
 SOURCES+=AES_CBC
 
 all: $(SOURCES)
@@ -6,7 +6,7 @@ all: $(SOURCES)
 $(SOURCES): SETUP
 
 .c:
-	$(GCC) $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@
+	$(GCC) $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0
 
 .PHONY: SETUP	
 SETUP:
