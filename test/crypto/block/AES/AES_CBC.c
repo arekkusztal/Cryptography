@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <AES.h>
+#include <CRYPTO_LIB_block_modes.h>
 #include "AES_CBC_test_vectors.h"
 
 enum AES_KEY_ROUNDS AES_get_key_rounds(enum AES_KEY_SZ AES_key_size)
@@ -19,65 +20,39 @@ enum AES_KEY_ROUNDS AES_get_key_rounds(enum AES_KEY_SZ AES_key_size)
 	}
 }
 
-void AES_encrypt_block(uint8_t *plaintext, struct AES_context *ctx)
+void AES_CBC_encrypt_test(struct CRYPTO_context *ctx)
 {
-	int i;
-	AES_encrypt(plaintext, ctx->key, ctx->expansion[0], FIRST);
-
-	for (i = 1; i < ctx->key_rounds - 1; i++) {
-		AES_encrypt(plaintext, NULL, ctx->expansion[i], STD);
-	}
-
-	AES_encrypt(plaintext, NULL, ctx->expansion[ctx->key_rounds - 1], LAST);
-}
-
-void
-CRYPTO_LIB_CBC_encrypt(uint8_t *out, struct AES_context *ctx, uint16_t block_count)
-{
-	int i, block_nr;
-
-	block_nr = 0;
-	for (i = 0; i < AES_BLOCK_SZ; i++) {
-		(out + AES_BLOCK_SZ * block_nr)[i] ^= iv[i];
-	}
-
-	AES_encrypt_block(out + AES_BLOCK_SZ * block_nr, ctx);
-
-	for (block_nr = 1; block_nr < block_count; block_nr ++) {
-
-		for (i =0; i < AES_BLOCK_SZ; i++) {
-			(out + AES_BLOCK_SZ * block_nr)[i] ^= (out+AES_BLOCK_SZ*(block_nr-1))[i];
-		}
-
-		AES_encrypt_block(out + AES_BLOCK_SZ * block_nr, ctx);
-	}
-}
-
-void AES_CBC_encrypt_test(uint8_t *out, struct AES_context *ctx, uint16_t block_count)
-{
-	AES_expand_keys(ctx);
-
-	CRYPTO_LIB_CBC_encrypt(out, ctx, block_count);
+	CRYPTO_LIB_CBC_encrypt(ctx);
 }
 
 int main(int argc, char *argv[])
 {
 	int i;
 	/* Create context */
-	struct AES_context *ctx = malloc(sizeof(struct AES_context));
+	struct CRYPTO_context *ctx = malloc(sizeof(struct CRYPTO_context));
+	struct AES_test_vector *vector = &AES_test_vector_1;
 
 	memset(ctx, 0, sizeof(*ctx));
-	ctx->key_size = AES_KEY_SZ_16;
+	ctx->key_size = vector->key.len;
 	ctx->key_rounds =  AES_get_key_rounds(ctx->key_size);
-	ctx->mode = CBC;
-	ctx->key = skey;
+	ctx->mode = vector->mode;
+	ctx->key = vector->key.data;
+	ctx->block_size = AES_BLOCK_SZ;
+	ctx->crypto_encrypt_block = AES_encrypt_block;
+	ctx->iv = vector->iv;
+	ctx->plaintext = vector->plaintext.data;
+	ctx->blocks_count = vector->plaintext.len/AES_BLOCK_SZ;
 
-	hex_dump("plaintext", datablock_2, 32, 16);
+	AES_expand_keys((struct AES_context *)ctx);
 
-	AES_CBC_encrypt_test(datablock_2, ctx, sizeof(datablock_2)/16);
+	hex_dump("plaintext", ctx->plaintext, 32, 16);
 
-	hex_dump("ciphertext ", datablock_2, 32, 16);
+	AES_CBC_encrypt_test(ctx);
+
+	hex_dump("ciphertext ", ctx->plaintext, 32, 16);
 	
+	free(ctx);
+
 	return 0;
 }
 

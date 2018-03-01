@@ -192,6 +192,18 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 	matrix_inverse(out, state);
 }
 
+void AES_encrypt_block(uint8_t *plaintext, struct CRYPTO_context *ctx)
+{
+	int i;
+	AES_encrypt(plaintext, ctx->key, ctx->expansion[0], FIRST);
+
+	for (i = 1; i < ctx->key_rounds - 1; i++) {
+		AES_encrypt(plaintext, NULL, ctx->expansion[i], STD);
+	}
+
+	AES_encrypt(plaintext, NULL, ctx->expansion[ctx->key_rounds - 1], LAST);
+}
+
 /* TO BE MOVED */
 void hex_dump(const char *def, uint8_t *data, uint16_t len,
 		uint16_t br)
