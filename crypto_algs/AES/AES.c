@@ -5,6 +5,7 @@
 #include <AES.h>
 
 #define AES_DEBUG
+#define KEY_EXPAND_2
 
 /* Multiplication over golis field characteristic 2 with 256 elements */
 uint8_t GMUL2[256] = {
@@ -174,6 +175,17 @@ void rol(uint8_t *data, uint16_t bg)
 	memcpy(data, temp, 4);
 }
 
+void ror(uint8_t *data, uint16_t bg)
+{
+	int i;
+
+	uint8_t temp[4];
+	for (i = bg; i < bg + 4; i++) {
+		temp[i - bg] = data[(4 - 2*bg + i) & 3];
+	}
+	memcpy(data, temp, 4);
+}
+
 void rijandel_mix(uint8_t *r) {
 
         uint8_t a[4];
@@ -331,7 +343,13 @@ AES_expand_keys(struct AES_context *ctx)
 	int i;
 
 	memcpy(ctx->expansion, ctx->key, ctx->key_size);
+#ifdef KEY_EXPAND_1
+	for (i = 1; i <= AES_get_rcon_numer(ctx->key_rounds); i++)
+		key_expand(ctx, &ctx->expansion[ctx->key_size*i],
+				&ctx->expansion[ctx->key_size*(i-1)], rcon[i]);
+#else
 	key_expansion(ctx);
+#endif
 
 	return ctx->expansion;
 }
@@ -342,7 +360,11 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 	int i;
 	uint8_t state[16], key_inv[16], key_inv_2[16];
 
+	printf("\n ------------- ENCRYPTION STEPS --------------");
+
+	hex_dump("out", out, 16, 16);
 	matrix_inverse(state, out);
+	hex_dump("matrix_inverse: state", state, 16, 16);
 	matrix_inverse(key_inv_2, key_2);
 
 	if (op == FIRST) {
@@ -350,15 +372,21 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 		for (i = 0; i < 16; i++) {
 			state[i] ^= key_inv[i];
 		}
+
+		hex_dump("first xor: state", state, 16, 16);
 	}
 
 	for (i = 0; i<16; i++) {
 		state[i] = s_box[state[i]];
 	}
 
+	hex_dump("after s_box: state", state, 16, 16);
+
 	for (i = 1; i < RIJNDAEL; i++) {
 		rol(&state[RIJNDAEL*i], i);
 	}
+
+	hex_dump("after 3 rol: state", state, 16, 16);
 
 	if (op != LAST) {
 		mix_columns(state);
@@ -368,7 +396,35 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 		state[i] = state[i] ^ key_inv_2[i];
 	}
 
+	hex_dump("after OTP: state", state, 16, 16);
+
 	matrix_inverse(out, state);
+
+	hex_dump("last inverse: state", out, 16, 16);
+
+
+	printf("\n ------------!- ENCRYPTION STEPS BACKWARDS -!-------------");
+
+	matrix_inverse(state, out);
+
+	hex_dump("REVERSE: last inverse: state", state, 16, 16);
+
+	for (i = 0 ;i < 16; i++) {
+		state[i] = state[i] ^ key_inv_2[i];
+	}
+
+	hex_dump("REVERSE: after OTP: state", state, 16, 16);
+
+	hex_dump("REVERSE: after rijndeal mix: state", state, 16, 16);
+
+
+	for (i = 1; i < RIJNDAEL; i++) {
+		ror(&state[RIJNDAEL*i], i);
+	}
+
+	hex_dump("REVERSE: after 3 ror: state", state, 16, 16);
+
+	printf("\n ------------------------ END ----------------------------");
 }
 
 void AES_encrypt_block(uint8_t *plaintext, struct CRYPTO_context *ctx)
@@ -376,11 +432,11 @@ void AES_encrypt_block(uint8_t *plaintext, struct CRYPTO_context *ctx)
 	int i;
 	AES_encrypt(plaintext, ctx->key, ctx->expansion + AES_BLOCK_SZ, FIRST);
 
-	for (i = 2; i <= ctx->key_rounds - 1; i++) {
+/*	for (i = 2; i <= ctx->key_rounds - 1; i++) {
 		AES_encrypt(plaintext, NULL, &ctx->expansion[AES_BLOCK_SZ * i], STD);
 	}
 
-	AES_encrypt(plaintext, NULL, &ctx->expansion[AES_BLOCK_SZ * ctx->key_rounds], LAST);
+	AES_encrypt(plaintext, NULL, &ctx->expansion[AES_BLOCK_SZ * ctx->key_rounds], LAST); */
 }
 
 /* TO BE MOVED */
