@@ -35,6 +35,7 @@ extern uint8_t rcon[256];
 
 void rol(uint8_t *data, uint16_t bg);
 void rijandel_mix(uint8_t *r);
+void mix_columns(uint8_t *state);
 void rijndeal_mix_help(uint8_t *state, uint16_t off);
 static inline void
 matrix_inverse(uint8_t *out, uint8_t *in);

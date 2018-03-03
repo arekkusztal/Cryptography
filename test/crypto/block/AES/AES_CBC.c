@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 	int i;
 	/* Create context */
 	struct CRYPTO_context *ctx = malloc(sizeof(struct CRYPTO_context));
-	struct AES_test_vector *vector = &AES_test_vector_cbc_256;
+	struct AES_test_vector *vector = &AES_test_vector_1;
 
 	uint8_t plaintext[512];
 	memcpy(plaintext, vector->plaintext.data, vector->plaintext.len);
