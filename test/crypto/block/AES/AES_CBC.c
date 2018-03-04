@@ -24,7 +24,10 @@ void AES_CBC_encrypt_test(struct CRYPTO_context *ctx)
 {
 	CRYPTO_LIB_CBC_encrypt(ctx);
 }
-
+void AES_CBC_decrypt_test(struct CRYPTO_context *ctx)
+{
+	CRYPTO_LIB_CBC_decrypt(ctx);
+}
 
 
 int main(int argc, char *argv[])
@@ -32,7 +35,7 @@ int main(int argc, char *argv[])
 	int i;
 	/* Create context */
 	struct CRYPTO_context *ctx = malloc(sizeof(struct CRYPTO_context));
-	struct AES_test_vector *vector = &AES_test_vector_1;
+	struct AES_test_vector *vector = &AES_test_vector_cbc_128;
 
 	uint8_t plaintext[512];
 	memcpy(plaintext, vector->plaintext.data, vector->plaintext.len);
@@ -44,23 +47,26 @@ int main(int argc, char *argv[])
 	ctx->key = vector->key.data;
 	ctx->block_size = AES_BLOCK_SZ;
 	ctx->crypto_encrypt_block = AES_encrypt_block;
+	ctx->crypto_decrypt_block = AES_decrypt_block;
 	ctx->iv = vector->iv;
 	ctx->plaintext = plaintext;
 	ctx->blocks_count = vector->plaintext.len / AES_BLOCK_SZ;
 
 	AES_expand_keys((struct AES_context *)ctx);
 
-
-	for (i = 0; i <= ctx->key_rounds; i++)
-	{
-//		hex_dump("key", &ctx->expansion[i*16], 16, 16);
-	}
 	hex_dump("plaintext", ctx->plaintext, vector->plaintext.len, 16);
 
 	AES_CBC_encrypt_test(ctx);
 
 	hex_dump("ciphertext ", ctx->plaintext, vector->plaintext.len, 16);
 	
+	memcpy(plaintext, vector->ciphertext.data, vector->ciphertext.len);
+
+	AES_CBC_decrypt_test(ctx);
+
+	hex_dump("plaintext ", ctx->plaintext, vector->plaintext.len, 16);
+
+
 	free(ctx);
 
 	return 0;

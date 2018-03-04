@@ -43,6 +43,8 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 				enum operation op);
 void AES_encrypt_block(uint8_t *plaintext,
 				struct CRYPTO_context *ctx);
+void AES_decrypt_block(uint8_t *plaintext,
+				struct CRYPTO_context *ctx);
 void key_expand(struct AES_context *ctx, uint8_t *out, uint8_t *in, uint16_t rcon);
 void *
 AES_expand_keys(struct AES_context *ctx);

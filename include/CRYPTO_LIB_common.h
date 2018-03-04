@@ -36,6 +36,8 @@ struct CRYPTO_context {
 	uint16_t block_size;
 	void (*crypto_encrypt_block)(uint8_t *plaintext,
 			struct CRYPTO_context *ctx);
+	void (*crypto_decrypt_block)(uint8_t *plaintext,
+			struct CRYPTO_context *ctx);
 };
 
 
