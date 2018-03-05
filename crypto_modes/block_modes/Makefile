@@ -1,3 +1,3 @@
-SOURCES-y+=cbc.o
+SOURCES-y+=CBC.o
 
 include $(CRYPTO_LIB)/build.src.mk

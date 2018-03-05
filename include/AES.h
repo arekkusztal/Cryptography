@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "CRYPTO_LIB_common.h"
+#include "Arus_dev_kit.h"
 
 #define RIJNDAEL		4
 #define AES_BLOCK_SZ	16

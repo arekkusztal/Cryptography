@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "CRYPTO_LIB_common.h"
+#include "Arus_dev_kit.h"
 
 void
 CRYPTO_LIB_CBC_encrypt(struct CRYPTO_context *ctx);

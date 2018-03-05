@@ -2,6 +2,7 @@
 #define CRYPTO_LIB_COMMON_H
 
 #include <stdint.h>
+#include "Arus_dev_kit.h"
 
 enum AES_KEY_SZ {
 	AES_KEY_SZ_16 = 16,

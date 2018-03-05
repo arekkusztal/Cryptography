@@ -1,4 +1,5 @@
 SUBDIRS+=crypto
+SUBDIRS+=math
 
 all: $(SUBDIRS)
 

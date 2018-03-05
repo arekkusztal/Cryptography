@@ -1,4 +1,4 @@
-CFLAGS=-I$(PWD)/include
+CFLAGS=-I$(PWD)/include -I$(PWD)/include/math
 BUILD=$(CRYPTO_LIB)/build
 LIB_OBJ=$(BUILD)/lib_obj
 MFLAGS=--no-print-directory
@@ -9,6 +9,8 @@ S=@
 DIRS+=crypto_algs
 DIRS+=crypto_modes
 DIRS+=math
+DIRS+=common
+DIRS+=misc
 DIRS+=test
 
 GCC=gcc

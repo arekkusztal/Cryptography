@@ -3,16 +3,49 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <long_numbers.h>
+/** TODO
+ * This functions need much optimization
+ */
 
-typedef struct Integer {
-	uint8_t *data;
-	uint16_t size;
-} integer;
+integer*
+set_integer(uint8_t *array) {
+	int16_t i, k;
+	uint16_t len;
+	uint16_t odd = 0;
+	integer *R;
+	uint8_t *temp;
 
-extern void hex_dump(const char *def, uint8_t *data, uint16_t len,
-		uint16_t br);
+	len = (strlen(array));
+	odd = (len & 1);
+	len = len/2 + odd;
 
-#define HEX_ME(arg) (arg - (arg < 58 ? 48 : 55))
+	if (odd) {
+		temp = malloc(len*2);
+		temp[0] = '0';
+		memcpy(&temp[1], array, len*2-1);
+		array = temp;
+	}
+
+	R = malloc(sizeof(integer));
+	R->data = malloc(len);
+	R->size = len;
+
+	memset(R->data, 0, len);
+
+	/* Optimize for 8B,4B archs and for SIMD later */
+	for (i = 0, k =0; i < len; i++, k+=2) {
+		R->data[i] += HEX_ME(array[k]) * 16;
+		R->data[i] += HEX_ME(array[k + 1]);
+	}
+
+	if (odd)
+		free(temp);
+
+	hex_dump("Long number (set_integer)", R->data, len ,32);
+
+	return R;
+}
 
 integer*
 set_integer_b16(uint8_t *array) {
@@ -48,7 +81,7 @@ set_integer_b16(uint8_t *array) {
 	if (odd)
 		free(temp);
 
-	hex_dump("Long number (set_integer)", R->data, len ,32);
+	hex_dump("Long number (set_integer b_16)", R->data, len ,32);
 
 	return R;
 }

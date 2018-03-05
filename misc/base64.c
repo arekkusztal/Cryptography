@@ -53,7 +53,7 @@ uint8_t *strtbase64(uint8_t *msg, uint32_t sz)
 
 	return out;
 }
-
+/*
 int main()
 {
 	uint8_t *msg;
@@ -63,3 +63,4 @@ int main()
 	printf("\nout:\n%s\n", msg);
 	return 0;
 }
+*/
