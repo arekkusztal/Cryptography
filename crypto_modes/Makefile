@@ -2,6 +2,4 @@ SUBDIRS+=block_modes
 
 all: $(SUBDIRS)
 
-.PHONY: $(SUBDIRS)
-$(SUBDIRS):
-	$(MAKE) -C $@
+include $(CRYPTO_LIB)/build.src.mk 

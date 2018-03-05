@@ -1,4 +1,4 @@
-SUBDIRS+=block
+SUBDIRS+= long_numbers
 
 all: $(SUBDIRS)
 

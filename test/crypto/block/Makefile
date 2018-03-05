@@ -1,5 +1,5 @@
 SUBDIRS+=AES
 
-.PHONY: $(SUBDIRS)
-$(SUBDIRS):
-	$(MAKE) -C $@
+all: $(SUBDIRS)
+
+include $(CRYPTO_LIB)/build.src.mk 

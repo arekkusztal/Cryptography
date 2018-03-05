@@ -9,19 +9,8 @@ typedef struct Integer {
 	uint16_t size;
 } integer;
 
-void hex_dump(const char *def, uint8_t *data, uint16_t len,
-		uint16_t br)
-{
-	uint16_t i;
-
-	printf("\n%s:\n", def);
-	for (i = 0; i < len; ++i) {
-		if (i && ( i % br ==0 ))
-			printf("\n");
-		printf("0x%02X ",data[i]);
-	}
-	printf("\n");
-}
+extern void hex_dump(const char *def, uint8_t *data, uint16_t len,
+		uint16_t br);
 
 #define HEX_ME(arg) (arg - (arg < 58 ? 48 : 55))
 
@@ -178,7 +167,7 @@ integer *mult(integer *A, integer *B)
 	return NULL;
 }
 
-
+/*
 int main(int argc, char *argv[])
 {
 	int i;
@@ -197,7 +186,7 @@ int main(int argc, char *argv[])
 }
 
 
-
+*/
 
 
 

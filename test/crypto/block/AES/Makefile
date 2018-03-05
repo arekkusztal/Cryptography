@@ -6,12 +6,13 @@ all: $(SOURCES)
 $(SOURCES): SETUP
 
 .c:
-	$(GCC) $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0
+	$(S)$(GCC) $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0
+	$(S) echo ld: $@
 
 .PHONY: SETUP	
 SETUP:
 	@if [ ! -d $(TEST_BUILD) ]; then \
-		echo "== mkdir: create test/build"; \
+		echo "md: create test/build"; \
 		mkdir $(TEST_BUILD); \
 	fi	
 	

@@ -1,6 +1,4 @@
-SUBDIRS+=symmetric
-SUBDIRS+=DES
-SUBDIRS+=asymmetric
+SUBDIRS+=AES
 
 all: $(SUBDIRS)	
 	
