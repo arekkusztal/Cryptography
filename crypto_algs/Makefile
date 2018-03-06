@@ -1,5 +1,4 @@
 SUBDIRS+=symmetric
-SUBDIRS+=DES
 SUBDIRS+=asymmetric
 
 all: $(SUBDIRS)	

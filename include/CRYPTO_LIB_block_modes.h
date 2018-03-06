@@ -11,4 +11,7 @@ CRYPTO_LIB_CBC_encrypt(struct CRYPTO_context *ctx);
 void
 CRYPTO_LIB_CBC_decrypt(struct CRYPTO_context *ctx);
 
+void
+CRYPTO_LIB_CTR_encrypt(struct CRYPTO_context *ctx);
+
 #endif

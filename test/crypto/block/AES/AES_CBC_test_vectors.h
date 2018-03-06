@@ -4,26 +4,6 @@
 #include <stdint.h>
 #include <CRYPTO_LIB_common.h>
 
-struct AES_test_vector
-{
-	enum mode mode;
-	uint8_t iv[16];
-	struct {
-		uint8_t data[32];
-		uint8_t len;
-	} key;
-	struct
-	{
-		uint8_t *data;
-		uint16_t len;
-	} plaintext;
-	struct
-	{
-		uint8_t data[4096];
-		uint16_t len;
-	} ciphertext;
-};
-
 uint8_t plaintext_1[] = {
 		0x54, 0x77, 0x6F, 0x20, 0x4F, 0x6E, 0x65, 0x20,
 		0x4E, 0x69, 0x6E, 0x65, 0x20, 0x54, 0x77, 0x6F,

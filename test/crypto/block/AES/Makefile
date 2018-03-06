@@ -1,12 +1,13 @@
 #SOURCES+=AES_ECB
 SOURCES+=AES_CBC
+SOURCES+=AES_CTR
 
 all: $(SOURCES)
 
 $(SOURCES): SETUP
 
 .c:
-	$(S)$(GCC) $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0
+	$(S)$(GCC) $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/TEST_$@ -g -O0
 	$(S) echo ld: $@
 
 .PHONY: SETUP	

@@ -1,4 +1,5 @@
 SUBDIRS+=AES
+SUBDIRS+=DES
 
 all: $(SUBDIRS)	
 	
