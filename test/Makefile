@@ -1,5 +1,7 @@
 SUBDIRS+=crypto
 SUBDIRS+=math
+SUBDIRS+=hash
+SUBDIRS+=new
 
 all: $(SUBDIRS)
 

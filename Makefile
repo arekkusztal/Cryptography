@@ -11,6 +11,7 @@ DIRS+=crypto_modes
 DIRS+=math
 DIRS+=common
 DIRS+=misc
+DIRS+=hash
 DIRS+=test
 
 GCC=gcc

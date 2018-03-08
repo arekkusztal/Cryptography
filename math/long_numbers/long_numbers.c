@@ -91,11 +91,10 @@ integer *add_integer(integer *A, integer *B) {
 	integer *R;
 	uint16_t i;
 	uint8_t carry;
-	/* To make it really easy */
 	uint8_t *a, *b;
 
 	R = malloc(sizeof(integer));
-	R->size = (A->size > B->size ? A->size : B->size) + 1;
+	R->size = (A->size > B->size ? A->size : B->size);
 	R->data = malloc(R->size+1);
 	a = malloc(R->size+1);
 	b = malloc(R->size+1);
@@ -109,11 +108,15 @@ integer *add_integer(integer *A, integer *B) {
 	memcpy(b, B->data, B->size);
 
 	carry = 0;
-	for (i =0 ;i< R->size ; i++) {
+	for (i = 0; i < R->size; i++) {
 		uint8_t t_1 = a[i], t_2 = b[i];
 		R->data[i] += b[i] + carry;
-		if ((R->data[i] <= t_1 || R->data[i] <= t_2))
+		if ((R->data[i] < t_1 || R->data[i] < t_2)) {
 			carry = 1;
+			if (i == R->size -1) {
+				R->size = R->size+1;
+			}
+		}
 		else
 			carry = 0;
 	}
@@ -185,7 +188,6 @@ integer *mult(integer *A, integer *B)
 	for (i=0;i<ones - 1;i++) {
 		temp = R;
 		R = lshift(R);
-		/*Dodgy right there, for now i will leave it out */
 		free(temp);
 		if (BIT_IN_STREAM(B, i)) {
 			temp = R;

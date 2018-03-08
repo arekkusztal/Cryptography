@@ -1,4 +1,5 @@
-SUBDIRS+= long_numbers
+SUBDIRS+=long_numbers
+SUBDIRS+=galois_field
 
 all: $(SUBDIRS)
 

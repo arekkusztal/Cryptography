@@ -1,0 +1,3 @@
+This folder serves only for purpose of checking new functionalities that
+do not need permanent tests. Like simple math functions, data structures
+or allocations.
