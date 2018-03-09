@@ -1,5 +1,6 @@
 SUBDIRS+=AES
 SUBDIRS+=DES
+SUBDIRS+=Twofish
 
 all: $(SUBDIRS)	
 	

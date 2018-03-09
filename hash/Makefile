@@ -1,4 +1,4 @@
-SUBDIRS+=md5
+SUBDIRS+=MD5
 
 all: $(SUBDIRS)	
 	
