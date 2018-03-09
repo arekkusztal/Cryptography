@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include <long_numbers.h>
+#include "TEST_long_numbers_test_vectors.h"
 
 int main(int argc, char *argv[])
 {
