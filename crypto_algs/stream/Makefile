@@ -1,6 +1,4 @@
-SUBDIRS+=symmetric
-SUBDIRS+=asymmetric
-SUBDIRS+=stream
+SUBDIRS+=internals
 
 all: $(SUBDIRS)	
 	

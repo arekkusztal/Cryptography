@@ -19,3 +19,13 @@ void hex_dump(const char *def, uint8_t *data, uint16_t len,
 	printf("\n");
 }
 
+void bit_dump(uint8_t data)
+{
+	uint8_t i;
+
+	for (i = 0; i < 8; i++)
+	{
+		printf("\n%d", (data >> (7 - i)) & 1);
+	}
+	printf("\n");
+}

@@ -1,6 +1,5 @@
 SUBDIRS+=symmetric
 SUBDIRS+=asymmetric
-SUBDIRS+=stream
 
 all: $(SUBDIRS)	
 	
