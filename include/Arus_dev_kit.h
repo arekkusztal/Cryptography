@@ -13,6 +13,7 @@
 void hex_dump(const char *def, uint8_t *data, uint16_t len,
 		uint16_t br);
 
-void bit_dump(uint8_t data);
+void bit_dump_b(uint8_t data);
+void bit_dump_s(uint8_t *data, int size);
 
 #endif /* ARUS_DEV_KIT_H_ */

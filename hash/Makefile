@@ -1,4 +1,5 @@
 SUBDIRS+=MD5
+SUBDIRS+=SHA1
 
 all: $(SUBDIRS)	
 	

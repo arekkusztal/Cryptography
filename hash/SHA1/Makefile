@@ -1,3 +1,3 @@
-SOURCES-y+=md5.o
+SOURCES-y+=sha1.o
 
 include $(CRYPTO_LIB)/build.src.mk
