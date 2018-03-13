@@ -16,4 +16,6 @@ void hex_dump(const char *def, uint8_t *data, uint16_t len,
 void bit_dump_b(uint8_t data);
 void bit_dump_s(uint8_t *data, int size);
 
+uint32_t lrotate32(uint32_t data, uint8_t shift);
+
 #endif /* ARUS_DEV_KIT_H_ */

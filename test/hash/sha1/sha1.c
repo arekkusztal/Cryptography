@@ -10,7 +10,7 @@ char string[] = "asafdsfdsfdsfdsfddsfsdfdsvcxvhueh"
 
 int main()
 {
-	SHA1(string, /*sizeof(string)*/ 55);
+	//SHA1(string, /*sizeof(string)*/ 55);
 
 	return 0;
 }
