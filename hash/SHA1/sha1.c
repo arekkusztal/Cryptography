@@ -138,19 +138,23 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 	uint32_t TEMP;
 	uint32_t R[5] = { };
 	uint32_t padding = 0, msg_SHA_blocks, msg_full_4_blocks, msg_remainder, SHA_on = 1, current_block = 0, last_chunk_size;
+	uint8_t additional_block = 0;
 	
+	msg_SHA_blocks = size / 64 + 1;
+	msg_full_4_blocks = (size / 4) & 15;
+	msg_remainder = size % 4;
+	last_chunk_size = size % 64;
+
 	if (size % 64 < 56) {
 		padding = 64 - (size & 63);
 		printf("\nPadding = %d", padding);
 	} else {
 		padding = 128 - (size & 63);
 		printf("\nPadding 1 = %d", padding);
+		additional_block = 1;
 	}
 
-	msg_SHA_blocks = size / 64 + 1;
-	msg_full_4_blocks = (size / 4) & 15;
-	msg_remainder = size % 4;
-	last_chunk_size = size % 64;
+
 
 	uint8_t *p = (uint8_t *)w;
 	if (msg_SHA_blocks == 1) {
@@ -225,45 +229,45 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 		h3 = h3 + D;
 		h4 = h4 + E;
 
-		it += 64;
+		it = ++current_block * 64;
 
-		memset(w, 0, 320);
+		memset(w, 0, 4 * 80);
 		uint8_t *p = (uint8_t *)w;
-		if (++current_block < msg_SHA_blocks)
-			if (current_block == msg_SHA_blocks - 1) {
-				for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
-					p[t] = string[it + t + 3];
-					p[t + 1] = string[it + t + 2];
-					p[t + 2] = string[it + t + 1];
-					p[t + 3] = string[it + t];
-				}
-				if (msg_remainder > 0)
-					p[t + 3] = string[it + t];
-				if (msg_remainder > 1)
-					p[t + 2] = string[it + t + 1];
-				if (msg_remainder > 2)
-					p[t + 1] = string[it + t + 2];
-				if (msg_remainder > 3)
-					p[t] = string[it + t + 3];
+		if (current_block < msg_SHA_blocks)
+			//if (additional_block) {
+				if (current_block == msg_SHA_blocks - 1) {
+					for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
+						p[t] = string[it + t + 3];
+						p[t + 1] = string[it + t + 2];
+						p[t + 2] = string[it + t + 1];
+						p[t + 3] = string[it + t];
+					}
+					if (msg_remainder > 0)
+						p[t + 3] = string[it + t];
+					if (msg_remainder > 1)
+						p[t + 2] = string[it + t + 1];
+					if (msg_remainder > 2)
+						p[t + 1] = string[it + t + 2];
+					if (msg_remainder > 3)
+						p[t] = string[it + t + 3];
 
-
-				printf("\n t = %u", t + 3 - msg_remainder);
-				p[t + 3 - msg_remainder] = 0x80;	
+					p[t + 3 - msg_remainder] = 0x80;	
 	
-				uint64_t len = size << 3;
+					uint64_t len = size << 3;
 
-				uint32_t *len_32 = (uint32_t *)&len;	
-				*(uint32_t *)&p[last_chunk_size + padding - 8] = len_32[1];
-				*(uint32_t *)&p[last_chunk_size + padding - 4] = len_32[0];
+					uint32_t *len_32 = (uint32_t *)&len;	
+					*(uint32_t *)&p[last_chunk_size + padding - 8] = len_32[1];
+					*(uint32_t *)&p[last_chunk_size + padding - 4] = len_32[0];
 
-			} else {
-				for (t = 0; t < 64; t += 4) {
-					p[t] = string[it + t + 3];
-					p[t + 1] = string[it + t + 2];
-					p[t + 2] = string[it + t + 1];
-					p[t + 3] = string[it + t];
+				} else {
+					for (t = 0; t < 64; t += 4) {
+						p[t] = string[it + t + 3];
+						p[t + 1] = string[it + t + 2];
+						p[t + 2] = string[it + t + 1];
+						p[t + 3] = string[it + t];
+					}
 				}
-			}
+			//}
 		else 			
 			SHA_on = 0;
 
