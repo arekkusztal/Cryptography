@@ -121,6 +121,16 @@ static uint8_t string_80_a_LE_var[] = {
 /*res: 0x86 0xF3 0x36 0x52 0xFC 0xFF 0xD7 0xFA 0x14 0x43 0xE2 0x46 0xDD 0x34 0xFE 0x5D 0x00 0xE2 0x5F 0xFD  */
 };
 
+static uint8_t string_57_a_LE_var[] = {
+		0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61,
+		0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61,
+		0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61,
+		0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61,
+
+/*res: 0xF0 0x8F 0x24 0x90 0x8D 0x68 0x25 0x55 0x11 0x1B 0xE7 0xFF 0x6F 0x00 0x4E 0x78 0x28 0x3D 0x98 0x9A  */
+};
+
+
 #define string string_80_a_LE_var
 
 static inline void LE_BE_64_convert(uint8_t *len_8)
@@ -152,12 +162,12 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 		padding = 128 - (size & 63);
 		printf("\nPadding 1 = %d", padding);
 		additional_block = 1;
+		msg_SHA_blocks += 1;
 	}
 
 
-
 	uint8_t *p = (uint8_t *)w;
-	if (msg_SHA_blocks == 1) {
+	if (msg_SHA_blocks == 1 || (msg_SHA_blocks == 2 && additional_block)) {
 		for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
 			p[t] = string[t + 3];
 			p[t + 1] = string[t + 2];
@@ -175,15 +185,10 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 
 
 		p[t + 3 - msg_remainder] = 0x80;	
-	
-/*		uint64_t len = size << 3;
 
-		uint32_t *len_32 = (uint32_t *)&len;	
-		*(uint32_t *)&p[size + padding - 8] = len_32[1];
-		*(uint32_t *)&p[size + padding - 4] = len_32[0]; */
-
-		*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
-			| ((uint64_t)size << 3) >> 32;
+		if (!additional_block)
+			*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
+				| ((uint64_t)size << 3) >> 32;
 					
 
 	} else {
@@ -238,6 +243,7 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 		uint8_t *p = (uint8_t *)w;
 		if (current_block < msg_SHA_blocks) {
 			if (additional_block) {
+				printf("Additional block\n");
 				if (current_block == msg_SHA_blocks - 2) {
 					for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
 						p[t] = string[it + t + 3];
@@ -257,7 +263,7 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 					p[t + 3 - msg_remainder] = 0x80;	
 	
 
-				} else if (current_block == msg_SHA_blocks - 2) {
+				} else if (current_block == msg_SHA_blocks - 1) {
 				/*	uint64_t len = size << 3;
 
 					uint32_t *len_32 = (uint32_t *)&len;	
@@ -275,6 +281,7 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 					}
 				}
 			} else {
+				printf("No additional block\n");
 				if (current_block == msg_SHA_blocks - 1) {
 					for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
 						p[t] = string[it + t + 3];
