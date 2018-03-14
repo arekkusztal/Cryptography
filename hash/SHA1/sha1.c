@@ -118,7 +118,7 @@ static uint8_t string_80_a_LE_var[] = {
 		0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61,
 		0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61, 0x61,
 
-/*res: 03 de 6c 57 0b fe 24 bf c3 28 cc d7 ca 46 b7 6e ad af 43 34 */
+/*res: 0x86 0xF3 0x36 0x52 0xFC 0xFF 0xD7 0xFA 0x14 0x43 0xE2 0x46 0xDD 0x34 0xFE 0x5D 0x00 0xE2 0x5F 0xFD  */
 };
 
 #define string string_80_a_LE_var
@@ -176,11 +176,14 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 
 		p[t + 3 - msg_remainder] = 0x80;	
 	
-		uint64_t len = size << 3;
+/*		uint64_t len = size << 3;
 
 		uint32_t *len_32 = (uint32_t *)&len;	
 		*(uint32_t *)&p[size + padding - 8] = len_32[1];
-		*(uint32_t *)&p[size + padding - 4] = len_32[0];
+		*(uint32_t *)&p[size + padding - 4] = len_32[0]; */
+
+		*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
+			| ((uint64_t)size << 3) >> 32;
 					
 
 	} else {
@@ -233,8 +236,45 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 
 		memset(w, 0, 4 * 80);
 		uint8_t *p = (uint8_t *)w;
-		if (current_block < msg_SHA_blocks)
-			//if (additional_block) {
+		if (current_block < msg_SHA_blocks) {
+			if (additional_block) {
+				if (current_block == msg_SHA_blocks - 2) {
+					for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
+						p[t] = string[it + t + 3];
+						p[t + 1] = string[it + t + 2];
+						p[t + 2] = string[it + t + 1];
+						p[t + 3] = string[it + t];
+					}
+					if (msg_remainder > 0)
+						p[t + 3] = string[it + t];
+					if (msg_remainder > 1)
+						p[t + 2] = string[it + t + 1];
+					if (msg_remainder > 2)
+						p[t + 1] = string[it + t + 2];
+					if (msg_remainder > 3)
+						p[t] = string[it + t + 3];
+
+					p[t + 3 - msg_remainder] = 0x80;	
+	
+
+				} else if (current_block == msg_SHA_blocks - 2) {
+				/*	uint64_t len = size << 3;
+
+					uint32_t *len_32 = (uint32_t *)&len;	
+					*(uint32_t *)&p[last_chunk_size + padding - 8] = len_32[1];
+					*(uint32_t *)&p[last_chunk_size + padding - 4] = len_32[0]; */
+					*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
+								 | ((uint64_t)size << 3) >> 32;
+
+				} else {
+					for (t = 0; t < 64; t += 4) {
+						p[t] = string[it + t + 3];
+						p[t + 1] = string[it + t + 2];
+						p[t + 2] = string[it + t + 1];
+						p[t + 3] = string[it + t];
+					}
+				}
+			} else {
 				if (current_block == msg_SHA_blocks - 1) {
 					for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
 						p[t] = string[it + t + 3];
@@ -254,10 +294,16 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 					p[t + 3 - msg_remainder] = 0x80;	
 	
 					uint64_t len = size << 3;
-
-					uint32_t *len_32 = (uint32_t *)&len;	
+					uint32_t *len_32 = (uint32_t *)&len;
+					//*(uint32_t *)&p[56] = len_32[1]; 
+					//*(uint32_t *)&p[60] = len_32[0];
+					//*(uint64_t *)&p[56] = (uint64_t)len_32[1] | (uint64_t)len_32[0] << 32;
+					*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
+								 | ((uint64_t)size << 3) >> 32;
+										
+				/*	uint32_t *len_32 = (uint32_t *)&len;	
 					*(uint32_t *)&p[last_chunk_size + padding - 8] = len_32[1];
-					*(uint32_t *)&p[last_chunk_size + padding - 4] = len_32[0];
+					*(uint32_t *)&p[last_chunk_size + padding - 4] = len_32[0]; */
 
 				} else {
 					for (t = 0; t < 64; t += 4) {
@@ -267,11 +313,14 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 						p[t + 3] = string[it + t];
 					}
 				}
-			//}
+
+			}
+
+			hex_dump("w", (uint8_t *)w, 320, 16);
+		}
 		else 			
 			SHA_on = 0;
 
-		//hex_dump("w", (uint8_t *)w, 320, 16);
 
 	}
 
