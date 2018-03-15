@@ -31,6 +31,8 @@ uint32_t k3 = 0xD6C162CA;
 
 #endif
 
+#define __low_bound(a) (a & ~3)
+
 uint32_t lrotate32(uint32_t data, uint8_t shift)
 {
 	int i;
@@ -131,7 +133,7 @@ static uint8_t string_57_a_LE_var[] = {
 };
 
 
-#define string string_80_a_LE_var
+#define string string_64_abc_LE_var
 
 static inline void LE_BE_64_convert(uint8_t *len_8)
 {
@@ -150,64 +152,48 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 	uint32_t padding = 0, msg_SHA_blocks, msg_full_4_blocks, msg_remainder, SHA_on = 1, current_block = 0, last_chunk_size;
 	uint8_t additional_block = 0;
 	
-	msg_SHA_blocks = size / 64 + 1;
-	msg_full_4_blocks = (size / 4) & 15;
-	msg_remainder = size % 4;
-	last_chunk_size = size % 64;
-
-	if (size % 64 < 56) {
-		padding = 64 - (size & 63);
-		printf("\nPadding = %d", padding);
-	} else {
-		padding = 128 - (size & 63);
-		printf("\nPadding 1 = %d", padding);
-		additional_block = 1;
-		msg_SHA_blocks += 1;
-	}
+	int32_t strcnt = 0, blkcnt = 0, BE_flag = 0;
 
 
 	uint8_t *p = (uint8_t *)w;
-	if (msg_SHA_blocks == 1 || (msg_SHA_blocks == 2 && additional_block)) {
-		for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
-			p[t] = string[t + 3];
-			p[t + 1] = string[t + 2];
-			p[t + 2] = string[t + 1];
-			p[t + 3] = string[t];
-		}
-		if (msg_remainder > 0)
-			p[t + 3] = string[t];
-		if (msg_remainder > 1)
-			p[t + 2] = string[t + 1];
-		if (msg_remainder > 2)
-			p[t + 1] = string[t + 2];
-		if (msg_remainder > 3)
-			p[t] = string[t + 3];
-
-
-		p[t + 3 - msg_remainder] = 0x80;	
-
-		if (!additional_block)
-			*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
-				| ((uint64_t)size << 3) >> 32;
-					
-
-	} else {
-		for (t = 0; t < 64 ; t+=4) {
-			p[t] = string[t + 3];
-			p[t + 1] = string[t + 2];
-			p[t + 2] = string[t + 1];
-			p[t + 3] = string[t];
-		}
-	}
-
-
-	printf("\nsize of string = %lu", sizeof(string));
-	printf("\nmsg_full_SHA_blocks = %u", msg_SHA_blocks);
-	printf("\nmsg_full_4_blocks = %u", msg_full_4_blocks);
-	printf("\nmsg_remainder = %u", msg_remainder);
-	hex_dump("w", (uint8_t *)w, 320, 16);
+	uint8_t __congruent64 = 0;
 
 	while (SHA_on) {
+		while (strcnt < size && blkcnt < 64) {
+			//p[ __low_bound(blkcnt) - BE_flag] = string[ __low_bound(blkcnt) + BE_flag];
+			p[ __low_bound(blkcnt) + 3 - BE_flag] = string[ __low_bound(blkcnt) + BE_flag];
+			strcnt++;
+			blkcnt++;
+			BE_flag++;
+			BE_flag &= 3;
+		}
+
+		if (blkcnt < 64) {
+			printf("\nDEBUG: blkcnt < 64");
+			p[ __low_bound(blkcnt) + 3 - BE_flag] = 0x80;
+			if (blkcnt)
+				if (blkcnt < 56) {
+					printf("\nDEBUG: blkcnt < 56 fill  with 80 zeros, len and end");
+					SHA_on = 0;
+					*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
+						| ((uint64_t)size << 3) >> 32;
+
+				}
+			else { //Additional block
+					SHA_on = 0;
+					*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
+						| ((uint64_t)size << 3) >> 32;
+					if (__congruent64)						
+						p[0] = 0x80;
+				
+			}
+
+		} else if (strcnt == size && blkcnt == 64) { //Special case when msg is congruent 0 mod 64
+			__congruent64 = 1;
+		}
+
+		blkcnt = 0;
+
 		for (t = 16; t < 80; t++) {
 			w[t] = lrotate32( (w[t-3] ^ w[t-8] ^ w[t-14] ^ w[t-16]), 1);
 		}
@@ -237,98 +223,7 @@ uint8_t *SHA1(uint8_t *ret, uint8_t *arg, int size)
 		h3 = h3 + D;
 		h4 = h4 + E;
 
-		it = ++current_block * 64;
-
-		memset(w, 0, 4 * 80);
-		uint8_t *p = (uint8_t *)w;
-		if (current_block < msg_SHA_blocks) {
-			if (additional_block) {
-				printf("Additional block\n");
-				if (current_block == msg_SHA_blocks - 2) {
-					for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
-						p[t] = string[it + t + 3];
-						p[t + 1] = string[it + t + 2];
-						p[t + 2] = string[it + t + 1];
-						p[t + 3] = string[it + t];
-					}
-					if (msg_remainder > 0)
-						p[t + 3] = string[it + t];
-					if (msg_remainder > 1)
-						p[t + 2] = string[it + t + 1];
-					if (msg_remainder > 2)
-						p[t + 1] = string[it + t + 2];
-					if (msg_remainder > 3)
-						p[t] = string[it + t + 3];
-
-					p[t + 3 - msg_remainder] = 0x80;	
-	
-
-				} else if (current_block == msg_SHA_blocks - 1) {
-				/*	uint64_t len = size << 3;
-
-					uint32_t *len_32 = (uint32_t *)&len;	
-					*(uint32_t *)&p[last_chunk_size + padding - 8] = len_32[1];
-					*(uint32_t *)&p[last_chunk_size + padding - 4] = len_32[0]; */
-					*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
-								 | ((uint64_t)size << 3) >> 32;
-
-				} else {
-					for (t = 0; t < 64; t += 4) {
-						p[t] = string[it + t + 3];
-						p[t + 1] = string[it + t + 2];
-						p[t + 2] = string[it + t + 1];
-						p[t + 3] = string[it + t];
-					}
-				}
-			} else {
-				printf("No additional block\n");
-				if (current_block == msg_SHA_blocks - 1) {
-					for (t = 0; t < msg_full_4_blocks * 4; t+=4) {
-						p[t] = string[it + t + 3];
-						p[t + 1] = string[it + t + 2];
-						p[t + 2] = string[it + t + 1];
-						p[t + 3] = string[it + t];
-					}
-					if (msg_remainder > 0)
-						p[t + 3] = string[it + t];
-					if (msg_remainder > 1)
-						p[t + 2] = string[it + t + 1];
-					if (msg_remainder > 2)
-						p[t + 1] = string[it + t + 2];
-					if (msg_remainder > 3)
-						p[t] = string[it + t + 3];
-
-					p[t + 3 - msg_remainder] = 0x80;	
-	
-					uint64_t len = size << 3;
-					uint32_t *len_32 = (uint32_t *)&len;
-					//*(uint32_t *)&p[56] = len_32[1]; 
-					//*(uint32_t *)&p[60] = len_32[0];
-					//*(uint64_t *)&p[56] = (uint64_t)len_32[1] | (uint64_t)len_32[0] << 32;
-					*(uint64_t *)&p[56] = ((uint64_t)size << 3) << 32
-								 | ((uint64_t)size << 3) >> 32;
-										
-				/*	uint32_t *len_32 = (uint32_t *)&len;	
-					*(uint32_t *)&p[last_chunk_size + padding - 8] = len_32[1];
-					*(uint32_t *)&p[last_chunk_size + padding - 4] = len_32[0]; */
-
-				} else {
-					for (t = 0; t < 64; t += 4) {
-						p[t] = string[it + t + 3];
-						p[t + 1] = string[it + t + 2];
-						p[t + 2] = string[it + t + 1];
-						p[t + 3] = string[it + t];
-					}
-				}
-
-			}
-
-			hex_dump("w", (uint8_t *)w, 320, 16);
-		}
-		else 			
-			SHA_on = 0;
-
-
+		memset(w, 0, 64);
 	}
 
 	R[0] = h0;
