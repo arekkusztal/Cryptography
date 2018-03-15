@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 	uint8_t carry = 0;
 
 	R = add_integer(A, B);
-	R = mult(A, B);
+	//R = mult(A, B);
 
 	//R = lshift(A);
 	//hex_dump("Addition", R->data, R->size ,32);

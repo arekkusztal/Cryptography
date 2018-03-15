@@ -19,6 +19,15 @@ typedef struct Integer {
 integer*
 set_integer_b16(uint8_t *array);
 
+int
+set_integer_128_b16(uint8_t *array, uint8_t *placeholder, int len);
+
+int 
+sub_integer_128(uint8_t *A, uint8_t *B, uint8_t *R);
+
+int
+add_integer_128(uint8_t *A, uint8_t *B, uint8_t *R);
+
 integer*
 set_integer(uint8_t *array);
 

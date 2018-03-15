@@ -47,6 +47,27 @@ set_integer(uint8_t *array) {
 	return R;
 }
 
+/**
+ * @brief 
+ */
+
+int
+set_integer_128_b16(uint8_t *array, uint8_t *placeholder, int len) {
+	int i, k;
+	if (len == 0)
+		len = 128;
+	else if (len >128 || len < 0) {
+		perror("");
+		return -1;
+	}
+		
+	for (i = len-1, k =0; i>=0; i--, k+=2) {
+		placeholder[i] += HEX_ME(array[k]) * 16;
+		placeholder[i] += HEX_ME(array[k + 1]);
+	}
+	return 0;
+}
+
 integer*
 set_integer_b16(uint8_t *array) {
 	int16_t i, k;
@@ -120,6 +141,8 @@ integer *add_integer(integer *A, integer *B) {
 		else
 			carry = 0;
 	}
+
+	hex_dump("Long number (set_integer b_16)", R->data, 4 ,32);
 
 	free(a);
 	free(b);
