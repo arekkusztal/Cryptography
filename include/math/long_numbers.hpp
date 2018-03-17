@@ -11,16 +11,47 @@
 #include <stdint.h>
 #include <Arus_dev_kit.h>
 
-typedef struct Integer {
+#define DEBUG
+
+typedef struct Integer_2 {
 	uint8_t *data;
 	uint16_t size;
 } integer;
+
+class int128_fast_t;
+
+class Int {
+protected:
+	uint16_t __len;
+};
+
+class int128_t : public Int {
+#define PRECISION 128
+	uint8_t __data[PRECISION] = { };
+	const uint16_t precision = PRECISION;
+public:
+	int128_t(uint8_t *);
+	int128_t(const char *);
+	int128_t(int128_fast_t);
+	int128_t operator=(Int);
+	int128_t operator=(const char *);
+	int128_t operator=(int128_fast_t);
+
+#ifdef DEBUG
+	void print();
+#endif
+};
+
+class int128_fast_t {
+#define PRECISION 128
+
+};
 
 integer*
 set_integer_b16(uint8_t *array);
 
 int
-set_integer_128_b16(uint8_t *array, uint8_t *placeholder, int len);
+set_integer_128_b16(uint8_t *array, struct Integer_2 *A, int len);
 
 int 
 sub_integer_128(uint8_t *A, uint8_t *B, uint8_t *R);

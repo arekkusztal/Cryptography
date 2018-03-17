@@ -4,6 +4,11 @@
 #include <stdint.h>
 #include "Arus_dev_kit.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 enum AES_KEY_SZ {
 	AES_KEY_SZ_16 = 16,
 	AES_KEY_SZ_24 = 24,
@@ -61,5 +66,8 @@ struct AES_test_vector
 	} ciphertext;
 };
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

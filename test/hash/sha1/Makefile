@@ -1,4 +1,4 @@
-SOURCES+=sha1
+#SOURCES+=sha1
 
 all: $(SOURCES)
 

@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
-#include <long_numbers.h>
 
 void hex_dump(const char *def, uint8_t *data, uint16_t len,
 		uint16_t br)

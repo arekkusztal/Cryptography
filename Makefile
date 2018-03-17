@@ -15,6 +15,7 @@ DIRS+=hash
 DIRS+=test
 
 GCC=gcc
+GPP=g++
 
 LIB_OBJ_FILES = $(wildcard $(LIB_OBJ)/*.o)
 
@@ -27,7 +28,7 @@ export TEST_BUILD
 all: $(LIB-X)
 
 $(LIB-X): $(DIRS)
-	$(S)$(GCC) -o $(BUILD)/$@ $(LIB_OBJ_FILES) main.c
+	$(S)$(GPP) -o $(BUILD)/$@ $(LIB_OBJ_FILES) main.c
 	$(S)echo ld: $@
 	
 .PHONY: $(DIRS)

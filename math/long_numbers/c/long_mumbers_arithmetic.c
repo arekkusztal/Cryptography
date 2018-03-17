@@ -1,4 +1,4 @@
-#include <long_numbers.h>
+#include <long_numbers.hpp>
 
 int add_integer_128(uint8_t *A, uint8_t *B, uint8_t *R)
 {

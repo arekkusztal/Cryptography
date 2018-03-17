@@ -30,7 +30,7 @@ struct long_number_vector
 		uint16_t size [1024];
 	} R;
 };
-
+/*
 static struct long_number_vector long_number_add_1 = {
 	.op = ADD,
 	.A = {
@@ -102,6 +102,6 @@ static struct long_number_vector long_number_mult_3 = {
 		.size = 12
 	},
 };
-
+*/
 
 #endif

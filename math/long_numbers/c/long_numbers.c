@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
-#include <long_numbers.h>
+#include <long_numbers.hpp>
 /** TODO
  * This functions need much optimization
  */
@@ -16,7 +16,7 @@ set_integer(uint8_t *array) {
 	integer *R;
 	uint8_t *temp;
 
-	len = (strlen(array));
+	len = (strlen((const char *)array));
 	odd = (len & 1);
 	len = len/2 + odd;
 
@@ -42,30 +42,9 @@ set_integer(uint8_t *array) {
 	if (odd)
 		free(temp);
 
-	hex_dump("Long number (set_integer)", R->data, len ,32);
+	//hex_dump("Long number (set_integer)", R->data, len ,32);
 
 	return R;
-}
-
-/**
- * @brief 
- */
-
-int
-set_integer_128_b16(uint8_t *array, uint8_t *placeholder, int len) {
-	int i, k;
-	if (len == 0)
-		len = 128;
-	else if (len >128 || len < 0) {
-		perror("");
-		return -1;
-	}
-		
-	for (i = len-1, k =0; i>=0; i--, k+=2) {
-		placeholder[i] += HEX_ME(array[k]) * 16;
-		placeholder[i] += HEX_ME(array[k + 1]);
-	}
-	return 0;
 }
 
 integer*
@@ -102,7 +81,7 @@ set_integer_b16(uint8_t *array) {
 	if (odd)
 		free(temp);
 
-	hex_dump("Long number (set_integer b_16)", R->data, len ,32);
+	//hex_dump("Long number (set_integer b_16)", R->data, len ,32);
 
 	return R;
 }
@@ -142,7 +121,7 @@ integer *add_integer(integer *A, integer *B) {
 			carry = 0;
 	}
 
-	hex_dump("Long number (set_integer b_16)", R->data, 4 ,32);
+	//hex_dump("Long number (set_integer b_16)", R->data, 4 ,32);
 
 	free(a);
 	free(b);
@@ -219,73 +198,33 @@ integer *mult(integer *A, integer *B)
 		}
 	}
 
-	hex_dump("Result", R->data, R->size ,32);
+	//hex_dump("Result", R->data, R->size ,32);
 
 	free(args);
 	return NULL;
 }
 
-/*
-int main(int argc, char *argv[])
-{
-	int i;
-	integer *A, *B, *R;
-	A = set_integer_b16("8001");
-	B = set_integer_b16("8001");
-	R = malloc(sizeof(R));
-	uint8_t carry = 0;
+/**
+ * @brief
+ */
 
-	R = add_integer(A, B);
-	//R = mult(A, B);
+int
+set_integer_128_b16(uint8_t *array, struct Integer *A, int len) {
+	int i, k;
+	if (len == 0)
+		len = 128;
+	else if (len >128 || len < 0) {
+		perror("");
+		return -1;
+	}
 
-	//R = lshift(A);
-	hex_dump("Addition", R->data, R->size ,32);
+	for (i = len-1, k =0; i>=0; i--, k+=2) {
+		A->data[i] += HEX_ME(array[k]) * 16;
+		A->data[i] += HEX_ME(array[k + 1]);
+	}
+	hex_dump("Long number (set_integer b_16)", A->data, len , 32);
+	A->size = len;
 	return 0;
 }
 
-
-*/
-
-
-
-/* x86
- *
- * /*
-	asm volatile(
-			"clc;"
-			"adc %[in], %[out];"
-			: [out] "=m" (I_1[0])
-			: [in] "r" (I_2[0])
-	);
-
-	for (i = 1; i<= 3; i++) {
-		asm volatile(
-				"adc %[in], %[out];"
-				: [out] "=m" (I_1[i])
-				: [in] "r" (I_2[i])
-		);
-	} */
-
-
-/*	uint8_t R[5] = { 0 };
-	memcpy(R, A->data, A->size); */
-
-
-/*	for (i =0 ;i< 5 ; i++) {
-		uint8_t t_1 = I_1[i], t_2 = I_2[i];
-		R[i] += I_2[i] + carry;
-		if (R[i] <= t_1 || R[i] <= t_2)
-			carry = 1;
-		else
-			carry = 0;
-	} */
-
-/*	for (i =0 ;i< A->size+1 ; i++) {
-		uint8_t t_1 = A->data[i], t_2 = B->data[i];
-		R[i] += B->data[i] + carry;
-		if (R[i] <= t_1 || R[i] <= t_2)
-			carry = 1;
-		else
-			carry = 0;
-	} */
-
+//int128_t int128_t_add(int128_t )

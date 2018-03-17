@@ -1,4 +1,4 @@
-SOURCES+=md5
+#SOURCES+=md5
 
 all: $(SOURCES)
 

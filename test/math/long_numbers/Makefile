@@ -4,8 +4,8 @@ all: $(SOURCES)
 
 $(SOURCES): SETUP
 
-.c:
-	$(S)$(GCC) $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0
+.cpp:
+	g++ $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0 -fpermissive -std=c++11
 	$(S) echo ld: $@
 
 .PHONY: SETUP	
