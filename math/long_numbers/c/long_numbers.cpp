@@ -6,7 +6,6 @@
 #include <long_numbers.hpp>
 
 #include <Arus_dev_kit.h>
-#include <iostream>
 
 /*
 int
@@ -29,8 +28,6 @@ set_integer_128_b16(uint8_t *array, struct Integer *A, int len) {
 }
 */
 
-
-
 void int128_t::print()
 {
 	hex_dump("int128", this->__data, this->precision, 16);
@@ -43,6 +40,7 @@ int128_t::int128_t(const char *number)
 	__len = strlen(number);
 	if (__len > 128)
 		return;
+
 	i = 0;
 	if (number[0] == '0' && number[1] == 'x')
 		prefix = 2;
@@ -60,4 +58,107 @@ int128_t::int128_t(const char *number)
 		i++;
 	}
 
+	this->__len = ((__len - prefix) >> 1) + (__len & 1);
 }
+
+#define intN_t_add \
+		__max_of_two = this->__len >= B.__len ?		\
+				this->__len : B.__len;		\
+		carry = 0;		\
+		i = 0;	\
+		while (i < __max_of_two) \
+		{ \
+			uint8_t t_a = this->__data[i], t_b = B.__data[i];	\
+			__b = this->__data[i] + B.__data[i] + carry; \
+			this->__data[i] = __b; \
+			if (__builtin_expect((t_a && t_b), 1)) { \
+				if (__b < t_a || __b < t_b) \
+					carry = 1; \
+				else \
+					carry = 0; \
+			} else if ((t_a == 0xFF || t_b == 0xFF) && carry) \
+				carry = 1; \
+			else \
+				carry = 0; \
+			i++; \
+		}
+
+int128_t int128_t::operator+=(int128_t B)
+{
+	uint16_t i, k, __max_of_two;
+	uint8_t carry, __b;
+
+	intN_t_add;
+	/*
+	* If carry general overflow
+	*/
+
+	return *this;
+}
+
+int128_t int128_t::operator<<=(uint16_t shift)
+{
+	int i;
+	shift &= ~0x80;
+
+	i = 0;
+	if (shift < 8) {
+		uint8_t __prev_left = this->__data[i] >> (8 - shift);
+		this->__data[i] <<= shift;
+		uint8_t __curr;
+
+		while (i < this->__len) {
+			i++;
+			__curr = this->__data[i];
+			this->__data[i] = this->__data[i] << shift | __prev_left;
+			__prev_left = __curr >> (8 - shift);
+		}
+		this->__data[0] |= __prev_left;
+	}
+
+	return *this;
+}
+
+int128_t int128_t::operator=(int128_t A)
+{
+	printf("\n OPERATOR =");
+	return *this;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+	__max_of_two = this->__len >= B.__len ?
+			this->__len : B.__len;
+	carry = 0;
+	i = 0;
+
+	while (i < __max_of_two)
+	{
+		uint8_t t_a = this->__data[i], t_b = B.__data[i];
+		__b = this->__data[i] + B.__data[i] + carry;
+		this->__data[i] = __b;
+
+		if (__builtin_expect((t_a && t_b), 1)) {
+			if (__b < t_a || __b < t_b)
+				carry = 1;
+			else
+				carry = 0;
+		} else if ((t_a == 0xFF || t_b == 0xFF) && carry)
+			carry = 1;
+		else
+			carry = 0;
+		i++;
+	} */

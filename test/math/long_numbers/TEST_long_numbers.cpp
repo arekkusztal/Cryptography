@@ -9,22 +9,19 @@
 
 #define INT_1	"1B0A"
 #define INT_2	"0B"
-/*
+
 int TEST_add_integer_128()
 {
-	struct Integer A, B;
-	uint8_t placeholder_1[512], placeholder_2[512];
-	memset(placeholder_1, 0, 512);
-	set_integer_128_b16(INT_1, &A, 2);
-	printf("\nadd integer");
-	return 0;
+	int128_t A = "0xAB1F2BC";
+	int128_t B = "0xF1FF2BC";
+	int128_t C = "0xF1241EF231789";
+	A += C;
+	//C<<=1;
+	A.print();
 }
-
-*/
 
 int main(int argc, char *argv[])
 {
-	int128_t a = "0xAB1F2BC";
-	a.print();
+	TEST_add_integer_128();
 	return 0;
 }

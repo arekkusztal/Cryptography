@@ -30,9 +30,15 @@ struct long_number_vector
 		uint16_t size [1024];
 	} R;
 };
-/*
+
 static struct long_number_vector long_number_add_1 = {
-	.op = ADD,
+		ADD,
+		{
+				"12254412",
+				4
+		},
+};
+/*	.op = ADD,
 	.A = {
 		.data = "12254412",
 		.size = 4
@@ -41,8 +47,8 @@ static struct long_number_vector long_number_add_1 = {
 		.data = "162207FA",
 		.size = 4
 	},
-};
-
+}; */
+/*
 static struct long_number_vector long_number_add_2 = {
 	.op = ADD,
 	.A = {
