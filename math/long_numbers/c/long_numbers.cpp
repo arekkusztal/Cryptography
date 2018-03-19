@@ -7,27 +7,6 @@
 
 #include <Arus_dev_kit.h>
 
-/*
-int
-set_integer_128_b16(uint8_t *array, struct Integer *A, int len) {
-	int i, k;
-	if (len == 0)
-		len = 128;
-	else if (len >128 || len < 0) {
-		perror("");
-		return -1;
-	}
-
-	for (i = len-1, k =0; i>=0; i--, k+=2) {
-		A->data[i] += HEX_ME(array[k]) * 16;
-		A->data[i] += HEX_ME(array[k + 1]);
-	}
-	hex_dump("Long number (set_integer b_16)", A->data, len , 32);
-	A->size = len;
-	return 0;
-}
-*/
-
 void int128_t::print()
 {
 	hex_dump("int128", this->__data, this->precision, 16);
@@ -36,6 +15,18 @@ void int128_t::print()
 int128_t::int128_t(const int128_t &T)
 {
     memcpy(this, &T, sizeof(*this));
+}
+
+inline void int128_t::__set_len_in_bits()
+{
+    int i;
+    for (i = 7; i >= 0; i--) {
+        if ((this->__data[this->__len - 1] >> i) & 1) {
+            this->__len_in_bits = ((this->__len - 1) << 3) + i + 1;
+            return;
+        }
+    }
+    this->__len_in_bits = ((this->__len - 1) << 3) + i + 1;
 }
 
 int128_t::int128_t(const char *number)
@@ -64,6 +55,7 @@ int128_t::int128_t(const char *number)
 	}
 
 	this->__len = ((__len - prefix) >> 1) + (__len & 1);
+   __set_len_in_bits();
 }
 
 #define intN_t_add \
@@ -135,6 +127,7 @@ int128_t int128_t::operator*=(int128_t B)
 
    *this = __temp;
    this->__len = this->__len + B.__len;
+   __set_len_in_bits();
 
    return *this;
 }
@@ -155,7 +148,6 @@ int128_t int128_t::operator<<=(uint16_t shift)
 
    shift &= 0x7;
 
-
 	if (shift < 8) {
 		uint8_t __prev_left = this->__data[i] >> (8 - shift);
 		this->__data[i] <<= shift;
@@ -171,8 +163,27 @@ int128_t int128_t::operator<<=(uint16_t shift)
 	}
 
    this->__len += (shift >> 8) + 1;
+   __set_len_in_bits();
 
 	return *this;
+}
+
+int128_t int128_t::karatsuba(int128_t B)
+{
+    int i, k;
+    uint8_t __likely_overflow;
+
+    if (this->__len_in_bits <= 64 || B->__len_in_bits <= 64) {
+        this->error_code = too_small_to_bother;
+        return *this;
+    }
+
+    /* Choose beaviour, can overflow or not? */
+    if (this->__len_in_bits + B.__len_in_bits >= this->precision) {
+        this->error_code = potential_overflow;
+        return *this;
+    }
+
 }
 
 int128_t int128_t::operator=(int128_t A)

@@ -1,3 +1,4 @@
+#SOURCESCPP-y+=karatsuba.o
 SOURCESCPP-y+=long_numbers.o
 #SOURCESCPP-y+=long_mumbers_arithmetic.o
 #SOURCESCPP-y+=karatsuba.o
