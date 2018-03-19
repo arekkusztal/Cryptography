@@ -12,12 +12,18 @@
 
 int TEST_add_integer_128()
 {
-	int128_t A = "0xAB1F2BC";
-	int128_t B = "0xF1FF2BC";
-	int128_t C = "0xF1241EF231789";
-	A += C;
-	//C<<=1;
-	A.print();
+   int128_t A = "0xAB1F2BC";
+   int128_t B = "0x123FF";
+   int128_t C = "0x1";
+   //A += C;
+   int128_t D = A;
+   C<<=16;
+
+   //A.print();
+   A*=B;
+
+
+   A.print();
 }
 
 int main(int argc, char *argv[])

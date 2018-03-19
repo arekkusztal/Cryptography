@@ -27,25 +27,27 @@ public:
 
 class int128_t : public Int {
 #define PRECISION 128
-	uint8_t __data[PRECISION] = { };
-	const uint16_t precision = PRECISION;
+    uint8_t __data[PRECISION] = { };
 public:
+   const uint16_t precision = PRECISION;
+   int128_t() = default;
+   int128_t(const int128_t&int128_t);
 	int128_t(uint8_t *);
 	int128_t(const char *);
 	int128_t(int128_fast_t);
-	int128_t operator=(int128_t);
+   int128_t operator=(int128_t);
 	int128_t operator+(Int);
 	int128_t operator=(const char *);
 	int128_t operator=(int128_fast_t);
 	int128_t operator+=(int128_t);
 	int128_t operator<<=(uint16_t);
+   int128_t operator*=(int128_t);
 
 	~int128_t() = default;
 #ifdef DEBUG
 	void print();
 #endif
 };
-
 
 class int128_fast_t {
 #define PRECISION 128

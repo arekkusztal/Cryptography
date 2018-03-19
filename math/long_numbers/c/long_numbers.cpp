@@ -33,6 +33,11 @@ void int128_t::print()
 	hex_dump("int128", this->__data, this->precision, 16);
 }
 
+int128_t::int128_t(const int128_t &T)
+{
+    memcpy(this, &T, sizeof(*this));
+}
+
 int128_t::int128_t(const char *number)
 {
 	uint16_t __len, i, prefix;
@@ -96,12 +101,55 @@ int128_t int128_t::operator+=(int128_t B)
 	return *this;
 }
 
+int128_t int128_t::operator*=(int128_t B)
+{
+   int128_t __temp, __shifted;
+   uint16_t i, k, __min_of_two;
+   uint8_t __a_is_smaller;
+
+   if (this->__len <= B.__len) {
+       __a_is_smaller = true;
+   }
+   else {
+       __shifted = *this;
+       __a_is_smaller = false;
+   }
+
+   if (__a_is_smaller) {
+
+   }
+   else {
+        for (i = 0; i < B.__len << 3; i++) {
+            if ( (B.__data[i >> 3] >> (i & 0x7)) & 1) {
+                __temp += __shifted;
+            }
+            __shifted <<= 1;
+        }
+   }
+
+   *this = __temp;
+   this->__len = this->__len + B.__len;
+
+   return *this;
+}
+
 int128_t int128_t::operator<<=(uint16_t shift)
 {
 	int i;
 	shift &= ~0x80;
 
 	i = 0;
+
+   for (i = 15; i >= (shift >> 3); i--) {
+        this->__data[i] = this->__data[i - (shift >> 3)];
+   }
+   for (i = (shift >> 3) - 1; i >= 0; i--) {
+        this->__data[i] = 0;
+   }
+
+   shift &= 0x7;
+
+
 	if (shift < 8) {
 		uint8_t __prev_left = this->__data[i] >> (8 - shift);
 		this->__data[i] <<= shift;
@@ -116,13 +164,14 @@ int128_t int128_t::operator<<=(uint16_t shift)
 		this->__data[0] |= __prev_left;
 	}
 
+   this->__len += (shift >> 8) + 1;
+
 	return *this;
 }
 
 int128_t int128_t::operator=(int128_t A)
 {
-	printf("\n OPERATOR =");
-	return *this;
+    memcpy(this, &A, sizeof(*this));
 }
 
 
