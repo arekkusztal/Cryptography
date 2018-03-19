@@ -86,14 +86,14 @@ int128_t::int128_t(const char *number)
 			else \
 				carry = 0; \
 			i++; \
-		}
+      }
 
 int128_t int128_t::operator+=(int128_t B)
 {
 	uint16_t i, k, __max_of_two;
-	uint8_t carry, __b;
+   uint8_t carry, __b;
 
-	intN_t_add;
+   intN_t_add;
 	/*
 	* If carry general overflow
 	*/
@@ -108,6 +108,7 @@ int128_t int128_t::operator*=(int128_t B)
    uint8_t __a_is_smaller;
 
    if (this->__len <= B.__len) {
+       __shifted = B;
        __a_is_smaller = true;
    }
    else {
@@ -116,7 +117,12 @@ int128_t int128_t::operator*=(int128_t B)
    }
 
    if (__a_is_smaller) {
-
+       for (i = 0; i < this->__len << 3; i++) {
+           if ( (this->__data[i >> 3] >> (i & 0x7)) & 1) {
+               __temp += __shifted;
+           }
+           __shifted <<= 1;
+       }
    }
    else {
         for (i = 0; i < B.__len << 3; i++) {
@@ -173,20 +179,6 @@ int128_t int128_t::operator=(int128_t A)
 {
     memcpy(this, &A, sizeof(*this));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 	__max_of_two = this->__len >= B.__len ?
