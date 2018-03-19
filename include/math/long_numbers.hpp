@@ -22,46 +22,47 @@ class int128_fast_t;
 
 class Int {
 protected:
-    uint16_t __len = 0;
-    uint16_t __len_in_bits = 0;
-    virtual void __set_len_in_bits() = 0;
+	uint16_t __len = 0;
+	uint16_t __len_in_bits = 0;
+	virtual void __set_len_in_bits() = 0;
 public:
 #ifdef DEBUG
-   virtual void print() = 0;
+	virtual void print() = 0;
 #endif
 };
 
 class int128_t : public Int {
 #define PRECISION 128
-    uint8_t __data[PRECISION] = { };
-    inline void __set_len_in_bits() override;
+	uint8_t __data[PRECISION] = { };
+	inline void __set_len_in_bits() override;
 public:
-   enum ERROR_CODE {
-       noerror = 0,
-       overflow,
-       negative,
-       potential_overflow,
-       too_small_to_bother,
-   };
-   const uint16_t precision = PRECISION;
-   enum ERROR_CODE error_code = noerror;
-   int128_t() = default;
-   int128_t(const int128_t& int128_t);
+	enum ERROR_CODE {
+	   noerror = 0,
+	   overflow,
+	   negative,
+	   potential_overflow,
+	   too_small_to_bother,
+	};
+	const uint16_t precision = PRECISION;
+	enum ERROR_CODE error_code = noerror;
+	int128_t() = default;
+	int128_t(const int128_t& int128_t);
 	int128_t(uint8_t *);
 	int128_t(const char *);
 	int128_t(int128_fast_t);
-   int128_t operator=(int128_t);
-   int128_t operator+(Int *);
+	int128_t operator=(int128_t);
+	int128_t operator+(Int *);
 	int128_t operator=(const char *);
 	int128_t operator=(int128_fast_t);
 	int128_t operator+=(int128_t);
 	int128_t operator<<=(uint16_t);
-   int128_t operator*=(int128_t);
-   int128_t karatsuba(int128_t);
+	int128_t operator*=(int128_t);
+	int128_t karatsuba(int128_t);
+	void copy_bits(uint16_t start, uint16_t end);
 
-   ~int128_t() = default;
+	~int128_t() = default;
 
-   void print() override;
+	void print() override;
 };
 
 class int128_fast_t {

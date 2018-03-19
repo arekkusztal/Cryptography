@@ -135,19 +135,17 @@ int128_t int128_t::operator*=(int128_t B)
 int128_t int128_t::operator<<=(uint16_t shift)
 {
 	int i;
+
 	shift &= ~0x80;
-
 	i = 0;
+	for (i = 15; i >= (shift >> 3); i--) {
+		this->__data[i] = this->__data[i - (shift >> 3)];
+	}
+	for (i = (shift >> 3) - 1; i >= 0; i--) {
+		this->__data[i] = 0;
+	}
 
-   for (i = 15; i >= (shift >> 3); i--) {
-        this->__data[i] = this->__data[i - (shift >> 3)];
-   }
-   for (i = (shift >> 3) - 1; i >= 0; i--) {
-        this->__data[i] = 0;
-   }
-
-   shift &= 0x7;
-
+	shift &= 0x7;
 	if (shift < 8) {
 		uint8_t __prev_left = this->__data[i] >> (8 - shift);
 		this->__data[i] <<= shift;
@@ -171,18 +169,33 @@ int128_t int128_t::operator<<=(uint16_t shift)
 int128_t int128_t::karatsuba(int128_t B)
 {
     int i, k;
+    uint16_t __b;
     uint8_t __likely_overflow;
+    uint8_t __chosen_one;
+    int128_t Z_0, Z_1, Z_2;
+    int128_t x_0, x_1, y_0, y_1;
 
-    if (this->__len_in_bits <= 64 || B->__len_in_bits <= 64) {
+
+    printf("\n %d %d", this->__len_in_bits, B.__len_in_bits);
+
+/*    if (this->__len_in_bits <= 64 || B.__len_in_bits <= 64) {
         this->error_code = too_small_to_bother;
         return *this;
     }
 
-    /* Choose beaviour, can overflow or not? */
     if (this->__len_in_bits + B.__len_in_bits >= this->precision) {
         this->error_code = potential_overflow;
         return *this;
-    }
+    }*/
+
+    __chosen_one = this->__len_in_bits - 32;
+    __chosen_one += !(__chosen_one & 1);
+    __b = ( ((__chosen_one - 1) >> 1) + 1);
+    printf("\n chosen one = %hu _b = %hu copy = %hu", __chosen_one, __b, this->__len_in_bits - __chosen_one);
+
+
+
+
 
 }
 

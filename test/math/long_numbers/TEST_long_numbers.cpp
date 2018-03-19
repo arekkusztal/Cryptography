@@ -12,16 +12,17 @@
 
 int TEST_add_integer_128()
 {
-   int128_t A = "0x40";//0xAB1F2BC";
-  // int128_t B = "0x123FF";
+   int128_t A = "0x2F2BC1231142";
+   int128_t B = "0xF2141232";
   // int128_t C = "0x1";
    //A += C;
   // int128_t D = A;
   // C<<=16;
 
    //A.print();
-  // A*=B;
+   //A*=B;
 
+   A.karatsuba(B);
 
    A.print();
 }
