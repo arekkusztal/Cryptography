@@ -21,7 +21,7 @@ typedef struct Integer_2 {
 class int128_fast_t;
 
 class Int {
-protected:
+public:
 	uint16_t __len = 0;
 	uint16_t __len_in_bits = 0;
 	virtual void __set_len_in_bits() = 0;
@@ -50,24 +50,24 @@ public:
 	int128_t(uint8_t *);
 	int128_t(const char *);
 	int128_t(int128_fast_t);
-   int128_t(int128_t, uint16_t start, uint16_t end);
+	int128_t(int128_t, uint16_t start, uint16_t end);
 	int128_t operator=(int128_t);   
 	int128_t operator+(Int *);
 	int128_t operator=(const char *);
 	int128_t operator=(int128_fast_t);
 	int128_t operator+=(int128_t);
 	int128_t operator<<=(uint16_t);
-   int128_t operator>>=(uint16_t);
+	int128_t operator>>=(uint16_t);
 	int128_t operator*=(int128_t);
 	int128_t karatsuba(int128_t);
 
-   int copy_bits(int128_t, uint16_t start, uint16_t end);
-   void copy_bits_1(uint16_t start, uint16_t end);
+	int copy_bits(int128_t, uint16_t start, uint16_t end);
+	void copy_bits_1(uint16_t start, uint16_t end);
 
 	~int128_t() = default;
 
 	void print() override;
-   void print_s();
+	void print_s(const char * str);
 };
 
 class int128_fast_t {

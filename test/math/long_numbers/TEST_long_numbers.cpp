@@ -30,26 +30,14 @@ using int1024_t = A<1024>;
 
 int TEST_add_integer_128()
 {
-   int128_t A = "0x2F2BC1231142";
-   int128_t B = "0xF2141232";
-  // int128_t C = "0x1";
-   //A += C;
-  // int128_t D = A;
-  // C<<=16;
+   int128_t A = "0x21C";
+   int128_t B = "0x20A";
+   int i;
+   A.print_s("A");
+   B.print_s("B");
+   A.karatsuba(B);
 
 
-   //A*=B;
-
-
-  // A.karatsuba(B);
-
-   A.print_s();
-   //A.print();
-   B.copy_bits(A, 0, 32);
-   /*A.print();
-   A.print_s();
-   A>>=6;
-   A.print_s();*/
 }
 
 int main(int argc, char *argv[])

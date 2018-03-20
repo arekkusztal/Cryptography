@@ -12,8 +12,9 @@ void int128_t::print()
    hex_dump("int128", this->__data, this->__len, 16);
 }
 
-void int128_t::print_s()
+void int128_t::print_s(const char * str)
 {
+	printf("\n %s", str);
     bit_dump_s(this->__data, this->__len);
 }
 
@@ -30,6 +31,11 @@ int128_t::int128_t(int128_t, uint16_t start, uint16_t end)
 inline void int128_t::__set_len_in_bits()
 {
     int i;
+    if (this->__len == 0) {
+    	this->__len_in_bits = 0;
+    	return;
+    }
+
     for (i = 7; i >= 0; i--) {
         if ((this->__data[this->__len - 1] >> i) & 1) {
             this->__len_in_bits = ((this->__len - 1) << 3) + i + 1;
@@ -88,7 +94,9 @@ int128_t::int128_t(const char *number)
 			else \
 				carry = 0; \
 			i++; \
-      }
+      } \
+		if (carry) \
+			this->__data[i] = 1; /* and i < precision >> 3 */
 
 int128_t int128_t::operator+=(int128_t B)
 {
@@ -109,6 +117,9 @@ int128_t int128_t::operator*=(int128_t B)
    uint16_t i, k, __min_of_two;
    uint8_t __a_is_smaller;
 
+   __temp.__len = 1;
+   __temp.__len_in_bits = 8;
+
    if (this->__len <= B.__len) {
        __shifted = B;
        __a_is_smaller = true;
@@ -121,7 +132,11 @@ int128_t int128_t::operator*=(int128_t B)
    if (__a_is_smaller) {
        for (i = 0; i < this->__len << 3; i++) {
            if ( (this->__data[i >> 3] >> (i & 0x7)) & 1) {
+        	   __shifted.print_s("Shifted");
                __temp += __shifted;
+               //__temp.print_s("__temp");
+               __temp.print();
+
            }
            __shifted <<= 1;
        }
@@ -165,16 +180,17 @@ int128_t int128_t::operator<<=(uint16_t shift)
 	}
    i = 0;
 	shift &= 0x7;
-	if (shift < 8) {
-      uint8_t __prev_left = this->__data[i] >> (7 - shift);
+	if (shift && shift < 8) {
+
+      uint8_t __prev_left = this->__data[i] >> (8 - shift);
 		this->__data[i] <<= shift;
 		uint8_t __curr;
 
-		while (i < this->__len) {
+		while (i < this->__len + (org_shift >> 3)) {
 			i++;
 			__curr = this->__data[i];
 			this->__data[i] = this->__data[i] << shift | __prev_left;
-         __prev_left = __curr >> (7 - shift);
+         __prev_left = __curr >> (8 - shift);
 		}
 	}
 
@@ -194,8 +210,12 @@ int128_t int128_t::operator>>=(uint16_t shift)
    org_shift = shift;
    sub_len = 1;
 
-   if (shift >= this->__len) {
-       // empty this
+   if (shift >= this->__len_in_bits) {
+	   /* TODO: Optimize to size */
+       memset(this->__data, 0, this->precision >> 3);
+       this->__len = 0;
+       this->__len_in_bits = 0;
+       return *this;
    }
 
    for (i = 0; i < 8 - (shift & 0x7); i++) {
@@ -234,22 +254,20 @@ int128_t int128_t::operator>>=(uint16_t shift)
 
 int int128_t::copy_bits(int128_t A, uint16_t start, uint16_t end)
 {
-    A <<= (128 - end);
-    A >>= (128 - end);
-    A.print_s();
+	*this = A;
+	*this <<= (128 - end);
+	*this >>= ((128 - end) + start);
 }
 
 int128_t int128_t::karatsuba(int128_t B)
 {
+#define OFFSET_CONSTANT 1
     int i, k;
     uint16_t __b;
     uint8_t __likely_overflow;
-    uint8_t __chosen_one;
+    uint16_t __chosen_one;
     int128_t Z_0, Z_1, Z_2;
     int128_t x_0, x_1, y_0, y_1;
-
-
-    printf("\n %d %d", this->__len_in_bits, B.__len_in_bits);
 
 /*    if (this->__len_in_bits <= 64 || B.__len_in_bits <= 64) {
         this->error_code = too_small_to_bother;
@@ -261,11 +279,28 @@ int128_t int128_t::karatsuba(int128_t B)
         return *this;
     }*/
 
-    __chosen_one = this->__len_in_bits - 32;
+    /* Choose it wisely for both args */
+    __chosen_one = this->__len_in_bits - OFFSET_CONSTANT;
     __chosen_one += !(__chosen_one & 1);
     __b = ( ((__chosen_one - 1) >> 1) + 1);
-    printf("\n chosen one = %hu _b = %hu copy = %hu", __chosen_one, __b, this->__len_in_bits - __chosen_one);
+    x_0.copy_bits(*this, __chosen_one - 1, this->__len_in_bits);
+    x_0.print_s("x_0");
+    x_1.copy_bits(B, __chosen_one - 1, __len_in_bits);
+    x_0.print_s("x_1");
 
+    y_0.copy_bits(*this, 0, __chosen_one);
+    y_0.print_s("y_0");
+
+    y_1.copy_bits(B, 0, __chosen_one);
+    y_1.print_s("y_1");
+
+    Z_2 = x_0;
+    Z_2 *= x_1;
+    Z_2.print_s("Z_2");
+
+    Z_0 = y_0;
+    Z_0 *= y_1;
+    Z_0.print_s("Z_0");
 
 
 }
