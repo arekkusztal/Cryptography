@@ -9,12 +9,22 @@
 
 void int128_t::print()
 {
-	hex_dump("int128", this->__data, this->precision, 16);
+   hex_dump("int128", this->__data, this->__len, 16);
+}
+
+void int128_t::print_s()
+{
+    bit_dump_s(this->__data, this->__len);
 }
 
 int128_t::int128_t(const int128_t &T)
 {
     memcpy(this, &T, sizeof(*this));
+}
+
+int128_t::int128_t(int128_t, uint16_t start, uint16_t end)
+{
+
 }
 
 inline void int128_t::__set_len_in_bits()
@@ -135,8 +145,16 @@ int128_t int128_t::operator*=(int128_t B)
 int128_t int128_t::operator<<=(uint16_t shift)
 {
 	int i;
+   uint16_t add_len;
 
 	shift &= ~0x80;
+   add_len = 0;
+
+   for (i = 0; i < (shift & 0x7); i++) {
+        if ( (this->__data[this->__len - 1] >> (7 - i)) & 1)
+            add_len = 1;
+   }
+
 	i = 0;
 	for (i = 15; i >= (shift >> 3); i--) {
 		this->__data[i] = this->__data[i - (shift >> 3)];
@@ -144,7 +162,7 @@ int128_t int128_t::operator<<=(uint16_t shift)
 	for (i = (shift >> 3) - 1; i >= 0; i--) {
 		this->__data[i] = 0;
 	}
-
+   i = 0;
 	shift &= 0x7;
 	if (shift < 8) {
 		uint8_t __prev_left = this->__data[i] >> (8 - shift);
@@ -157,13 +175,54 @@ int128_t int128_t::operator<<=(uint16_t shift)
 			this->__data[i] = this->__data[i] << shift | __prev_left;
 			__prev_left = __curr >> (8 - shift);
 		}
-		this->__data[0] |= __prev_left;
 	}
 
-   this->__len += (shift >> 8) + 1;
+   this->__len += ((shift >> 8) + add_len) > this->precision ?
+               this->precision : ((shift >> 8) + add_len);
    __set_len_in_bits();
 
 	return *this;
+}
+
+int128_t int128_t::operator>>=(uint16_t shift)
+{
+   int i;
+   uint16_t sub_len;
+
+   shift &= ~0x80;
+   sub_len = 1;
+
+   for (i = 0; i < 8 - (shift & 0x7); i++) {
+        if ( (this->__data[this->__len - 1] >> (7 - i)) & 1)
+            sub_len = 0;
+   }
+
+   i = 0;
+   for (i = 0; i < 16 - (shift >> 3); i++) {
+      this->__data[i] = this->__data[i + (shift >> 3)];
+   }
+   for (i = 16 - (shift >> 3); i < 16; i++) {
+      this->__data[i] = 0;
+   }
+   i = this->__len - 1;
+   shift &= 0x7;
+   if (shift < 8) {
+      uint8_t __prev_right = this->__data[i];
+      this->__data[i] >>= shift;
+      uint8_t __curr;
+
+      while (i >= 0) {
+         i--;
+         __curr = this->__data[i];
+         this->__data[i] = this->__data[i] >> shift | (__prev_right << (8 - shift));
+         __prev_right = __curr;
+      }
+   }
+
+   this->__len -= (shift >> 8) + sub_len;
+   __set_len_in_bits();
+
+   return *this;
 }
 
 int128_t int128_t::karatsuba(int128_t B)

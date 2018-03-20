@@ -37,6 +37,8 @@ void bit_dump_s(uint8_t *data, int size)
 	for (j = size -1; j >= 0; j--)
 		for (i = 0; i < 8; i++)
 		{
+          if (!(i & 3))
+              printf(" ");
 			printf("%d", (data[j] >> (7 - i)) & 1);
 		}
 	printf("\n");

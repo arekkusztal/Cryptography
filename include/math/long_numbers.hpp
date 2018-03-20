@@ -50,12 +50,14 @@ public:
 	int128_t(uint8_t *);
 	int128_t(const char *);
 	int128_t(int128_fast_t);
-	int128_t operator=(int128_t);
+   int128_t(int128_t, uint16_t start, uint16_t end);
+	int128_t operator=(int128_t);   
 	int128_t operator+(Int *);
 	int128_t operator=(const char *);
 	int128_t operator=(int128_fast_t);
 	int128_t operator+=(int128_t);
 	int128_t operator<<=(uint16_t);
+   int128_t operator>>=(uint16_t);
 	int128_t operator*=(int128_t);
 	int128_t karatsuba(int128_t);
 	void copy_bits(uint16_t start, uint16_t end);
@@ -63,6 +65,7 @@ public:
 	~int128_t() = default;
 
 	void print() override;
+   void print_s();
 };
 
 class int128_fast_t {

@@ -10,6 +10,24 @@
 #define INT_1	"1B0A"
 #define INT_2	"0B"
 
+
+
+template <uint16_t len_t>
+class A
+{
+public:
+    A();
+    uint16_t len = len_t;
+
+};
+
+template <uint16_t len_t>
+A<len_t>::A() { };
+
+using int256_t = A<256>;
+using int512_t = A<512>;
+using int1024_t = A<1024>;
+
 int TEST_add_integer_128()
 {
    int128_t A = "0x2F2BC1231142";
@@ -19,12 +37,16 @@ int TEST_add_integer_128()
   // int128_t D = A;
   // C<<=16;
 
-   //A.print();
+
    //A*=B;
 
-   A.karatsuba(B);
+
+  // A.karatsuba(B);
 
    A.print();
+   A.print_s();
+   A>>=6;
+   A.print_s();
 }
 
 int main(int argc, char *argv[])
