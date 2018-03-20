@@ -60,7 +60,9 @@ public:
    int128_t operator>>=(uint16_t);
 	int128_t operator*=(int128_t);
 	int128_t karatsuba(int128_t);
-	void copy_bits(uint16_t start, uint16_t end);
+
+   int copy_bits(int128_t, uint16_t start, uint16_t end);
+   void copy_bits_1(uint16_t start, uint16_t end);
 
 	~int128_t() = default;
 

@@ -43,10 +43,13 @@ int TEST_add_integer_128()
 
   // A.karatsuba(B);
 
-   A.print();
+   A.print_s();
+   //A.print();
+   B.copy_bits(A, 0, 32);
+   /*A.print();
    A.print_s();
    A>>=6;
-   A.print_s();
+   A.print_s();*/
 }
 
 int main(int argc, char *argv[])

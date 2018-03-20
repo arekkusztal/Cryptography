@@ -145,9 +145,10 @@ int128_t int128_t::operator*=(int128_t B)
 int128_t int128_t::operator<<=(uint16_t shift)
 {
 	int i;
-   uint16_t add_len;
+   uint16_t add_len, org_shift;
 
 	shift &= ~0x80;
+   org_shift = shift;
    add_len = 0;
 
    for (i = 0; i < (shift & 0x7); i++) {
@@ -165,7 +166,7 @@ int128_t int128_t::operator<<=(uint16_t shift)
    i = 0;
 	shift &= 0x7;
 	if (shift < 8) {
-		uint8_t __prev_left = this->__data[i] >> (8 - shift);
+      uint8_t __prev_left = this->__data[i] >> (7 - shift);
 		this->__data[i] <<= shift;
 		uint8_t __curr;
 
@@ -173,12 +174,12 @@ int128_t int128_t::operator<<=(uint16_t shift)
 			i++;
 			__curr = this->__data[i];
 			this->__data[i] = this->__data[i] << shift | __prev_left;
-			__prev_left = __curr >> (8 - shift);
+         __prev_left = __curr >> (7 - shift);
 		}
 	}
 
-   this->__len += ((shift >> 8) + add_len) > this->precision ?
-               this->precision : ((shift >> 8) + add_len);
+   this->__len = (this->__len + ((org_shift >> 3) + add_len)) > (this->precision >> 3) ?
+               (this->precision >> 3) : (this->__len + ((org_shift >> 3) + add_len));
    __set_len_in_bits();
 
 	return *this;
@@ -187,10 +188,15 @@ int128_t int128_t::operator<<=(uint16_t shift)
 int128_t int128_t::operator>>=(uint16_t shift)
 {
    int i;
-   uint16_t sub_len;
+   uint16_t sub_len, org_shift;
 
    shift &= ~0x80;
+   org_shift = shift;
    sub_len = 1;
+
+   if (shift >= this->__len) {
+       // empty this
+   }
 
    for (i = 0; i < 8 - (shift & 0x7); i++) {
         if ( (this->__data[this->__len - 1] >> (7 - i)) & 1)
@@ -219,10 +225,18 @@ int128_t int128_t::operator>>=(uint16_t shift)
       }
    }
 
-   this->__len -= (shift >> 8) + sub_len;
+   this->__len -= (org_shift >> 3) + sub_len;
    __set_len_in_bits();
 
    return *this;
+}
+
+
+int int128_t::copy_bits(int128_t A, uint16_t start, uint16_t end)
+{
+    A <<= (128 - end);
+    A >>= (128 - end);
+    A.print_s();
 }
 
 int128_t int128_t::karatsuba(int128_t B)
@@ -251,8 +265,6 @@ int128_t int128_t::karatsuba(int128_t B)
     __chosen_one += !(__chosen_one & 1);
     __b = ( ((__chosen_one - 1) >> 1) + 1);
     printf("\n chosen one = %hu _b = %hu copy = %hu", __chosen_one, __b, this->__len_in_bits - __chosen_one);
-
-
 
 
 
