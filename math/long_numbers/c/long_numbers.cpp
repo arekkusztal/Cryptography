@@ -111,7 +111,38 @@ int128_t int128_t::operator+=(int128_t B)
 	return *this;
 }
 
-int128_t int128_t::operator*=(int128_t B)
+int128_t& int128_t::operator-=(int128_t B)
+{
+    uint16_t i, k, __max_of_two;
+    uint8_t borrow, __b;
+
+    __max_of_two = this->__len >= B.__len ?		\
+          this->__len : B.__len;
+
+    borrow = 0;
+
+    for (i = 0; i < this->__len;i++) {
+        if (!this->__data[i])
+            continue;
+
+        this->__data[i] -= borrow;
+        if (this->__data[i] < B.__data[i]) {
+            borrow = 1;
+            uint16_t ext_1 = this->__data[i];
+            ext_1 += 0x100;
+            ext_1 -= B.__data[i];
+            this->__data[i] = ext_1;
+        }
+        else {
+            this->__data[i] -= B.__data[i];
+            borrow = 0;
+        }
+    }
+
+    return *this;
+}
+
+int128_t& int128_t::operator*=(int128_t B)
 {
    int128_t __temp, __shifted;
    uint16_t i, k, __min_of_two;
@@ -197,8 +228,6 @@ int128_t int128_t::operator<<=(uint16_t shift)
    this->__len = (this->__len + ((org_shift >> 3) + add_len)) > (this->precision >> 3) ?
                (this->precision >> 3) : (this->__len + ((org_shift >> 3) + add_len));
    __set_len_in_bits();
-
-	return *this;
 }
 
 int128_t int128_t::operator>>=(uint16_t shift)
@@ -247,8 +276,6 @@ int128_t int128_t::operator>>=(uint16_t shift)
 
    this->__len -= (org_shift >> 3) + sub_len;
    __set_len_in_bits();
-
-   return *this;
 }
 
 

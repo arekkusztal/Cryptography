@@ -30,12 +30,14 @@ using int1024_t = A<1024>;
 
 int TEST_add_integer_128()
 {
-   int128_t A = "0x21C";
-   int128_t B = "0x20A";
-   int i;
+   int128_t A = "0x241423421C";
+   int128_t B = "0x425230A";
+   A-=B;
+   A.print();
+  /* int i;
    A.print_s("A");
    B.print_s("B");
-   A.karatsuba(B);
+   A.karatsuba(B); */
 
 
 }
