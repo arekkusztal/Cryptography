@@ -347,7 +347,6 @@ int128_t int128_t::karatsuba(int128_t B)
     Z_1 -= Z_2;
     Z_1.print();
 
-
     x_0 -= Z_0;
     Z_1.print();
 

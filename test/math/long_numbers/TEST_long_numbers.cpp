@@ -39,11 +39,22 @@ int TEST_add_integer_128()
    B.print_s("B");
    A.karatsuba(B);
 
+    return 0;
+}
 
+void TEST_shift_integer()
+{
+    int128_t A = "0x10E";
+    A.print_s("A");
+    A <<=120;
+    A.print_s("A <<= 120");
+    A >>=120;
+    A.print_s("A >>= 120");
 }
 
 int main(int argc, char *argv[])
 {
-	TEST_add_integer_128();
+   //TEST_add_integer_128();
+   TEST_shift_integer();
 	return 0;
 }

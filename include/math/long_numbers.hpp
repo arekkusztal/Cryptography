@@ -44,7 +44,7 @@ public:
 	   too_small_to_bother,
 	};
 	const uint16_t precision = PRECISION;
-	enum ERROR_CODE error_code = noerror;
+   enum ERROR_CODE error_code = noerror;
 	int128_t() = default;
 	int128_t(const int128_t& int128_t);
 	int128_t(uint8_t *);

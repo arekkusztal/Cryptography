@@ -34,13 +34,49 @@ void bit_dump_s(uint8_t *data, int size)
 	uint8_t i;
 	int j;
 
-	for (j = size -1; j >= 0; j--)
-		for (i = 0; i < 8; i++)
-		{
-          if (!(i))
-              printf(" (%d) ", j);
-			printf("%d", (data[j] >> (7 - i)) & 1);
-		}
+   int org_size = size;
+   size += 7;
+   size &= ~7;
+   printf("\n");
+   for (j = size; j >= 0; j--) {
+        if (j == size) {
+
+            /* This is one ugly thing, fix when more time */
+            for (i = 0; i < 8; i++) {
+                if (i == 0)
+                    printf("\t%d", 8 - i - 1);
+                else if (i == 1)
+                    printf("\t %d", 8 - i - 1);
+                else if (i == 2)
+                    printf("\t  %d", 8 - i - 1);
+                else if (i == 3)
+                    printf("\t   %d", 8 - i - 1);
+                else if (i == 4)
+                    printf("\t    %d", 8 - i - 1);
+                else if (i == 5)
+                    printf("\t     %d", 8 - i - 1);
+                else if (i == 6)
+                    printf("\t      %d", 8 - i - 1);
+                else if (i == 7)
+                    printf("\t       %d", 8 - i - 1);
+
+            }
+            printf("\n");
+        }
+        else {
+
+         for (i = 0; i < 8; i++) {
+                  if (!(i))
+                      printf(" ");
+                if (j >= org_size)
+                    printf(".");
+                else
+                    printf("%d", (data[j] >> (7 - i)) & 1);
+              }
+              if (j && j % 8 == 0 )
+                  printf("\n");
+        }
+   }
 	printf("\n");
 }
 
