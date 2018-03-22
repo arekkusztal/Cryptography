@@ -17,6 +17,10 @@ extern "C" {
 #define KCYN  "\x1B[36m"
 #define KWHT  "\x1B[37m"
 
+#define foreach(arg, args) \
+            arg = &(*args);        \
+            for (; arg < &(*args) + sizeof(args)/sizeof(*args); arg++ ) \
+
 enum AES_KEY_SZ {
 	AES_KEY_SZ_16 = 16,
 	AES_KEY_SZ_24 = 24,

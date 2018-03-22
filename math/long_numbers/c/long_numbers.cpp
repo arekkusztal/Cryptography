@@ -16,6 +16,7 @@ void int128_t::print()
 void int128_t::print_s(const char * str)
 {
     int i;
+    printf("\n<");
     for (i = 0; i < 40; i++)
         printf("-");
    printf("\n%s %s %s", KCYN, str, KNRM);
@@ -24,6 +25,7 @@ void int128_t::print_s(const char * str)
 
     for (i = 0; i < 40; i++)
         printf("-");
+    printf(">");
 
 }
 
@@ -374,6 +376,13 @@ int128_t int128_t::karatsuba(int128_t B)
 int128_t int128_t::operator=(int128_t A)
 {
     memcpy(this, &A, sizeof(*this));
+}
+
+bool int128_t::operator==(int128_t *A)
+{
+    if (this->__len_in_bits != A->__len_in_bits)
+        return false;
+    return !memcmp(this->__data, A->__data, this->__len);
 }
 
 /*

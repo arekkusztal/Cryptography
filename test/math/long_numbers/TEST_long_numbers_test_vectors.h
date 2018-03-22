@@ -3,12 +3,18 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum OP {
 	ADD = 1,
 	SUB,
 	MULT,
 	DIV,
-	MOD
+   MOD,
+   LSH,
+   RSH,
 };
 
 
@@ -28,15 +34,55 @@ struct long_number_vector
 	struct {
 		uint8_t data[1024];
 		uint16_t size [1024];
-	} R;
+   } R;
+   uint16_t lsh;
+};
+
+static struct long_number_vector long_numbers_shift_vectors[] =
+{
+    {
+        LSH,
+        {
+            "0x10E",
+            2
+        },
+        {
+            /* Unused */
+        },
+        {
+            "0E000000000000000000000000000000",
+            16
+        },
+        120,
+    },
+    {
+        LSH,
+        {
+            "1521534435",
+            sizeof("1521534435")
+        },
+        {
+            /* Unused */
+        },
+        {
+
+        },
+        117
+    }
 };
 
 static struct long_number_vector long_number_add_1 = {
-		ADD,
+      ADD,
 		{
 				"12254412",
 				4
 		},
+    {
+    },
+    {
+    },
+    0
+
 };
 /*	.op = ADD,
 	.A = {
@@ -109,5 +155,8 @@ static struct long_number_vector long_number_mult_3 = {
 	},
 };
 */
+#ifdef __cplusplus
+}
+#endif
 
 #endif
