@@ -53,7 +53,7 @@ void bit_dump_s(uint8_t *data, int size)
    int org_size = size;
    size += 7;
    size &= ~7;
-   printf("%s", KGRN);
+   printf("%s", KNRM);
    hex_dump_number("HEX: ", data, org_size, 16);
    printf("\n%s", KYEL);
    for (j = size; j >= 0; j--) {

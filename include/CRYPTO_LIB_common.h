@@ -18,8 +18,11 @@ extern "C" {
 #define KWHT  "\x1B[37m"
 
 #define foreach(arg, args) \
-            arg = &(*args);        \
-            for (; arg < &(*args) + sizeof(args)/sizeof(*args); arg++ ) \
+			decltype(&args[0]) arg; \
+            arg = args;        \
+            for (; arg < (decltype(arg))args + sizeof(args)/sizeof(*args); arg++ ) \
+
+//for (; arg < (decltype(arg))args + sizeof(args)/sizeof(*args); arg++ ) \
 
 enum AES_KEY_SZ {
 	AES_KEY_SZ_16 = 16,

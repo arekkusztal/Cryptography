@@ -54,6 +54,7 @@ public:
 	int128_t operator=(int128_t);   
 	int128_t operator+(Int *);
 	int128_t operator=(const char *);
+	int128_t operator=(unsigned char *);
 	int128_t operator=(int128_fast_t);
 	int128_t operator+=(int128_t);
 	int128_t operator<<=(uint16_t);
@@ -62,6 +63,7 @@ public:
 	int128_t karatsuba(int128_t);
    int128_t& operator-=(int128_t);
    bool operator==(int128_t *);
+   bool operator==(unsigned char *);
 
 	int copy_bits(int128_t, uint16_t start, uint16_t end);
 	void copy_bits_1(uint16_t start, uint16_t end);

@@ -19,8 +19,8 @@ void int128_t::print_s(const char * str)
     printf("\n<");
     for (i = 0; i < 40; i++)
         printf("-");
-   printf("\n%s %s %s", KCYN, str, KNRM);
-   printf("\n | len = %s%hu%s | leninbits = %s%hu%s |", KRED, this->__len, KNRM, KRED,this->__len_in_bits, KNRM);
+   printf("\n%s %s %s", KNRM, str, KNRM);
+   printf("\n | len = %s%hu%s | leninbits = %s%hu%s |", KNRM, this->__len, KNRM, KNRM,this->__len_in_bits, KNRM);
     bit_dump_s(this->__data, this->__len);
 
     for (i = 0; i < 40; i++)
@@ -85,36 +85,63 @@ int128_t::int128_t(const char *number)
    __set_len_in_bits();
 }
 
-#define intN_t_add \
-		__max_of_two = this->__len >= B.__len ?		\
-				this->__len : B.__len;		\
-		carry = 0;		\
-		i = 0;	\
-		while (i < __max_of_two) \
-		{ \
-			uint8_t t_a = this->__data[i], t_b = B.__data[i];	\
-			__b = this->__data[i] + B.__data[i] + carry; \
-			this->__data[i] = __b; \
-			if (__builtin_expect((t_a && t_b), 1)) { \
-				if (__b < t_a || __b < t_b) \
-					carry = 1; \
-				else \
-					carry = 0; \
-			} else if ((t_a == 0xFF || t_b == 0xFF) && carry) \
-				carry = 1; \
-			else \
-				carry = 0; \
-			i++; \
-      } \
-		if (carry) \
-			this->__data[i] = 1; /* and i < precision >> 3 */
+int128_t::int128_t(unsigned char *number)
+{
+	uint16_t __len, i, prefix;
 
+	__len = strlen((const char *)number);
+	if (__len > 128)
+		return;
+
+	i = 0;
+	if (number[0] == '0' && number[1] == 'x')
+		prefix = 2;
+	else
+		prefix = 0;
+
+	while (i < __len - prefix) {
+		/*
+		 * TODO
+		 * check if number[] is hex
+		 */
+		__data[(i & (~1)) >> 1] += (i & 1) ?
+				(HEX_ME(number[__len - i - 1]) << 4) :
+					HEX_ME(number[__len - i - 1]);
+		i++;
+	}
+
+	this->__len = ((__len - prefix) >> 1) + (__len & 1);
+   __set_len_in_bits();
+}
 int128_t int128_t::operator+=(int128_t B)
 {
 	uint16_t i, k, __max_of_two;
    uint8_t carry, __b;
 
-   intN_t_add;
+	__max_of_two = this->__len >= B.__len ?
+			this->__len : B.__len;
+	carry = 0;
+	i = 0;
+	while (i < __max_of_two)
+	{
+		uint8_t t_a = this->__data[i], t_b = B.__data[i];
+		__b = this->__data[i] + B.__data[i] + carry;
+		this->__data[i] = __b;
+		if (__builtin_expect((t_a && t_b), 1)) {
+			if (__b < t_a || __b < t_b)
+				carry = 1;
+			else
+				carry = 0;
+		} else if ((t_a == 0xFF || t_b == 0xFF) && carry)
+			carry = 1;
+		else
+			carry = 0;
+		i++;
+	}
+	if (carry) {
+		this->__data[i] = 1;
+		this->__len += 1;
+	}
 	/*
 	* If carry general overflow
 	*/
@@ -156,11 +183,13 @@ int128_t& int128_t::operator-=(int128_t B)
 int128_t& int128_t::operator*=(int128_t B)
 {
    int128_t __temp, __shifted;
-   uint16_t i, k, __min_of_two;
+   uint16_t i, k, __min_of_two, __final_len;
    uint8_t __a_is_smaller;
 
    __temp.__len = 1;
    __temp.__len_in_bits = 8;
+   __final_len = this->__len + B.__len;
+
 
    if (this->__len <= B.__len) {
        __shifted = B;
@@ -174,10 +203,7 @@ int128_t& int128_t::operator*=(int128_t B)
    if (__a_is_smaller) {
        for (i = 0; i < this->__len << 3; i++) {
            if ( (this->__data[i >> 3] >> (i & 0x7)) & 1) {
-        	   __shifted.print_s("Shifted");
                __temp += __shifted;
-               //__temp.print_s("__temp");
-               __temp.print();
 
            }
            __shifted <<= 1;
@@ -193,7 +219,7 @@ int128_t& int128_t::operator*=(int128_t B)
    }
 
    *this = __temp;
-   this->__len = this->__len + B.__len;
+   this->__len = __final_len;
    __set_len_in_bits();
 
    return *this;
@@ -384,6 +410,12 @@ bool int128_t::operator==(int128_t *A)
         return false;
     return !memcmp(this->__data, A->__data, this->__len);
 }
+
+bool int128_t::operator==(unsigned char *s)
+{
+    return !memcmp(this->__data, s, this->__len);
+}
+
 
 /*
 	__max_of_two = this->__len >= B.__len ?

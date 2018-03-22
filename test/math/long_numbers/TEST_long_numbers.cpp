@@ -44,24 +44,103 @@ int TEST_add_integer_128()
 
 static int __TEST_shift_vector(long_number_vector *vector)
 {
+#define DEBUG_1
+	bool result;
+	int128_t A = vector->A.data;
+#ifdef DEBUG_1
+    A.print_s("<----> DEFINITION: A");
+    if (vector->op == LSH)
+    	printf("\n shift left by = %hu", vector->lsh);
+    else
+    	printf("\n shift right by = %hu", vector->lsh);
+#endif
+    if (vector->op == LSH)
+    	A <<= vector->lsh;
+    else
+    	A >>= vector->lsh;
+#ifdef DEBUG_1
+    A.print_s("<----> OPERATION:");
+#endif
+    if (result = (A == vector->R.data))
+    	printf("\n%sTest %s SUCCESS%s", KGRN, vector->name, KNRM);
+    else
+    	printf("\n%sTest %s FAIL%s", KRED, vector->name, KNRM);
 
-    printf("\n lsh = %hu", vector->lsh);
+    return result;
+}
+
+static int __TEST_mult_vector(long_number_vector *vector)
+{
+	bool result;
+	int128_t A = vector->A.data;
+	int128_t B = vector->B.data;
+#ifdef DEBUG_1
+    A.print_s("<----> DEFINITION: A");
+    B.print_s("<----> DEFINITION: B");
+    printf("\n mult");
+#endif
+    A*=B;
+#ifdef DEBUG_1
+    A.print_s("<----> MULT:");
+#endif
+
+    if (result = (A == vector->R.data))
+    	printf("\n%sTest %s SUCCESS%s", KGRN, vector->name, KNRM);
+    else
+    	printf("\n%sTest %s FAIL%s", KRED, vector->name, KNRM);
+
+    return result;
+}
+
+static int __TEST_add_vector(long_number_vector *vector)
+{
+	bool result;
+	int128_t A = vector->A.data;
+	int128_t B = vector->B.data;
+#ifdef DEBUG_1
+    A.print_s("<----> DEFINITION: A");
+    B.print_s("<----> DEFINITION: B");
+    printf("\n mult");
+#endif
+    A+=B;
+#ifdef DEBUG_1
+    A.print_s("<----> ADD:");
+#endif
+
+    if (result = (A == vector->R.data))
+    	printf("\n%sTest %s SUCCESS%s", KGRN, vector->name, KNRM);
+    else
+    	printf("\n%sTest %s FAIL%s", KRED, vector->name, KNRM);
+
+    return result;
 }
 
 void TEST_shift_integer()
 {
-    int128_t A = "0x10E";
-    A.print_s("<----> DEFINITION: A");
-    A <<=120;
-    A.print_s("<----> OPERATION: A <<= 120");
-    A >>=120;
-    A.print_s("<----> OPERATION: A >>= 120");
-
-    long_number_vector *vector;
-    foreach(vector, long_numbers_shift_vectors) {
+	foreach(vector, long_numbers_shift_vectors) {
         __TEST_shift_vector(vector);
     }
-    //    printf("\n lsh = %p", vector);
+}
+
+void TEST_mult_integer()
+{
+	foreach(vector, long_numbers_mult_vectors) {
+        __TEST_mult_vector(vector);
+    }
+}
+
+void TEST_add_integer()
+{
+	foreach(vector, long_numbers_add_vectors) {
+        __TEST_add_vector(vector);
+    }
+}
+
+void TEST_karatsuba()
+{
+	foreach(vector, long_numbers_add_vectors) {
+        __TEST_add_vector(vector);
+    }
 }
 
 void TEST_cmp_integer()
@@ -75,8 +154,10 @@ void TEST_cmp_integer()
 int main(int argc, char *argv[])
 {
    //TEST_add_integer_128();
-   TEST_shift_integer();
+   //TEST_shift_integer();
    //TEST_cmp_integer();
+   //TEST_mult_integer();
+   //TEST_add_integer();
    printf("\n");
 	return 0;
 }

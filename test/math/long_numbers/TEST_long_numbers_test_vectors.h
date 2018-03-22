@@ -20,19 +20,20 @@ enum OP {
 
 struct long_number_vector
 {
+	const char *name;
 	enum OP op;
 	struct {
-		uint8_t data[1024];
+		unsigned char data[1024];
 		uint16_t size [1024];
 	} A;
 
 	struct {
-		uint8_t data[1024];
+		unsigned char data[1024];
 		uint16_t size [1024];
 	} B;
 
 	struct {
-		uint8_t data[1024];
+		unsigned char data[1024];
 		uint16_t size [1024];
    } R;
    uint16_t lsh;
@@ -41,21 +42,23 @@ struct long_number_vector
 static struct long_number_vector long_numbers_shift_vectors[] =
 {
     {
+    	"LEFT_SHIFT_vector_1_LSH_120",
         LSH,
         {
             "0x10E",
             2
         },
         {
-            /* Unused */
         },
         {
-            "0E000000000000000000000000000000",
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0E,
             16
         },
         120,
     },
     {
+    	"LEFT_SHIFT_vector_1_LSH_117",
         LSH,
         {
             "1521534435",
@@ -65,12 +68,93 @@ static struct long_number_vector long_numbers_shift_vectors[] =
             /* Unused */
         },
         {
-
+    			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xA0, 0x86,
         },
         117
     }
 };
 
+static struct long_number_vector long_numbers_add_vectors[] =
+{
+    {
+    	"ADD_vector_10E_75E4",
+        LSH,
+        {
+            "10E",
+            2
+        },
+        {
+        		"75E4",
+        		2
+        },
+        {
+			0x78, 0x56, 0x7C, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			//"7C5678",
+            3
+        },
+    },
+    {
+    	"ADD_vector_10E_75E4",
+        LSH,
+        {
+            "FFAE",
+            2
+        },
+        {
+        		"75E4",
+        		2
+        },
+        {
+			0x78, 0x56, 0x7C, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			//"7C5678",
+            3
+        },
+    },
+};
+
+static struct long_number_vector long_numbers_mult_vectors[] =
+{
+    {
+    	"MULT_vector_10E_75E4",
+        LSH,
+        {
+            "10E",
+            2
+        },
+        {
+        		"75E4",
+        		2
+        },
+        {
+			0x78, 0x56, 0x7C, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			//"7C5678",
+            3
+        },
+    },
+    {
+    	"MULT_vector_F13410E_A1243FF5E4",
+        LSH,
+        {
+           "F13410E",
+            4
+        },
+        {
+        	"A1243FF5E4",
+        	5
+        },
+        {
+			0x78, 0x56, 0x7C, 0x00, 0x00, 0x00, 0x00, 0x00,
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+			//"7C5678",
+            3
+        },
+    },
+};
+/*
 static struct long_number_vector long_number_add_1 = {
       ADD,
 		{
@@ -83,7 +167,7 @@ static struct long_number_vector long_number_add_1 = {
     },
     0
 
-};
+}; */
 /*	.op = ADD,
 	.A = {
 		.data = "12254412",
