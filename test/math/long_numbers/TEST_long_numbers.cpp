@@ -45,16 +45,17 @@ int TEST_add_integer_128()
 void TEST_shift_integer()
 {
     int128_t A = "0x10E";
-    A.print_s("A");
+    A.print_s("<----> DEFINITION: A");
     A <<=120;
-    A.print_s("A <<= 120");
+    A.print_s("<----> OPERATION: A <<= 120");
     A >>=120;
-    A.print_s("A >>= 120");
+    A.print_s("<----> OPERATION: A >>= 120");
 }
 
 int main(int argc, char *argv[])
 {
    //TEST_add_integer_128();
    TEST_shift_integer();
+   printf("\n");
 	return 0;
 }

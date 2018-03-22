@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <long_numbers.hpp>
 
+#include <CRYPTO_LIB_common.h>
 #include <Arus_dev_kit.h>
 
 void int128_t::print()
@@ -14,8 +15,16 @@ void int128_t::print()
 
 void int128_t::print_s(const char * str)
 {
-	printf("\n %s", str);
+    int i;
+    for (i = 0; i < 40; i++)
+        printf("-");
+   printf("\n%s %s %s", KCYN, str, KNRM);
+   printf("\n | len = %s%hu%s | leninbits = %s%hu%s |", KRED, this->__len, KNRM, KRED,this->__len_in_bits, KNRM);
     bit_dump_s(this->__data, this->__len);
+
+    for (i = 0; i < 40; i++)
+        printf("-");
+
 }
 
 int128_t::int128_t(const int128_t &T)

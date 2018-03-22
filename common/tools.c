@@ -4,6 +4,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <CRYPTO_LIB_common.h>
+
 void hex_dump(const char *def, uint8_t *data, uint16_t len,
 		uint16_t br)
 {
@@ -16,6 +18,20 @@ void hex_dump(const char *def, uint8_t *data, uint16_t len,
 		printf("0x%02X ",data[i]);
 	}
 	printf("\n");
+}
+
+void hex_dump_number(const char *def, uint8_t *data, uint16_t len,
+      uint16_t br)
+{
+   int16_t i;
+   printf("\n");
+   printf("\n%s:\n", def);
+   for (i = len -1; i >= 0; i--) {
+      if (i && ( i % br ==0 ))
+         printf("\n");
+      printf("0x%02X ",data[i]);
+   }
+   printf("\n");
 }
 
 void bit_dump_b(uint8_t data)
@@ -37,7 +53,9 @@ void bit_dump_s(uint8_t *data, int size)
    int org_size = size;
    size += 7;
    size &= ~7;
-   printf("\n");
+   printf("%s", KGRN);
+   hex_dump_number("HEX: ", data, org_size, 16);
+   printf("\n%s", KYEL);
    for (j = size; j >= 0; j--) {
         if (j == size) {
 
@@ -61,7 +79,7 @@ void bit_dump_s(uint8_t *data, int size)
                     printf("\t       %d", 8 - i - 1);
 
             }
-            printf("\n");
+            printf("\n%s", KNRM);
         }
         else {
 
