@@ -158,6 +158,10 @@ int main(int argc, char *argv[])
    //TEST_cmp_integer();
    //TEST_mult_integer();
    //TEST_add_integer();
-   printf("\n");
+	int128 A = "10FABB2";
+	int256 B;
+	B = integer_cast<256>(A);
+	B.print_s("");
+    printf("\n");
 	return 0;
 }
