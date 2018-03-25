@@ -86,6 +86,8 @@ class Integer
 {
 public:
 	uint8_t __data[len] = { };
+	uint16_t __len = 0;
+	uint16_t __len_in_bits = 0;
 public:
 
 	const uint64_t precision = len;
@@ -94,10 +96,11 @@ public:
 	Integer<len>(uint8_t *);
 	Integer<len>(const char *);
 	/* < Operators */
+	/* < ---- *< Assignement */
 	Integer<len> operator=(Integer<len>);
+	/* < ---- *< Arithmetic */
 
-	uint16_t __len = 0;
-	uint16_t __len_in_bits = 0;
+	/* <Len functions */
 	void __set_len_in_bits();
 
 	/* < Debug funcs */
@@ -168,7 +171,46 @@ Integer<len>::Integer(const char *number)
 template <uint16_t len>
 Integer<len> Integer<len>::operator=(Integer<len> A)
 {
-    memcpy(this, &A, sizeof(*this));
+	memcpy(this->__data, A.__data, this->__len);
+	this->__len = A.__len;
+	this->__len_in_bits = A.__len_in_bits;
+}
+
+template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
+{
+	Integer<len_A> ret;
+	uint16_t i, k, __max_of_two;
+	uint8_t carry;
+
+	__max_of_two = A.__len >= B.__len ?
+			A.__len : B.__len;
+	carry = 0;
+	i = 0;
+	while (i < __max_of_two)
+	{
+		ret.__data[i] = A.__data[i] + B.__data[i] + carry;
+		if (__builtin_expect((A.__data[i] && B.__data[i]), 1)) {
+			if (ret.__data[i] < A.__data[i] || ret.__data[i] < B.__data[i])
+				carry = 1;
+			else
+				carry = 0;
+		} else if ((A.__data[i] == 0xFF || B.__data[i] == 0xFF) && carry)
+			carry = 1;
+		else
+			carry = 0;
+		i++;
+	}
+
+	ret.__len = __max_of_two;
+	if (carry) {
+		ret.__data[i] = 1;
+		ret.__len += 1;
+	}
+	ret.__set_len_in_bits();
+	ret.print_s("");
+
+	return ret;
 }
 
 template <uint16_t len>

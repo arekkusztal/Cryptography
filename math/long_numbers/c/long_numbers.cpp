@@ -416,28 +416,3 @@ bool int128_t::operator==(unsigned char *s)
 {
     return !memcmp(this->__data, s, this->__len);
 }
-
-
-/*
-	__max_of_two = this->__len >= B.__len ?
-			this->__len : B.__len;
-	carry = 0;
-	i = 0;
-
-	while (i < __max_of_two)
-	{
-		uint8_t t_a = this->__data[i], t_b = B.__data[i];
-		__b = this->__data[i] + B.__data[i] + carry;
-		this->__data[i] = __b;
-
-		if (__builtin_expect((t_a && t_b), 1)) {
-			if (__b < t_a || __b < t_b)
-				carry = 1;
-			else
-				carry = 0;
-		} else if ((t_a == 0xFF || t_b == 0xFF) && carry)
-			carry = 1;
-		else
-			carry = 0;
-		i++;
-	} */

@@ -159,9 +159,10 @@ int main(int argc, char *argv[])
    //TEST_mult_integer();
    //TEST_add_integer();
 	int128 A = "10FABB2";
-	int256 B;
-	B = integer_cast<256>(A);
-	B.print_s("");
+	int256 B = "FF";
+	int128 C = A + B;
+
+	C.print_s("");
     printf("\n");
 	return 0;
 }
