@@ -100,6 +100,9 @@ public:
 	Integer<len> operator=(Integer<len>);
 	/* < ---- *< Arithmetic */
 
+   /* < ---- *< Shift operators */
+   Integer<len> operator<<(uint16_t shift);
+   Integer<len> operator>>(uint16_t shift);
 	/* <Len functions */
 	void __set_len_in_bits();
 
@@ -176,6 +179,10 @@ Integer<len> Integer<len>::operator=(Integer<len> A)
 	this->__len_in_bits = A.__len_in_bits;
 }
 
+/*
+ * ********** Arithmetic operators  **********
+ */
+
 template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
 {
@@ -207,11 +214,191 @@ Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
 		ret.__data[i] = 1;
 		ret.__len += 1;
 	}
-	ret.__set_len_in_bits();
-	ret.print_s("");
+   ret.__set_len_in_bits();
 
 	return ret;
 }
+
+template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B)
+{
+    Integer<len_A> ret;
+    uint16_t i, k, __max_of_two;
+    uint8_t borrow, __b;
+
+    __max_of_two = A.__len >= B.__len ?		\
+          A.__len : B.__len;
+
+    borrow = 0;
+
+    for (i = 0; i < A.__len;i++) {
+        if (!A.__data[i])
+            continue;
+
+        A.__data[i] -= borrow;
+        if (A.__data[i] < B.__data[i]) {
+            borrow = 1;
+            uint16_t ext_1 = A.__data[i];
+            ext_1 += 0x100;
+            ext_1 -= B.__data[i];
+            ret.__data[i] = ext_1;
+        }
+        else {
+            ret.__data[i] = A.__data[i] - B.__data[i];
+            borrow = 0;
+        }
+    }
+
+    return ret;
+}
+
+template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> operator*(Integer<len_A> A, Integer<len_B> B)
+{
+   Integer<len_A> ret;
+   Integer<len_A> __temp, __shifted;
+   uint16_t i, k, __min_of_two, __final_len;
+   uint8_t __a_is_smaller;
+
+   __temp.__len = 1;
+   __temp.__len_in_bits = 8;
+   __final_len = A.__len + B.__len;
+
+
+   if (A.__len <= B.__len) {
+       __shifted = B;
+       __a_is_smaller = true;
+   }
+   else {
+       __shifted = A;
+       __a_is_smaller = false;
+   }
+
+   if (__a_is_smaller) {
+       for (i = 0; i < A.__len << 3; i++) {
+           if ( (A.__data[i >> 3] >> (i & 0x7)) & 1) {
+               __temp += __shifted;
+
+           }
+           __shifted <<= 1;
+       }
+   }
+   else {
+        for (i = 0; i < B.__len << 3; i++) {
+            if ( (B.__data[i >> 3] >> (i & 0x7)) & 1) {
+                __temp += __shifted;
+            }
+            __shifted <<= 1;
+        }
+   }
+
+   ret = __temp;
+   ret.__len = __final_len;
+   ret.__set_len_in_bits();
+
+   return ret;
+}
+
+/*
+ * ********** Bit shift operators  **********
+*/
+
+template <uint16_t len>
+Integer<len> Integer<len>::operator<<(uint16_t shift)
+{
+   Integer<len> ret;
+   int i;
+   uint16_t add_len, org_shift;
+
+   shift &= (len - 1);
+   org_shift = shift;
+   add_len = 0;
+
+   for (i = 0; i < (shift & 0x7); i++) {
+        if ( (this->__data[this->__len - 1] >> (7 - i)) & 1)
+            add_len = 1;
+   }
+
+   i = 0;
+   for (i = len - 1; i >= (shift >> 3); i--) {
+      ret.__data[i] = this->__data[i - (shift >> 3)];
+   }
+   for (i = (shift >> 3) - 1; i >= 0; i--) {
+      ret.__data[i] = 0;
+   }
+   i = 0;
+   shift &= 0x7;
+   if (shift && shift < 8) {
+
+      uint8_t __prev_left = this->__data[i] >> (8 - shift);
+      ret.__data[i] <<= shift;
+      uint8_t __curr;
+
+      while (i < this->__len + (org_shift >> 3)) {
+         i++;
+         __curr = this->__data[i];
+         ret.__data[i] = this->__data[i] << shift | __prev_left;
+         __prev_left = __curr >> (8 - shift);
+      }
+   }
+
+   ret.__len = (this->__len + ((org_shift >> 3) + add_len)) > (this->precision >> 3) ?
+               (this->precision >> 3) : (this->__len + ((org_shift >> 3) + add_len));
+   __set_len_in_bits();
+}
+
+template <uint16_t len>
+Integer<len> Integer<len>::operator>>(uint16_t shift)
+{
+   int i;
+   uint16_t sub_len, org_shift;
+
+   shift &= (len - 1);
+   org_shift = shift;
+   sub_len = 1;
+
+   if (shift >= this->__len_in_bits) {
+      /* TODO: Optimize to size */
+       memset(this->__data, 0, this->precision >> 3);
+       this->__len = 0;
+       this->__len_in_bits = 0;
+       return *this;
+   }
+
+   for (i = 0; i < 8 - (shift & 0x7); i++) {
+        if ( (this->__data[this->__len - 1] >> (7 - i)) & 1)
+            sub_len = 0;
+   }
+
+   i = 0;
+   for (i = 0; i < len - (shift >> 3); i++) {
+      this->__data[i] = this->__data[i + (shift >> 3)];
+   }
+   for (i = (len - 1) - (shift >> 3); i < 16; i++) {
+      this->__data[i] = 0;
+   }
+   i = this->__len - 1;
+   shift &= 0x7;
+   if (shift < 8) {
+      uint8_t __prev_right = this->__data[i];
+      this->__data[i] >>= shift;
+      uint8_t __curr;
+
+      while (i >= 0) {
+         i--;
+         __curr = this->__data[i];
+         this->__data[i] = this->__data[i] >> shift | (__prev_right << (8 - shift));
+         __prev_right = __curr;
+      }
+   }
+
+   this->__len -= (org_shift >> 3) + sub_len;
+   __set_len_in_bits();
+}
+
+/*
+ * ********** Misc member functions  **********
+*/
 
 template <uint16_t len>
 void Integer<len>::__set_len_in_bits()
