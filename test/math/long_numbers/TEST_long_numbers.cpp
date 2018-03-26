@@ -158,11 +158,12 @@ int main(int argc, char *argv[])
    //TEST_cmp_integer();
    //TEST_mult_integer();
    //TEST_add_integer();
-	int128 A = "10FABB2";
-	int256 B = "FF";
-	int128 C = A + B;
+	int32 A = "0xFFFFFFFD";
+	int32 B = "0xAAAAAAAA";
+	int16 C = "0x5";
+	A = A + C;
 
-	C.print_s("");
+	A.print_s("");
     printf("\n");
 	return 0;
 }

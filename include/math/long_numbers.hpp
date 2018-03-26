@@ -187,13 +187,22 @@ template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
 {
 	Integer<len_A> ret;
-	uint16_t i, k, __max_of_two;
+	uint16_t i, __max_of_two, __complement;
 	uint8_t carry;
 
-	__max_of_two = A.__len >= B.__len ?
-			A.__len : B.__len;
 	carry = 0;
 	i = 0;
+	__complement = 0;
+	__max_of_two = A.__len >= B.__len ?
+			A.__len : B.__len;
+
+	if (__builtin_expect(len_A < len_B, 0))
+		throw;
+	if (__builtin_expect(len_A > len_B, 0)) {
+		__complement = __max_of_two;
+		__max_of_two = len_B >> 3;
+	}
+
 	while (i < __max_of_two)
 	{
 		ret.__data[i] = A.__data[i] + B.__data[i] + carry;
@@ -209,14 +218,30 @@ Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
 		i++;
 	}
 
-	ret.__len = __max_of_two;
+	while (i < __complement)
+	{
+		ret.__data[i] = A.__data[i] + carry;
+		if (__builtin_expect((A.__data[i]), 1)) {
+			if (ret.__data[i] < A.__data[i])
+				carry = 1;
+			else
+				carry = 0;
+		} else if (A.__data[i] == 0xFF && carry)
+			carry = 1;
+		i++;
+	}
+
+	ret.__len = __complement ? __complement : __max_of_two;
 	if (carry) {
 		ret.__data[i] = 1;
 		ret.__len += 1;
+		if (ret.__len > (len_A >> 3)) {
+			ret.__len -= (len_A >> 3);
+		}
 	}
    ret.__set_len_in_bits();
 
-	return ret;
+   return ret;
 }
 
 template <uint16_t len_A, uint16_t len_B>
@@ -449,6 +474,8 @@ void Integer<len>::print_s(const char * str)
 
 }
 
+using int16 = Integer<16>;
+using int32 = Integer<32>;
 using int128 = Integer<128>;
 using int256 = Integer<256>;
 
