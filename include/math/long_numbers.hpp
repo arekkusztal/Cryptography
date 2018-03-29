@@ -174,7 +174,7 @@ Integer<len>::Integer(const char *number)
 template <uint16_t len>
 Integer<len> Integer<len>::operator=(Integer<len> A)
 {
-	memcpy(this->__data, A.__data, this->__len);
+   memcpy(this->__data, A.__data, A.__len);
 	this->__len = A.__len;
    this->__len_in_bits = A.__len_in_bits;
 }
