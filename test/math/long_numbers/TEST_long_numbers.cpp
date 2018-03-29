@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
    //TEST_add_integer();
    int16 A = "0x5";
    int16 B = "0x5";
-   A += B;
+   A = A >> 3;
 
 	A.print_s("");
     printf("\n");
