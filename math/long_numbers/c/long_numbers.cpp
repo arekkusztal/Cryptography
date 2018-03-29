@@ -326,77 +326,7 @@ int int128_t::copy_bits(int128_t A, uint16_t start, uint16_t end)
 
 int128_t int128_t::karatsuba(int128_t B)
 {
-#define OFFSET_CONSTANT 1
-    int i, k;
-    uint16_t __b;
-    uint8_t __likely_overflow;
-    uint16_t __chosen_one;
-    int128_t Z_0, Z_1, Z_2;
-    int128_t x_0, x_1, y_0, y_1;
 
-/*    if (this->__len_in_bits <= 64 || B.__len_in_bits <= 64) {
-        this->error_code = too_small_to_bother;
-        return *this;
-    }
-
-    if (this->__len_in_bits + B.__len_in_bits >= this->precision) {
-        this->error_code = potential_overflow;
-        return *this;
-    }*/
-
-    /* Choose it wisely for both args */
-    __chosen_one = this->__len_in_bits - OFFSET_CONSTANT;
-    __chosen_one += !(__chosen_one & 1);
-  //  __b = ( ((__chosen_one - 1) >> 1) + 1);
-    __b = (__chosen_one << 1) - 1;
-    x_0.copy_bits(*this, __chosen_one - 1, this->__len_in_bits);
-    x_0.print_s("x_0");
-    x_1.copy_bits(B, __chosen_one - 1, __len_in_bits);
-    x_0.print_s("x_1");
-
-    y_0.copy_bits(*this, 0, __chosen_one - 2);
-    y_0.print_s("y_0");
-
-    y_1.copy_bits(B, 0, __chosen_one - 2);
-    y_1.print_s("y_1");
-    Z_2 = x_0;
-    Z_2 *= x_1;
-    Z_2.print_s("Z_2");
-
-    printf("\n == Z_0");
-    Z_0 = y_0;
-    Z_0.print();
-    Z_0 *= y_1;
-    Z_0.print_s("Z_0");
-    Z_0.print();
-    Z_0.print_s("Z_0");
-
-    Z_1 = x_0;
-
-    Z_1 += y_0;
-    Z_1.print();
-
-    Z_1 += y_1;
-    Z_1.print();
-
-    Z_1 *= x_1;
-    Z_1.print();
-
-    Z_1 -= Z_2;
-    Z_1.print();
-
-    x_0 -= Z_0;
-    Z_1.print();
-
-    Z_2 <<= __b - 1;
-    Z_2.print();
-    Z_1 <<= __chosen_one - 1;
-    Z_1.print();
-    Z_0.print();
-
-    Z_2 += Z_1;
-    Z_2 += Z_0;
-    Z_2.print();
 
 }
 

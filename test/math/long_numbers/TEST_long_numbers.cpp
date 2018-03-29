@@ -159,12 +159,23 @@ int main(int argc, char *argv[])
    //TEST_mult_integer();
    //TEST_add_integer();
 
-    int128 A = "0x10E";
-    int128 B = "0x105";
+  /*  int128 A = "0x10E";
+    int128 B = "0x105"; */
 
-    A = karatsuba(A, B);
+  /*  int128 A = "0x21C";
+    int128 B = "0x20A"; */
+	// 04 4D 18
 
-    A.print_s("A");
+/*	int128 A = "0xB10";
+	int128 B = "0xB10"; */
+
+ /*   A.print_s("A");
+    B.print_s("B");
+
+    A = karatsuba(A, B); */
+
+
+ //   A.print_s("A");
 
     printf("\n");
 	return 0;

@@ -401,7 +401,7 @@ Integer<len_A> operator*(Integer<len_A> A, Integer<len_B> B)
 template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> karatsuba(Integer<len_A> A, Integer<len_B> B)
 {
-#define OFFSET_CONSTANT 1
+#define OFFSET_CONSTANT 2
     Integer<len_A> ret;
     uint16_t __chosen_one, __b;
 
@@ -410,33 +410,25 @@ Integer<len_A> karatsuba(Integer<len_A> A, Integer<len_B> B)
 
     __chosen_one = A.__len_in_bits - OFFSET_CONSTANT;
     __b = __chosen_one << 1;
-    x_0.copy_bits(A, __chosen_one - 1, A.__len_in_bits);
+
+    x_0.copy_bits(A, __chosen_one, A.__len_in_bits);
+    x_1.copy_bits(B, __chosen_one, B.__len_in_bits);
+    y_0.copy_bits(A, 0, __chosen_one - OFFSET_CONSTANT);
+    y_1.copy_bits(B, 0, __chosen_one - OFFSET_CONSTANT);
+    Z_2 = x_0 * x_1;
+    Z_0 = y_0 * y_1;
+    Z_1 = (x_0 + y_0) * (x_1 + y_1) - Z_0 - Z_2;
+    ret = (Z_2 << __b) + (Z_1 << __chosen_one) + Z_0;
+
     x_0.print_s("x_0");
-    x_1.copy_bits(B, __chosen_one - 1, B.__len_in_bits);
     x_0.print_s("x_1");
-
-    y_0.copy_bits(A, 0, __chosen_one - 2);
     y_0.print_s("y_0");
-
-    y_1.copy_bits(B, 0, __chosen_one - 2);
     y_1.print_s("y_1");
-
-    Z_2 = x_0;
-    Z_2 = Z_2 * x_1;
     Z_2.print_s("Z_2");
-
-
-    Z_0 = y_0;
-    Z_0 = Z_0 * y_1;
     Z_0.print_s("Z_0");
-
-    Z_1 = (x_0 + y_0) * (x_1 + y_1) - Z_2 - Z_1;
     Z_1.print_s("Z_1");
+    printf("\n chosen_one = %hu, __b = %hu", __chosen_one, __b);
 
-    Integer<len_A> _temp = "0x1";
-    _temp <<= __b + 1;
-    _temp.print_s("temp");
-    ret = (Z_2 << __b + 1) + (Z_1 << __chosen_one) + Z_0;
     ret.print_s("ret");
 
     return ret;
@@ -480,7 +472,7 @@ Integer<len> operator<<(Integer<len> A, uint16_t shift)
       while (i < A.__len + (org_shift >> 3)) {
          i++;
          __curr = A.__data[i];
-         ret.__data[i] = A.__data[i] << shift | __prev_left;
+         ret.__data[i] = ret.__data[i] << shift | __prev_left;
          __prev_left = __curr >> (8 - shift);
       }
    }
