@@ -158,11 +158,15 @@ int main(int argc, char *argv[])
    //TEST_cmp_integer();
    //TEST_mult_integer();
    //TEST_add_integer();
-   int16 A = "0x5";
-   int16 B = "0x5";
-   A = A * B;
 
-	A.print_s("");
+    int128 A = "0x10E";
+    int128 B = "0x105";
+
+
+    A = karatsuba(A, B);
+
+    A.print_s("A");
+
     printf("\n");
 	return 0;
 }

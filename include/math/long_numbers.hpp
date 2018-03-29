@@ -98,13 +98,14 @@ public:
 	/* < Operators */
 	/* < ---- *< Assignement */
 	Integer<len> operator=(Integer<len>);
-	/* < ---- *< Arithmetic */
+   /* < ---- *< Arithmetic */
 
    /* < ---- *< Shift operators */
    Integer<len>& operator<<=(uint16_t shift);
    Integer<len>& operator>>=(uint16_t shift);
 	/* <Len functions */
-	void __set_len_in_bits();
+   void __set_len_in_bits();
+   void copy_bits(Integer A, uint16_t start, uint16_t end);
 
 	/* < Debug funcs */
 	void print();
@@ -181,6 +182,10 @@ Integer<len> Integer<len>::operator=(Integer<len> A)
 
 /*
  * ********** Arithmetic operators  **********
+ */
+/*
+ * @brief Add operator, works when len of A is equal or bigger than len of B
+ *
  */
 
 template <uint16_t len_A, uint16_t len_B>
@@ -350,7 +355,7 @@ Integer<len_A> operator*(Integer<len_A> A, Integer<len_B> B)
 
    __temp.__len = 1;
    __temp.__len_in_bits = 8;
-   __final_len = A.__len + B.__len;
+   __final_len = ((A.__len_in_bits + B.__len_in_bits - 1) >> 3) + 1;
 
 
    if (A.__len <= B.__len) {
@@ -384,7 +389,66 @@ Integer<len_A> operator*(Integer<len_A> A, Integer<len_B> B)
    ret.__len = __final_len;
    ret.__set_len_in_bits();
 
+   if (ret.__len_in_bits > ret.precision) {
+       ret.__len_in_bits = ret.precision;
+       ret.__len = ret.precision >> 3;
+   }
+
    return ret;
+}
+
+template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> karatsuba(Integer<len_A> A, Integer<len_B> B)
+{
+#define OFFSET_CONSTANT 1
+    Integer<len_A> ret;
+    uint16_t __chosen_one, __b;
+
+    Integer<len_A> Z_0, Z_1, Z_2;
+    Integer<len_A> x_0, x_1, y_0, y_1;
+
+    __chosen_one = A.__len_in_bits - OFFSET_CONSTANT;
+    __b = __chosen_one << 1;
+    x_0.copy_bits(A, __chosen_one - 1, A.__len_in_bits);
+    x_0.print_s("x_0");
+    x_1.copy_bits(B, __chosen_one - 1, B.__len_in_bits);
+    x_0.print_s("x_1");
+
+    y_0.copy_bits(A, 0, __chosen_one - 2);
+    y_0.print_s("y_0");
+
+    y_1.copy_bits(B, 0, __chosen_one - 2);
+    y_1.print_s("y_1");
+
+    Z_2 = x_0;
+    Z_2 = Z_2 * x_1;
+    Z_2.print_s("Z_2");
+
+
+    Z_0 = y_0;
+    Z_0 = Z_0 * y_1;
+    Z_0.print_s("Z_0");
+
+    Z_1 = x_0;
+
+    Z_1 += y_0;
+
+    Z_1 += y_1;
+
+    Z_1 = Z_1 * x_1;
+
+    Z_1 = Z_1 - Z_2;
+
+    x_0 = x_0 - Z_0;
+
+    Z_2 <<= __b - 1;
+    Z_1 <<= __chosen_one - 1;
+
+    Z_2 += Z_1;
+    Z_2 += Z_0;
+    Z_2.print_s("Z_2");
+
+    return ret;
 }
 
 /*
@@ -591,7 +655,7 @@ void Integer<len>::__set_len_in_bits()
     int i;
     if (this->__len == 0) {
     	this->__len_in_bits = 0;
-    	return;
+      return;
     }
 
     for (i = 7; i >= 0; i--) {
@@ -600,7 +664,9 @@ void Integer<len>::__set_len_in_bits()
             return;
         }
     }
-    this->__len_in_bits = ((this->__len - 1) << 3) + i + 1;
+    //this->__len_in_bits = ((this->__len - 1) << 3) + i + 1;
+    this->__len -= 1;
+    this->__set_len_in_bits();
 }
 
 template <uint16_t len_A, uint16_t len_B>
@@ -632,6 +698,14 @@ void Integer<len>::print_s(const char * str)
         printf("-");
     printf(">");
 
+}
+
+template <uint16_t len>
+void Integer<len>::copy_bits(Integer A, uint16_t start, uint16_t end)
+{
+   *this = A;
+   *this <<= (A.precision - end);
+   *this >>= ((A.precision - end) + start);
 }
 
 using int16 = Integer<16>;
