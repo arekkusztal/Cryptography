@@ -189,7 +189,7 @@ Integer<len> Integer<len>::operator=(Integer<len> A)
  */
 
 template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator+(Integer<len_A>& A, Integer<len_B> B)
+Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
 {
 	Integer<len_A> ret;
 	uint16_t i, __max_of_two, __complement;
@@ -341,7 +341,8 @@ Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B)
             borrow = 0;
         }
     }
-
+    ret.__len = A.__len;
+    ret.__set_len_in_bits();
     return ret;
 }
 
@@ -429,24 +430,14 @@ Integer<len_A> karatsuba(Integer<len_A> A, Integer<len_B> B)
     Z_0 = Z_0 * y_1;
     Z_0.print_s("Z_0");
 
-    Z_1 = x_0;
+    Z_1 = (x_0 + y_0) * (x_1 + y_1) - Z_2 - Z_1;
+    Z_1.print_s("Z_1");
 
-    Z_1 += y_0;
-
-    Z_1 += y_1;
-
-    Z_1 = Z_1 * x_1;
-
-    Z_1 = Z_1 - Z_2;
-
-    x_0 = x_0 - Z_0;
-
-    Z_2 <<= __b - 1;
-    Z_1 <<= __chosen_one - 1;
-
-    Z_2 += Z_1;
-    Z_2 += Z_0;
-    Z_2.print_s("Z_2");
+    Integer<len_A> _temp = "0x1";
+    _temp <<= __b + 1;
+    _temp.print_s("temp");
+    ret = (Z_2 << __b + 1) + (Z_1 << __chosen_one) + Z_0;
+    ret.print_s("ret");
 
     return ret;
 }

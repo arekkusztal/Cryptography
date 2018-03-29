@@ -162,7 +162,6 @@ int main(int argc, char *argv[])
     int128 A = "0x10E";
     int128 B = "0x105";
 
-
     A = karatsuba(A, B);
 
     A.print_s("A");
