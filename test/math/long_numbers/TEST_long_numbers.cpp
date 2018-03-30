@@ -11,7 +11,6 @@
 #define INT_1	"1B0A"
 #define INT_2	"0B"
 
-uint16_t karatsuba_treshold = 240;
 
 static __inline__ unsigned long long rdtsc(void)
 {
@@ -161,7 +160,7 @@ void TEST_copy_bits_func()
 
 }
 
-#define INT int4096
+#define INT int8192
 
 int main(int argc, char *argv[])
 {
