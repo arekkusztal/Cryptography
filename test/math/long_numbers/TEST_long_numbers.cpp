@@ -37,20 +37,12 @@ using int1024_t = A<1024>;
 
 int TEST_add_integer_128()
 {
-   int128_t A = "0x10E";
-   int128_t B = "0x105";
-  // A-=B;
-  // A.print();
-   int i;
-   A.print_s("A");
-   B.print_s("B");
-   A.karatsuba(B);
-
     return 0;
 }
 
 static int __TEST_shift_vector(long_number_vector *vector)
 {
+    /*
 #define DEBUG_1
 	bool result;
 	int128_t A = vector->A.data;
@@ -73,11 +65,12 @@ static int __TEST_shift_vector(long_number_vector *vector)
     else
     	printf("\n%sTest %s FAIL%s", KRED, vector->name, KNRM);
 
-    return result;
+    return result; */
 }
 
 static int __TEST_mult_vector(long_number_vector *vector)
 {
+    /*
    bool result;
    int128_t A = vector->A.data;
    int128_t B = vector->B.data;
@@ -96,12 +89,12 @@ static int __TEST_mult_vector(long_number_vector *vector)
     else
     	printf("\n%sTest %s FAIL%s", KRED, vector->name, KNRM);
 
-    return result;
+    return result; */
 }
 
 static int __TEST_add_vector(long_number_vector *vector)
 {
-	bool result;
+/*	bool result;
    int128_t A = vector->A.data;
    int128_t B = vector->B.data;
 #ifdef DEBUG_1
@@ -119,7 +112,7 @@ static int __TEST_add_vector(long_number_vector *vector)
     else
     	printf("\n%sTest %s FAIL%s", KRED, vector->name, KNRM);
 
-    return result;
+    return result; */
 }
 
 void TEST_shift_integer()
@@ -164,6 +157,8 @@ void TEST_copy_bits_func()
     B.copy_bits(A, 1, 9);
     B.print_s("after");
 
+    void test_fun();
+
 }
 
 #define INT int4096
@@ -201,7 +196,7 @@ int main(int argc, char *argv[])
     INT A = "0x23235435325FFF43543534252345423522345345345324534545523345235432534525232345675675475686568568"
             "568456856856856868561321232133213212332132132123221321C1B11"
             "0x23235435325FFF43543534252345423522345345345324534545523345235432534525232345675675475686568568"
-            "568456856856856868561321232133213212332132132123221321C1B11";
+            "568456856856856868561321232133213212332132132123221321C1B1134324324";
     INT B = "0x2323532345342543234534252345234544354353454354445453545435454534532552421332123123123132132123"
             "231568568548568568568568456865865856865854422424324343C1B11"
             "0x23235435325FFF43543534252345423522345345345324534545523345235432534525232345675675475686568568"
@@ -226,7 +221,6 @@ int main(int argc, char *argv[])
         R = A * B;
     }
     uint64_t r_end = rdtsc();
-
 
     R.print_s("result");
 

@@ -1,8 +1,8 @@
 /*
- * long_numbers.h
+ * long_numbers.hpp
  *
  *  Created on: Mar 5, 2018
- *      Author: arek67
+ *      Author: Arek Kusztal
  */
 
 #ifndef LONG_NUMBERS_H_
@@ -13,74 +13,6 @@
 #include <CRYPTO_LIB_common.h>
 
 extern uint16_t karatsuba_treshold;
-
-#define DEBUG
-
-typedef struct Integer_2 {
-	uint8_t *data;
-	uint16_t size;
-} integer;
-
-class int128_fast_t;
-
-class Int {
-public:
-	uint16_t __len = 0;
-	uint16_t __len_in_bits = 0;
-	virtual void __set_len_in_bits() = 0;
-public:
-#ifdef DEBUG
-	virtual void print() = 0;
-#endif
-};
-
-class int128_t : public Int {
-#define PRECISION 128
-	uint8_t __data[PRECISION] = { };
-	inline void __set_len_in_bits() override;
-public:
-	enum ERROR_CODE {
-	   noerror = 0,
-	   overflow,
-	   negative,
-	   potential_overflow,
-	   too_small_to_bother,
-	};
-	const uint16_t precision = PRECISION;
-   enum ERROR_CODE error_code = noerror;
-	int128_t() = default;
-	int128_t(const int128_t& int128_t);
-	int128_t(uint8_t *);
-	int128_t(const char *);
-	int128_t(int128_fast_t);
-	int128_t(int128_t, uint16_t start, uint16_t end);
-	int128_t operator=(int128_t);   
-	int128_t operator+(Int *);
-	int128_t operator=(const char *);
-	int128_t operator=(unsigned char *);
-	int128_t operator=(int128_fast_t);
-	int128_t operator+=(int128_t);
-	int128_t operator<<=(uint16_t);
-	int128_t operator>>=(uint16_t);
-   int128_t& operator*=(int128_t);
-	int128_t karatsuba(int128_t);
-   int128_t& operator-=(int128_t);
-   bool operator==(int128_t *);
-   bool operator==(unsigned char *);
-
-	int copy_bits(int128_t, uint16_t start, uint16_t end);
-	void copy_bits_1(uint16_t start, uint16_t end);
-
-	~int128_t() = default;
-
-	void print() override;
-	void print_s(const char * str);
-};
-
-class int128_fast_t {
-#define PRECISION 128
-
-};
 
 template <uint16_t len>
 class Integer
@@ -110,7 +42,7 @@ public:
 
 	/* < Debug funcs */
 	void print();
-	void print_s(const char * str);
+   void print_s(const char * str);
 };
 
 template <uint16_t len>
@@ -409,65 +341,6 @@ Integer<len_A> operator*(const Integer<len_A> &A, const Integer<len_B>& B)
 
    return ret;
 }
-
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator*(const Integer<len_A> &&A, Integer<len_B> &B)
-{
-   Integer<len_A> ret;
-
-   if (A.__len > karatsuba_treshold && B.__len > karatsuba_treshold) {
-   //    printf("\nINFO: Entering Karatsuba A.len >> 1 = %hu", A.__len >> 1);
-       return karatsuba(A, B);
-   }
-
-   Integer<len_A> __temp, __shifted;
-   uint16_t i, k, __min_of_two, __final_len;
-   uint8_t __a_is_smaller;
-
-   __temp.__len = 1;
-   __temp.__len_in_bits = 8;
-   __final_len = ((A.__len_in_bits + B.__len_in_bits - 1) >> 3) + 1;
-
-
-   if (A.__len <= B.__len) {
-       __shifted = B;
-       __a_is_smaller = true;
-   }
-   else {
-       __shifted = A;
-       __a_is_smaller = false;
-   }
-
-   if (__a_is_smaller) {
-       for (i = 0; i < A.__len << 3; i++) {
-           if ( (A.__data[i >> 3] >> (i & 0x7)) & 1) {
-               __temp += __shifted;
-
-           }
-           __shifted <<= 1;
-       }
-   }
-   else {
-        for (i = 0; i < B.__len << 3; i++) {
-            if ( (B.__data[i >> 3] >> (i & 0x7)) & 1) {
-                __temp += __shifted;
-            }
-            __shifted <<= 1;
-        }
-   }
-
-   ret = __temp;
-   ret.__len = __final_len;
-   ret.__set_len_in_bits();
-
-   if (ret.__len_in_bits > ret.precision) {
-       ret.__len_in_bits = ret.precision;
-       ret.__len = ret.precision >> 3;
-   }
-
-   return ret;
-}
-
 
 #define __DEBUG_
 
