@@ -253,59 +253,7 @@ Integer<len_A> operator/(Integer<len_A> A, Integer<len_B> B)
 template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> operator*(const Integer<len_A> &&A, const Integer<len_B>& B)
 {
-   Integer<len_A> ret;
-
-   if (A.__len > karatsuba_treshold && B.__len > karatsuba_treshold) {
-   //    printf("\nINFO: Entering Karatsuba A.len >> 1 = %hu", A.__len >> 1);
-       return karatsuba(A, B);
-   }
-
-   Integer<len_A> __temp, __shifted;
-   uint16_t i, k, __min_of_two, __final_len;
-   uint8_t __a_is_smaller;
-
-   __temp.__len = 1;
-   __temp.__len_in_bits = 8;
-   __final_len = ((A.__len_in_bits + B.__len_in_bits - 1) >> 3) + 1;
-
-
-   if (A.__len <= B.__len) {
-       __shifted = B;
-       __a_is_smaller = true;
-   }
-   else {
-       __shifted = A;
-       __a_is_smaller = false;
-   }
-
-   if (__a_is_smaller) {
-       for (i = 0; i < A.__len << 3; i++) {
-           if ( (A.__data[i >> 3] >> (i & 0x7)) & 1) {
-               __temp += __shifted;
-
-           }
-           __shifted <<= 1;
-       }
-   }
-   else {
-        for (i = 0; i < B.__len << 3; i++) {
-            if ( (B.__data[i >> 3] >> (i & 0x7)) & 1) {
-                __temp += __shifted;
-            }
-            __shifted <<= 1;
-        }
-   }
-
-   ret = __temp;
-   ret.__len = __final_len;
-   ret.__set_len_in_bits();
-
-   if (ret.__len_in_bits > ret.precision) {
-       ret.__len_in_bits = ret.precision;
-       ret.__len = ret.precision >> 3;
-   }
-
-   return ret;
+    return A * B;
 }
 
 template <uint16_t len_A, uint16_t len_B>
