@@ -26,10 +26,10 @@ void hex_dump_number(const char *def, uint8_t *data, uint16_t len,
    int16_t i;
    printf("\n");
    printf("\n%s:\n", def);
-   for (i = len -1; i >= 0; i--) {
-      if (i && ( i % br ==0 ))
+   for (i = len - 1; i >= 0; i--) {
+      if (i && ( (i + 1) % br == 0 ))
          printf("\n");
-      printf("0x%02X ",data[i]);
+      printf("0x%02X ", data[i]);
    }
    printf("\n");
 }

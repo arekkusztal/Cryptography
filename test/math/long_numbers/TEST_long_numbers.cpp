@@ -11,7 +11,14 @@
 #define INT_1	"1B0A"
 #define INT_2	"0B"
 
+uint16_t karatsuba_treshold = 240;
 
+static __inline__ unsigned long long rdtsc(void)
+{
+    unsigned hi, lo;
+    __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+    return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
+}
 
 template <uint16_t len_t>
 class A
@@ -71,9 +78,9 @@ static int __TEST_shift_vector(long_number_vector *vector)
 
 static int __TEST_mult_vector(long_number_vector *vector)
 {
-	bool result;
-	int128_t A = vector->A.data;
-	int128_t B = vector->B.data;
+   bool result;
+   int128_t A = vector->A.data;
+   int128_t B = vector->B.data;
 #ifdef DEBUG_1
     A.print_s("<----> DEFINITION: A");
     B.print_s("<----> DEFINITION: B");
@@ -95,8 +102,8 @@ static int __TEST_mult_vector(long_number_vector *vector)
 static int __TEST_add_vector(long_number_vector *vector)
 {
 	bool result;
-	int128_t A = vector->A.data;
-	int128_t B = vector->B.data;
+   int128_t A = vector->A.data;
+   int128_t B = vector->B.data;
 #ifdef DEBUG_1
     A.print_s("<----> DEFINITION: A");
     B.print_s("<----> DEFINITION: B");
@@ -145,38 +152,87 @@ void TEST_karatsuba()
 
 void TEST_cmp_integer()
 {
-    int128_t A = "0x10E";
-    int128_t B = "0x10E";
-    printf("\n A == B : %d", A == &B);
+
 
 }
 
+void TEST_copy_bits_func()
+{
+    int128 A = "0x75A";
+    int128 B;
+    A.print_s("before");
+    B.copy_bits(A, 1, 9);
+    B.print_s("after");
+
+}
+
+#define INT int4096
+
 int main(int argc, char *argv[])
 {
+    int i;
    //TEST_add_integer_128();
    //TEST_shift_integer();
    //TEST_cmp_integer();
    //TEST_mult_integer();
    //TEST_add_integer();
+//    TEST_copy_bits_func();
 
-  /*  int128 A = "0x10E";
+ /*   int128 A = "0x10E";
     int128 B = "0x105"; */
-
-  /*  int128 A = "0x21C";
+    // 01 13 46
+    /*int128 A = "0x21C";
     int128 B = "0x20A"; */
 	// 04 4D 18
 
-/*	int128 A = "0xB10";
-	int128 B = "0xB10"; */
+   /*int128 A = "0xB10";
+   int128 B = "0xB10"; */
+    // 7A 61 00
 
- /*   A.print_s("A");
+    /*int128 A = "0xC1B10";
+    int128 B = "0xC1B10"; */
+    // 92 8C 5C 61 00
+
+    /*int128 A = "0x21321C1B10";
+    int128 B = "0x343C1B10"; */
+    // Error on online
+
+    INT R;
+    INT A = "0x23235435325FFF43543534252345423522345345345324534545523345235432534525232345675675475686568568"
+            "568456856856856868561321232133213212332132132123221321C1B11"
+            "0x23235435325FFF43543534252345423522345345345324534545523345235432534525232345675675475686568568"
+            "568456856856856868561321232133213212332132132123221321C1B11";
+    INT B = "0x2323532345342543234534252345234544354353454354445453545435454534532552421332123123123132132123"
+            "231568568548568568568568456865865856865854422424324343C1B11"
+            "0x23235435325FFF43543534252345423522345345345324534545523345235432534525232345675675475686568568"
+            "568456856856856868561321232133213212332132132123221321C1B11";
+    //INT A = "0x4F12B4A38A345323";
+    //INT B = "0x12FFEAB53434BB11";
+
+    A.print_s("A");
     B.print_s("B");
 
-    A = karatsuba(A, B); */
+    uint64_t k_start = rdtsc();
+    for (i = 0; i < 1000; i++) {
+        R = karatsuba(A, B);
+    }
+    uint64_t k_end = rdtsc();
+
+    R.print_s("karatsuba result");
+
+    karatsuba_treshold = 9999;
+    uint64_t r_start = rdtsc();
+    for (i = 0; i < 1000; i++) {
+        R = A * B;
+    }
+    uint64_t r_end = rdtsc();
 
 
- //   A.print_s("A");
+    R.print_s("result");
 
     printf("\n");
-	return 0;
+    printf("\nKaratsuba time = \t%lu", k_end - k_start);
+    printf("\nNormal time = \t\t%lu", r_end - r_start);
+    printf("\n");
+    return 0;
 }

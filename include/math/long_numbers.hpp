@@ -12,6 +12,7 @@
 #include <Arus_dev_kit.h>
 #include <CRYPTO_LIB_common.h>
 
+extern uint16_t karatsuba_treshold;
 
 #define DEBUG
 
@@ -147,9 +148,7 @@ Integer<len>::Integer(const char *number)
 {
 	uint16_t __len, i, prefix;
 
-	__len = strlen((const char *)number);
-	if (__len > 128)
-		return;
+   __len = strlen((const char *)number);
 
 	i = 0;
 	if (number[0] == '0' && number[1] == 'x')
@@ -347,9 +346,22 @@ Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B)
 }
 
 template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator*(Integer<len_A> A, Integer<len_B> B)
+Integer<len_A> operator/(Integer<len_A> A, Integer<len_B> B)
 {
    Integer<len_A> ret;
+   return ret;
+}
+
+template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> operator*(const Integer<len_A> &&A, Integer<len_B> &B)
+{
+   Integer<len_A> ret;
+
+   if (A.__len > karatsuba_treshold && B.__len > karatsuba_treshold) {
+   //    printf("\nINFO: Entering Karatsuba A.len >> 1 = %hu", A.__len >> 1);
+       return karatsuba(A, B);
+   }
+
    Integer<len_A> __temp, __shifted;
    uint16_t i, k, __min_of_two, __final_len;
    uint8_t __a_is_smaller;
@@ -399,37 +411,112 @@ Integer<len_A> operator*(Integer<len_A> A, Integer<len_B> B)
 }
 
 template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> karatsuba(Integer<len_A> A, Integer<len_B> B)
+Integer<len_A> operator*(const Integer<len_A> &A, const Integer<len_B>& B)
 {
-#define OFFSET_CONSTANT 2
+   Integer<len_A> ret;
+
+   if (A.__len > karatsuba_treshold && B.__len > karatsuba_treshold) {
+   //    printf("\nINFO: Entering Karatsuba A.len >> 1 = %hu", A.__len >> 1);
+       return karatsuba(A, B);
+   }
+
+   Integer<len_A> __temp, __shifted;
+   uint16_t i, k, __min_of_two, __final_len;
+   uint8_t __a_is_smaller;
+
+   __temp.__len = 1;
+   __temp.__len_in_bits = 8;
+   __final_len = ((A.__len_in_bits + B.__len_in_bits - 1) >> 3) + 1;
+
+
+   if (A.__len <= B.__len) {
+       __shifted = B;
+       __a_is_smaller = true;
+   }
+   else {
+       __shifted = A;
+       __a_is_smaller = false;
+   }
+
+   if (__a_is_smaller) {
+       for (i = 0; i < A.__len << 3; i++) {
+           if ( (A.__data[i >> 3] >> (i & 0x7)) & 1) {
+               __temp += __shifted;
+
+           }
+           __shifted <<= 1;
+       }
+   }
+   else {
+        for (i = 0; i < B.__len << 3; i++) {
+            if ( (B.__data[i >> 3] >> (i & 0x7)) & 1) {
+                __temp += __shifted;
+            }
+            __shifted <<= 1;
+        }
+   }
+
+   ret = __temp;
+   ret.__len = __final_len;
+   ret.__set_len_in_bits();
+
+   if (ret.__len_in_bits > ret.precision) {
+       ret.__len_in_bits = ret.precision;
+       ret.__len = ret.precision >> 3;
+   }
+
+   return ret;
+}
+
+#define __DEBUG_
+
+#ifdef __DEBUG
+#define DEBUG_PRINTF(str) printf(str);
+#define DEBUG_PRINT(arg,str) arg.print_s(str);
+#else
+#define DEBUG_PRINTF(str)
+#define DEBUG_PRINT(arg,str)
+#endif
+
+#define KARATSUBA_BYTE_OFFSET 120
+template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> karatsuba(const Integer<len_A>& A, const Integer<len_B>& B)
+{
     Integer<len_A> ret;
+    if (A.__len_in_bits + B.__len_in_bits > A.precision) {
+        printf("\nINFO: potential overflow = %hu", A.__len_in_bits + B.__len_in_bits);
+        return ret;
+    }
+
     uint16_t __chosen_one, __b;
 
     Integer<len_A> Z_0, Z_1, Z_2;
     Integer<len_A> x_0, x_1, y_0, y_1;
 
-    __chosen_one = A.__len_in_bits - OFFSET_CONSTANT;
+    if (KARATSUBA_BYTE_OFFSET >= (A.__len)) {
+     //   printf("\nINFO: Leaving Karatsuba A.__len/2 = %hu", A.__len >> 1);
+        return A * B;
+    }
+    /* TODO: test it */
+    /* __chosen_one = A.__len_in_bits - 1; */
+    __chosen_one = (A.__len - KARATSUBA_BYTE_OFFSET) << 3;
     __b = __chosen_one << 1;
-
     x_0.copy_bits(A, __chosen_one, A.__len_in_bits);
+
+    DEBUG_PRINT(x_0, "x_0");
     x_1.copy_bits(B, __chosen_one, B.__len_in_bits);
-    y_0.copy_bits(A, 0, __chosen_one - OFFSET_CONSTANT);
-    y_1.copy_bits(B, 0, __chosen_one - OFFSET_CONSTANT);
+    DEBUG_PRINT(x_1, "x_1");
+    y_0.copy_bits(A, 0, __chosen_one);
+    DEBUG_PRINT(y_0, "y_0");
+    y_1.copy_bits(B, 0, __chosen_one);
+    DEBUG_PRINT(y_1, "y_1");
     Z_2 = x_0 * x_1;
+    DEBUG_PRINT(Z_2, "Z_2");
     Z_0 = y_0 * y_1;
+    DEBUG_PRINT(Z_0, "Z_0");
     Z_1 = (x_0 + y_0) * (x_1 + y_1) - Z_0 - Z_2;
+    DEBUG_PRINT(Z_1, "Z_1");
     ret = (Z_2 << __b) + (Z_1 << __chosen_one) + Z_0;
-
-    x_0.print_s("x_0");
-    x_0.print_s("x_1");
-    y_0.print_s("y_0");
-    y_1.print_s("y_1");
-    Z_2.print_s("Z_2");
-    Z_0.print_s("Z_0");
-    Z_1.print_s("Z_1");
-    printf("\n chosen_one = %hu, __b = %hu", __chosen_one, __b);
-
-    ret.print_s("ret");
 
     return ret;
 }
@@ -439,7 +526,7 @@ Integer<len_A> karatsuba(Integer<len_A> A, Integer<len_B> B)
 */
 
 template <uint16_t len>
-Integer<len> operator<<(Integer<len> A, uint16_t shift)
+Integer<len> operator<<(const Integer<len>& A, uint16_t shift)
 {
    Integer<len> ret;
    int i;
@@ -489,7 +576,6 @@ Integer<len>& Integer<len>::operator<<=(uint16_t shift)
    int i;
    uint16_t add_len, org_shift;
 
-   shift &= ~0x80;
    org_shift = shift;
    add_len = 0;
 
@@ -499,7 +585,7 @@ Integer<len>& Integer<len>::operator<<=(uint16_t shift)
    }
 
    i = 0;
-   for (i = 15; i >= (shift >> 3); i--) {
+   for (i = (len >> 3) - 1; i >= (shift >> 3); i--) {
       this->__data[i] = this->__data[i - (shift >> 3)];
    }
    for (i = (shift >> 3) - 1; i >= 0; i--) {
@@ -528,7 +614,7 @@ Integer<len>& Integer<len>::operator<<=(uint16_t shift)
 }
 
 template <uint16_t len>
-Integer<len> operator>>(Integer<len> A, uint16_t shift)
+Integer<len> operator>>(const Integer<len>& A, uint16_t shift)
 {    
    Integer<len> ret;
    int i;
@@ -585,7 +671,6 @@ Integer<len>& Integer<len>::operator>>=(uint16_t shift)
    int i;
    uint16_t sub_len, org_shift;
 
-   shift &= ~0x80;
    org_shift = shift;
    sub_len = 1;
 
@@ -603,10 +688,11 @@ Integer<len>& Integer<len>::operator>>=(uint16_t shift)
    }
 
    i = 0;
-   for (i = 0; i < 16 - (shift >> 3); i++) {
+   for (i = 0; i < (len >> 3) - (shift >> 3); i++) {
       this->__data[i] = this->__data[i + (shift >> 3)];
    }
-   for (i = 16 - (shift >> 3); i < 16; i++) {
+
+   for (i = (len >> 3) - (shift >> 3); i < this->__len; i++) {
       this->__data[i] = 0;
    }
    i = this->__len - 1;
@@ -695,6 +781,9 @@ using int16 = Integer<16>;
 using int32 = Integer<32>;
 using int128 = Integer<128>;
 using int256 = Integer<256>;
+using int512 = Integer<512>;
+using int4096 = Integer<4096>;
+using int8192 = Integer<8192>;
 
 
 #endif /* LONG_NUMBERS_H_ */

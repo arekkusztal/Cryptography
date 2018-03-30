@@ -44,8 +44,8 @@ inline void int128_t::__set_len_in_bits()
 {
     int i;
     if (this->__len == 0) {
-    	this->__len_in_bits = 0;
-    	return;
+      this->__len_in_bits = 0;
+      return;
     }
 
     for (i = 7; i >= 0; i--) {
@@ -59,95 +59,95 @@ inline void int128_t::__set_len_in_bits()
 
 int128_t::int128_t(const char *number)
 {
-	uint16_t __len, i, prefix;
+   uint16_t __len, i, prefix;
 
-	__len = strlen(number);
-	if (__len > 128)
-		return;
+   __len = strlen(number);
+   if (__len > 128)
+      return;
 
-	i = 0;
-	if (number[0] == '0' && number[1] == 'x')
-		prefix = 2;
-	else
-		prefix = 0;
+   i = 0;
+   if (number[0] == '0' && number[1] == 'x')
+      prefix = 2;
+   else
+      prefix = 0;
 
-	while (i < __len - prefix) {
-		/*
-		 * TODO
-		 * check if number[] is hex
-		 */
-		__data[(i & (~1)) >> 1] += (i & 1) ?
-				(HEX_ME(number[__len - i - 1]) << 4) :
-					HEX_ME(number[__len - i - 1]);
-		i++;
-	}
+   while (i < __len - prefix) {
+      /*
+       * TODO
+       * check if number[] is hex
+       */
+      __data[(i & (~1)) >> 1] += (i & 1) ?
+            (HEX_ME(number[__len - i - 1]) << 4) :
+               HEX_ME(number[__len - i - 1]);
+      i++;
+   }
 
-	this->__len = ((__len - prefix) >> 1) + (__len & 1);
+   this->__len = ((__len - prefix) >> 1) + (__len & 1);
    __set_len_in_bits();
 }
 
 int128_t::int128_t(unsigned char *number)
 {
-	uint16_t __len, i, prefix;
+   uint16_t __len, i, prefix;
 
-	__len = strlen((const char *)number);
-	if (__len > 128)
-		return;
+   __len = strlen((const char *)number);
+   if (__len > 128)
+      return;
 
-	i = 0;
-	if (number[0] == '0' && number[1] == 'x')
-		prefix = 2;
-	else
-		prefix = 0;
+   i = 0;
+   if (number[0] == '0' && number[1] == 'x')
+      prefix = 2;
+   else
+      prefix = 0;
 
-	while (i < __len - prefix) {
-		/*
-		 * TODO
-		 * check if number[] is hex
-		 */
-		__data[(i & (~1)) >> 1] += (i & 1) ?
-				(HEX_ME(number[__len - i - 1]) << 4) :
-					HEX_ME(number[__len - i - 1]);
-		i++;
-	}
+   while (i < __len - prefix) {
+      /*
+       * TODO
+       * check if number[] is hex
+       */
+      __data[(i & (~1)) >> 1] += (i & 1) ?
+            (HEX_ME(number[__len - i - 1]) << 4) :
+               HEX_ME(number[__len - i - 1]);
+      i++;
+   }
 
-	this->__len = ((__len - prefix) >> 1) + (__len & 1);
+   this->__len = ((__len - prefix) >> 1) + (__len & 1);
    __set_len_in_bits();
 }
 int128_t int128_t::operator+=(int128_t B)
 {
-	uint16_t i, k, __max_of_two;
+   uint16_t i, k, __max_of_two;
    uint8_t carry, __b;
 
-	__max_of_two = this->__len >= B.__len ?
-			this->__len : B.__len;
-	carry = 0;
-	i = 0;
-	while (i < __max_of_two)
-	{
-		uint8_t t_a = this->__data[i], t_b = B.__data[i];
-		__b = this->__data[i] + B.__data[i] + carry;
-		this->__data[i] = __b;
-		if (__builtin_expect((t_a && t_b), 1)) {
-			if (__b < t_a || __b < t_b)
-				carry = 1;
-			else
-				carry = 0;
-		} else if ((t_a == 0xFF || t_b == 0xFF) && carry)
-			carry = 1;
-		else
-			carry = 0;
-		i++;
-	}
-	if (carry) {
-		this->__data[i] = 1;
-		this->__len += 1;
-	}
-	/*
-	* If carry general overflow
-	*/
+   __max_of_two = this->__len >= B.__len ?
+         this->__len : B.__len;
+   carry = 0;
+   i = 0;
+   while (i < __max_of_two)
+   {
+      uint8_t t_a = this->__data[i], t_b = B.__data[i];
+      __b = this->__data[i] + B.__data[i] + carry;
+      this->__data[i] = __b;
+      if (__builtin_expect((t_a && t_b), 1)) {
+         if (__b < t_a || __b < t_b)
+            carry = 1;
+         else
+            carry = 0;
+      } else if ((t_a == 0xFF || t_b == 0xFF) && carry)
+         carry = 1;
+      else
+         carry = 0;
+      i++;
+   }
+   if (carry) {
+      this->__data[i] = 1;
+      this->__len += 1;
+   }
+   /*
+   * If carry general overflow
+   */
 
-	return *this;
+   return *this;
 }
 
 int128_t& int128_t::operator-=(int128_t B)
@@ -228,10 +228,10 @@ int128_t& int128_t::operator*=(int128_t B)
 
 int128_t int128_t::operator<<=(uint16_t shift)
 {
-	int i;
+   int i;
    uint16_t add_len, org_shift;
 
-	shift &= ~0x80;
+   shift &= ~0x80;
    org_shift = shift;
    add_len = 0;
 
@@ -240,28 +240,28 @@ int128_t int128_t::operator<<=(uint16_t shift)
             add_len = 1;
    }
 
-	i = 0;
-	for (i = 15; i >= (shift >> 3); i--) {
-		this->__data[i] = this->__data[i - (shift >> 3)];
-	}
-	for (i = (shift >> 3) - 1; i >= 0; i--) {
-		this->__data[i] = 0;
-	}
    i = 0;
-	shift &= 0x7;
-	if (shift && shift < 8) {
+   for (i = 15; i >= (shift >> 3); i--) {
+      this->__data[i] = this->__data[i - (shift >> 3)];
+   }
+   for (i = (shift >> 3) - 1; i >= 0; i--) {
+      this->__data[i] = 0;
+   }
+   i = 0;
+   shift &= 0x7;
+   if (shift && shift < 8) {
 
       uint8_t __prev_left = this->__data[i] >> (8 - shift);
-		this->__data[i] <<= shift;
-		uint8_t __curr;
+      this->__data[i] <<= shift;
+      uint8_t __curr;
 
-		while (i < this->__len + (org_shift >> 3)) {
-			i++;
-			__curr = this->__data[i];
-			this->__data[i] = this->__data[i] << shift | __prev_left;
+      while (i < this->__len + (org_shift >> 3)) {
+         i++;
+         __curr = this->__data[i];
+         this->__data[i] = this->__data[i] << shift | __prev_left;
          __prev_left = __curr >> (8 - shift);
-		}
-	}
+      }
+   }
 
    this->__len = (this->__len + ((org_shift >> 3) + add_len)) > (this->precision >> 3) ?
                (this->precision >> 3) : (this->__len + ((org_shift >> 3) + add_len));
@@ -278,7 +278,7 @@ int128_t int128_t::operator>>=(uint16_t shift)
    sub_len = 1;
 
    if (shift >= this->__len_in_bits) {
-	   /* TODO: Optimize to size */
+      /* TODO: Optimize to size */
        memset(this->__data, 0, this->precision >> 3);
        this->__len = 0;
        this->__len_in_bits = 0;
@@ -319,14 +319,84 @@ int128_t int128_t::operator>>=(uint16_t shift)
 
 int int128_t::copy_bits(int128_t A, uint16_t start, uint16_t end)
 {
-	*this = A;
-	*this <<= (128 - end);
-	*this >>= ((128 - end) + start);
+   *this = A;
+   *this <<= (128 - end);
+   *this >>= ((128 - end) + start);
 }
 
 int128_t int128_t::karatsuba(int128_t B)
 {
+#define OFFSET_CONSTANT 1
+    int i, k;
+    uint16_t __b;
+    uint8_t __likely_overflow;
+    uint16_t __chosen_one;
+    int128_t Z_0, Z_1, Z_2;
+    int128_t x_0, x_1, y_0, y_1;
 
+/*    if (this->__len_in_bits <= 64 || B.__len_in_bits <= 64) {
+        this->error_code = too_small_to_bother;
+        return *this;
+    }
+
+    if (this->__len_in_bits + B.__len_in_bits >= this->precision) {
+        this->error_code = potential_overflow;
+        return *this;
+    }*/
+
+    /* Choose it wisely for both args */
+    __chosen_one = this->__len_in_bits - OFFSET_CONSTANT;
+    __chosen_one += !(__chosen_one & 1);
+  //  __b = ( ((__chosen_one - 1) >> 1) + 1);
+    __b = (__chosen_one << 1) - 1;
+    x_0.copy_bits(*this, __chosen_one - 1, this->__len_in_bits);
+    x_0.print_s("x_0");
+    x_1.copy_bits(B, __chosen_one - 1, __len_in_bits);
+    x_0.print_s("x_1");
+
+    y_0.copy_bits(*this, 0, __chosen_one - 2);
+    y_0.print_s("y_0");
+
+    y_1.copy_bits(B, 0, __chosen_one - 2);
+    y_1.print_s("y_1");
+    Z_2 = x_0;
+    Z_2 *= x_1;
+    Z_2.print_s("Z_2");
+
+    printf("\n == Z_0");
+    Z_0 = y_0;
+    Z_0.print();
+    Z_0 *= y_1;
+    Z_0.print_s("Z_0");
+    Z_0.print();
+    Z_0.print_s("Z_0");
+
+    Z_1 = x_0;
+
+    Z_1 += y_0;
+    Z_1.print();
+
+    Z_1 += y_1;
+    Z_1.print();
+
+    Z_1 *= x_1;
+    Z_1.print();
+
+    Z_1 -= Z_2;
+    Z_1.print();
+
+    x_0 -= Z_0;
+    Z_1.print();
+
+    Z_2 <<= __b - 1;
+    Z_2.print();
+    Z_1 <<= __chosen_one - 1;
+    Z_1.print();
+    Z_0.print();
+
+    Z_2 += Z_1;
+    Z_2 += Z_0;
+    Z_2.print();
 
 }
 
