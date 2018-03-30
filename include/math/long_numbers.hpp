@@ -353,7 +353,7 @@ Integer<len_A> operator/(Integer<len_A> A, Integer<len_B> B)
 }
 
 template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator*(const Integer<len_A> &&A, Integer<len_B> &B)
+Integer<len_A> operator*(const Integer<len_A> &A, const Integer<len_B>& B)
 {
    Integer<len_A> ret;
 
@@ -411,7 +411,7 @@ Integer<len_A> operator*(const Integer<len_A> &&A, Integer<len_B> &B)
 }
 
 template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator*(const Integer<len_A> &A, const Integer<len_B>& B)
+Integer<len_A> operator*(const Integer<len_A> &&A, Integer<len_B> &B)
 {
    Integer<len_A> ret;
 
@@ -467,6 +467,7 @@ Integer<len_A> operator*(const Integer<len_A> &A, const Integer<len_B>& B)
 
    return ret;
 }
+
 
 #define __DEBUG_
 

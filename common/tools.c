@@ -23,13 +23,19 @@ void hex_dump(const char *def, uint8_t *data, uint16_t len,
 void hex_dump_number(const char *def, uint8_t *data, uint16_t len,
       uint16_t br)
 {
-   int16_t i;
+   int16_t i, __complement_len;
    printf("\n");
    printf("\n%s:\n", def);
-   for (i = len - 1; i >= 0; i--) {
+   //printf("\n === %hu %hu", len, 16 - len % 16);
+   __complement_len = (br - len % br);
+
+   for (i = len - 1 + __complement_len; i >= 0; i--) {
       if (i && ( (i + 1) % br == 0 ))
          printf("\n");
-      printf("0x%02X ", data[i]);
+      if (i <= len - 1)
+        printf("0x%02X ", data[i]);
+      else
+          printf(".... ");
    }
    printf("\n");
 }
