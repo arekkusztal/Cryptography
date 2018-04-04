@@ -146,8 +146,14 @@ void TEST_karatsuba()
 
 void TEST_cmp_integer()
 {
-    int128 A = "0x124";
-    int128 B = "0x123";
+    int128 A = "0x0";
+    int128 B = "0x6";
+
+    A.print_s("A");
+    B.print_s("B");
+
+    A = A + B;
+    A.print_s("A");
 
     //std::cout << "A > B : " << (A > B);
 
@@ -160,15 +166,26 @@ void TEST_cmp_integer()
 
 void TEST_divide()
 {
-    //int128 A = "0x26B";
-    //int128 B = "0x9";
+    int128 A = "0x236";
+    int128 B = "0x19";
 
-    int128 A = "0x1B";
-    int128 B = "0xF";
+   // int128 A = "0x1B";
+   // int128 B = "0xF";
+
+//	int128 A = "0x17";
+//	int128 B = "0x6";
+
+//	int128 A = "0x254";
+//	int128 B = "0x28";
 
 
-    A = A / B;
-    A.print_s("TEST result");
+    DIV_RESULT<128> res;
+    int i;
+    //for (i = 0; i < 1000000; i++)
+    res = metoda_wielkanocna(A, B);
+
+    res.ret.print("TEST result RET");
+    res.mod.print("TEST result MOD");
 }
 
 void TEST_copy_bits_func()

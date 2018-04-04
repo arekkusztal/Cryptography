@@ -73,7 +73,7 @@ Integer<len>::Integer(const char *number)
 template <uint16_t len>
 Integer<len> Integer<len>::operator=(Integer<len> A)
 {
-   memcpy(this->__data, A.__data, A.__len);
+   memcpy(this->__data, A.__data, A.__len + 1);
    this->__len = A.__len;
    this->__len_in_bits = A.__len_in_bits;
 }
@@ -216,7 +216,6 @@ Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B)
     Integer<len_A> ret;
     uint16_t i, k, __max_of_two;
     uint8_t borrow, __b;
-
     __max_of_two = A.__len >= B.__len ?		\
           A.__len : B.__len;
 
@@ -243,11 +242,16 @@ Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B)
     ret.__set_len_in_bits();
     return ret;
 }
+#define DEBUG_MW
 
 template <uint16_t len_A, uint16_t len_B>
 DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
 {
+	printf("\n !! ============= metoda_wielkanocna ========== !");
+	int i;
     DIV_RESULT<len_A> res;
+
+    Integer<len_A> __sub_1 = "1";
     Integer<len_B> __temp;
     DIV_RESULT<len_A> __temp_res[32];
     uint16_t __len_to_shift, __bits_to_shift[32];
@@ -260,48 +264,46 @@ DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
         throw; */
     int __iteration__ = 0, __bits_added = 0, __mod_ladder_cout = 0;
     while (A > B) {
-        printf("\n ============ ITERATION %d =========== \n", __iteration__++);
-        A.print_s("/ A = ");
-        B.print_s("/ B = ");
         __temp = B;
         __len_to_shift = A.__len_in_bits - __temp.__len_in_bits;
         __temp <<= __len_to_shift;
-        printf("\n --------- SHIFT BY %hu", __len_to_shift);
-        __temp.print_s("/ AFTER SHIFT __temp = ");
 
         if (A > __temp) {
             A = A - __temp;
-            A.print_s("/ AFTER sub A = ");
         }
         else {
             uint16_t __pos = A.__len_in_bits - 1;
             Integer<len_A> __temp_internal;
             while (A < __temp) {
                 if (!(A.__data[__pos >> 3] >> (__pos & 0x7) & 1)) {
-                    printf("\n -------- POS found = %hu  \n", __pos);
                     A |= __pos;
-
                     __temp_internal |= __pos;
-                    getc(stdin);
                 }
                 __pos--;
 
             }
             __temp_res[__mod_ladder_cout] = metoda_wielkanocna(__temp_internal, B);
-         //   A.print_s("/ AFTER succesfull addition = ");
-            A = A - __temp;
-         //   __temp_res[__mod_ladder_cout].ret.print_s("ret (INTERNAL)");
-         //   __temp_res[__mod_ladder_cout].mod.print_s("mod (INTERNAL)");
+            __temp_internal = __temp_internal >> 128;
             __mod_ladder_cout++;
+            A = A - __temp;
         }
 
 
         res.ret |= __len_to_shift;
-        res.ret.print_s("ret");
-        getc(stdin);
     }
+
+    for (i = 0; i < __mod_ladder_cout; i++) {
+    	if (A < __temp_res[i].mod) {
+    		__temp_res[i].mod.print_s("__temp_res[i].mod BEFORE LAST STEP = ");
+    		A = A + B;
+    	    A.print_s("A after +B = ");
+    		res.ret = res.ret - __sub_1;
+    	}
+		A = A - __temp_res[i].mod;
+		res.ret = res.ret - __temp_res[i].ret;
+    }
+
     res.mod = A;
-    res.mod.print_s("mod");
 
     return res;
 }
@@ -703,6 +705,7 @@ void Integer<len>::__set_len_in_bits()
     int i;
     if (this->__len == 0) {
       this->__len_in_bits = 0;
+      this->__data[0] = 0;
       return;
     }
 
@@ -713,6 +716,7 @@ void Integer<len>::__set_len_in_bits()
         }
     }
     //this->__len_in_bits = ((this->__len - 1) << 3) + i + 1;
+    this->__data[this->__len - 1] = 0;
     this->__len -= 1;
     this->__set_len_in_bits();
 }
@@ -726,9 +730,9 @@ Integer<len_A> integer_cast(Integer<len_B> B)
 }
 
 template <uint16_t len>
-void Integer<len>::print()
+void Integer<len>::print(const char * str)
 {
-   hex_dump("int128", this->__data, this->__len, 16);
+   hex_dump(str, this->__data, this->__len, 16);
 }
 
 template <uint16_t len>
@@ -776,6 +780,8 @@ template bool operator>(const Integer<128> A, const Integer<128> B);
 template bool operator<(const Integer<128> A, const Integer<128> B);
 template DIV_RESULT<128> metoda_wielkanocna(Integer<128> A, Integer<128> B);
 template Integer<128> operator/(Integer<128> A, Integer<128> B);
+
+template Integer<128> operator+(Integer<128> A, Integer<128> B);
 
 template class Integer<256>;
 template Integer<256> operator*(const Integer<256>&& A, const Integer<256>& B);

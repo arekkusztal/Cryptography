@@ -45,7 +45,7 @@ public:
    void copy_bits(Integer A, uint16_t start, uint16_t end);
 
 	/* < Debug funcs */
-	void print();
+   void print(const char * str);
    void print_s(const char * str);
 };
 
@@ -70,6 +70,12 @@ Integer<len_A> karatsuba(const Integer<len_A>& A, const Integer<len_B>& B);
 
 template <uint16_t len_A, uint16_t len_B>
 bool operator>(Integer<len_A> A, Integer<len_B> B);
+
+template <uint16_t len_A, uint16_t len_B>
+DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B);
+
+template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B);
 
 using int16 = Integer<16>;
 using int32 = Integer<32>;
