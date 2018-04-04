@@ -4,6 +4,8 @@
 #include <string.h>
 #include <Arus_dev_kit.h>
 
+#include <iostream>
+
 #include <CRYPTO_LIB_common.h>
 #include <long_numbers.hpp>
 #include "TEST_long_numbers_test_vectors.h"
@@ -144,8 +146,29 @@ void TEST_karatsuba()
 
 void TEST_cmp_integer()
 {
+    int128 A = "0x124";
+    int128 B = "0x123";
+
+    //std::cout << "A > B : " << (A > B);
+
+    /*A.print_s("before");
+    A |= 127;
+    A.print_s("after"); */
 
 
+}
+
+void TEST_divide()
+{
+    //int128 A = "0x26B";
+    //int128 B = "0x9";
+
+    int128 A = "0x1B";
+    int128 B = "0xF";
+
+
+    A = A / B;
+    A.print_s("TEST result");
 }
 
 void TEST_copy_bits_func()
@@ -165,6 +188,9 @@ void TEST_copy_bits_func()
 int main(int argc, char *argv[])
 {
     int i;
+    //TEST_cmp_integer();
+    TEST_divide();
+    return 0;
    //TEST_add_integer_128();
    //TEST_shift_integer();
    //TEST_cmp_integer();

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <long_numbers.hpp>
+#include <iostream>
 
 #include <CRYPTO_LIB_common.h>
 #include <Arus_dev_kit.h>
@@ -244,10 +245,74 @@ Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B)
 }
 
 template <uint16_t len_A, uint16_t len_B>
+DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
+{
+    DIV_RESULT<len_A> res;
+    Integer<len_B> __temp;
+    DIV_RESULT<len_A> __temp_res[32];
+    uint16_t __len_to_shift, __bits_to_shift[32];
+    if (len_A < len_B) {
+        res.ret = "0";
+        res.mod = B;
+        return res;
+    }
+  /*  if (A.__len_in_bits < B.__len_in_bits)
+        throw; */
+    int __iteration__ = 0, __bits_added = 0, __mod_ladder_cout = 0;
+    while (A > B) {
+        printf("\n ============ ITERATION %d =========== \n", __iteration__++);
+        A.print_s("/ A = ");
+        B.print_s("/ B = ");
+        __temp = B;
+        __len_to_shift = A.__len_in_bits - __temp.__len_in_bits;
+        __temp <<= __len_to_shift;
+        printf("\n --------- SHIFT BY %hu", __len_to_shift);
+        __temp.print_s("/ AFTER SHIFT __temp = ");
+
+        if (A > __temp) {
+            A = A - __temp;
+            A.print_s("/ AFTER sub A = ");
+        }
+        else {
+            uint16_t __pos = A.__len_in_bits - 1;
+            Integer<len_A> __temp_internal;
+            while (A < __temp) {
+                if (!(A.__data[__pos >> 3] >> (__pos & 0x7) & 1)) {
+                    printf("\n -------- POS found = %hu  \n", __pos);
+                    A |= __pos;
+
+                    __temp_internal |= __pos;
+                    getc(stdin);
+                }
+                __pos--;
+
+            }
+            __temp_res[__mod_ladder_cout] = metoda_wielkanocna(__temp_internal, B);
+         //   A.print_s("/ AFTER succesfull addition = ");
+            A = A - __temp;
+         //   __temp_res[__mod_ladder_cout].ret.print_s("ret (INTERNAL)");
+         //   __temp_res[__mod_ladder_cout].mod.print_s("mod (INTERNAL)");
+            __mod_ladder_cout++;
+        }
+
+
+        res.ret |= __len_to_shift;
+        res.ret.print_s("ret");
+        getc(stdin);
+    }
+    res.mod = A;
+    res.mod.print_s("mod");
+
+    return res;
+}
+
+template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> operator/(Integer<len_A> A, Integer<len_B> B)
 {
-   Integer<len_A> ret;
-   return ret;
+   DIV_RESULT<len_A> res;
+   res = metoda_wielkanocna(A, B);
+
+   return res.ret;
 }
 
 template <uint16_t len_A, uint16_t len_B>
@@ -561,6 +626,74 @@ Integer<len>& Integer<len>::operator>>=(uint16_t shift)
 }
 
 /*
+ * ********** Logical operators  **********
+*/
+
+template <uint16_t len_A, uint16_t len_B>
+bool operator>(Integer<len_A> A, Integer<len_B> B)
+{
+    int i;
+    if (A.__len_in_bits > B.__len_in_bits)
+        return true;
+    else if (A.__len_in_bits < B.__len_in_bits)
+        return false;
+    else {
+        i = A.__len;
+        while (i >= 0) {
+            if (A.__data[i] > B.__data[i])
+                return true;
+            i--;
+        }
+
+    }
+    return false;
+}
+
+template <uint16_t len_A, uint16_t len_B>
+bool operator<(Integer<len_A> A, Integer<len_B> B)
+{
+    int i;
+    if (A.__len_in_bits < B.__len_in_bits)
+        return true;
+    else if (A.__len_in_bits > B.__len_in_bits)
+        return false;
+    else {
+        i = A.__len;
+        while (i >= 0) {
+            if (A.__data[i] < B.__data[i])
+                return true;
+            i--;
+        }
+
+    }
+    return false;
+}
+
+template <uint16_t len>
+Integer<len>& Integer<len>::operator&(Integer<len>&)
+{
+
+    return *this;
+}
+
+template <uint16_t len>
+Integer<len>& Integer<len>::operator|=(BNLib_int_size pos)
+{
+    BNLib_int_size __byte_to_change;
+    if (pos >= this->precision)
+        return *this;
+
+    __byte_to_change = pos >> 3;
+    pos &= 0x7;
+    this->__data[__byte_to_change] |= (1 << pos);
+    if (__byte_to_change > this->__len - 1)
+        this->__len = __byte_to_change + 1;
+
+    this->__set_len_in_bits();
+    return *this;
+}
+
+/*
  * ********** Misc member functions  **********
 */
 
@@ -639,6 +772,10 @@ template class Integer<128>;
 template Integer<128> operator*(const Integer<128>&& A, const Integer<128>& B);
 template Integer<128> operator*(const Integer<128>& A, const Integer<128>& B);
 template Integer<128> karatsuba(const Integer<128>& A, const Integer<128>& B);
+template bool operator>(const Integer<128> A, const Integer<128> B);
+template bool operator<(const Integer<128> A, const Integer<128> B);
+template DIV_RESULT<128> metoda_wielkanocna(Integer<128> A, Integer<128> B);
+template Integer<128> operator/(Integer<128> A, Integer<128> B);
 
 template class Integer<256>;
 template Integer<256> operator*(const Integer<256>&& A, const Integer<256>& B);

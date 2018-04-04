@@ -13,6 +13,7 @@
 #include <CRYPTO_LIB_common.h>
 
 extern uint16_t karatsuba_treshold;
+using BNLib_int_size = uint16_t;
 
 template <uint16_t len>
 class Integer
@@ -36,6 +37,9 @@ public:
    /* < ---- *< Shift operators */
    Integer<len>& operator<<=(uint16_t shift);
    Integer<len>& operator>>=(uint16_t shift);
+   /* < ---- *< Logical */
+   Integer<len>& operator&(Integer<len>& mask);
+   Integer<len>& operator|=(uint16_t pos);
 	/* <Len functions */
    void __set_len_in_bits();
    void copy_bits(Integer A, uint16_t start, uint16_t end);
@@ -45,6 +49,13 @@ public:
    void print_s(const char * str);
 };
 
+template <uint16_t len_A>
+struct DIV_RESULT
+{
+    Integer<len_A> ret;
+    Integer<len_A> mod;
+};
+
 template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> operator*(const Integer<len_A> &A, const Integer<len_B>& B);
 
@@ -52,7 +63,13 @@ template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> operator*(const Integer<len_A> &&A, const Integer<len_B>& B);
 
 template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> operator/(Integer<len_A> A, Integer<len_B> B);
+
+template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> karatsuba(const Integer<len_A>& A, const Integer<len_B>& B);
+
+template <uint16_t len_A, uint16_t len_B>
+bool operator>(Integer<len_A> A, Integer<len_B> B);
 
 using int16 = Integer<16>;
 using int32 = Integer<32>;
