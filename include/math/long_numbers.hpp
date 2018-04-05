@@ -72,6 +72,9 @@ template <uint16_t len_A, uint16_t len_B>
 bool operator>(Integer<len_A> A, Integer<len_B> B);
 
 template <uint16_t len_A, uint16_t len_B>
+bool operator<(Integer<len_A> A, Integer<len_B> B);
+
+template <uint16_t len_A, uint16_t len_B>
 DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B);
 
 template <uint16_t len_A, uint16_t len_B>

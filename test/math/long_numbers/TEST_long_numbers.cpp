@@ -146,16 +146,16 @@ void TEST_karatsuba()
 
 void TEST_cmp_integer()
 {
-    int128 A = "0x0";
-    int128 B = "0x6";
+    int128 A = "0x336";
+    int128 B = "0x240";
 
     A.print_s("A");
     B.print_s("B");
 
-    A = A + B;
-    A.print_s("A");
+    //A = A + B;
+    //A.print_s("A");
 
-    //std::cout << "A > B : " << (A > B);
+    std::cout << "A < B : " << (A < B);
 
     /*A.print_s("before");
     A |= 127;
@@ -164,10 +164,12 @@ void TEST_cmp_integer()
 
 }
 
+extern int MW_COUNT;
+
 void TEST_divide()
 {
-    int128 A = "0x236";
-    int128 B = "0x19";
+    int128 A = "0x8236";
+    int128 B = "0x219";
 
    // int128 A = "0x1B";
    // int128 B = "0xF";
@@ -178,14 +180,33 @@ void TEST_divide()
 //	int128 A = "0x254";
 //	int128 B = "0x28";
 
+    uint64_t a = 0x8236;
+    uint64_t b = 0x219;
+
+    uint64_t r, m;
+
+    uint64_t start = rdtsc();
+    int i;
+ //   for (i = 0; i < 1000000; i++) {
+        r = a / b;
+ //   }
+    uint64_t end = rdtsc();
+
+    printf("\n cpu = %lu", end - start);
+
 
     DIV_RESULT<128> res;
-    int i;
-    //for (i = 0; i < 1000000; i++)
-    res = metoda_wielkanocna(A, B);
+
+    start = rdtsc();
+  //  for (i = 0; i < 1000000; i++)
+        res = metoda_wielkanocna(A, B);
+    end = rdtsc();
+ //   printf("\n mw = %lu", end - start);
 
     res.ret.print("TEST result RET");
     res.mod.print("TEST result MOD");
+
+  //  printf("\n MW_COUNT = %d", MW_COUNT);
 }
 
 void TEST_copy_bits_func()
@@ -205,7 +226,7 @@ void TEST_copy_bits_func()
 int main(int argc, char *argv[])
 {
     int i;
-    //TEST_cmp_integer();
+  //  TEST_cmp_integer();
     TEST_divide();
     return 0;
    //TEST_add_integer_128();

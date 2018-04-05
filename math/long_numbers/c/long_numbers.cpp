@@ -73,6 +73,7 @@ Integer<len>::Integer(const char *number)
 template <uint16_t len>
 Integer<len> Integer<len>::operator=(Integer<len> A)
 {
+   memset(this->__data, 0, this->precision >> 3);
    memcpy(this->__data, A.__data, A.__len + 1);
    this->__len = A.__len;
    this->__len_in_bits = A.__len_in_bits;
@@ -244,12 +245,19 @@ Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B)
 }
 #define DEBUG_MW
 
+int MW_COUNT;
+
 template <uint16_t len_A, uint16_t len_B>
 DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
 {
-	printf("\n !! ============= metoda_wielkanocna ========== !");
+    MW_COUNT++;
+   //printf("\n !! ============= metoda_wielkanocna ========== !");
 	int i;
     DIV_RESULT<len_A> res;
+
+    //A.print_s("A");
+    //B.print_s("B");
+   // getc(stdin);
 
     Integer<len_A> __sub_1 = "1";
     Integer<len_B> __temp;
@@ -275,7 +283,9 @@ DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
             uint16_t __pos = A.__len_in_bits - 1;
             Integer<len_A> __temp_internal;
             while (A < __temp) {
-                if (!(A.__data[__pos >> 3] >> (__pos & 0x7) & 1)) {
+                if ( (!(A.__data[__pos >> 3] >> (__pos & 0x7) & 1))
+                     && (__temp.__data[__pos >> 3] >> (__pos & 0x7) & 1))
+                {
                     A |= __pos;
                     __temp_internal |= __pos;
                 }
@@ -293,10 +303,8 @@ DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
     }
 
     for (i = 0; i < __mod_ladder_cout; i++) {
-    	if (A < __temp_res[i].mod) {
-    		__temp_res[i].mod.print_s("__temp_res[i].mod BEFORE LAST STEP = ");
-    		A = A + B;
-    	    A.print_s("A after +B = ");
+      if (A < __temp_res[i].mod) {
+         A = A + B;
     		res.ret = res.ret - __sub_1;
     	}
 		A = A - __temp_res[i].mod;
@@ -643,7 +651,9 @@ bool operator>(Integer<len_A> A, Integer<len_B> B)
         i = A.__len;
         while (i >= 0) {
             if (A.__data[i] > B.__data[i])
-                return true;
+                return true;            
+            else if (A.__data[i] < B.__data[i])
+                return false;
             i--;
         }
 
@@ -660,10 +670,12 @@ bool operator<(Integer<len_A> A, Integer<len_B> B)
     else if (A.__len_in_bits > B.__len_in_bits)
         return false;
     else {
-        i = A.__len;
+        i = A.__len - 1;
         while (i >= 0) {
             if (A.__data[i] < B.__data[i])
                 return true;
+            else if (A.__data[i] > B.__data[i])
+                return false;
             i--;
         }
 
