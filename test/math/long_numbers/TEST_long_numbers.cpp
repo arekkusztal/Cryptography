@@ -221,13 +221,21 @@ void TEST_copy_bits_func()
 
 }
 
+void SETUP()
+{
+    int b = __builtin_cpu_is("intel");
+    printf("\n intel = %d", b);
+
+}
+
 #define INT int8192
 
 int main(int argc, char *argv[])
 {
     int i;
   //  TEST_cmp_integer();
-    TEST_divide();
+  //  TEST_divide();
+    SETUP();
     return 0;
    //TEST_add_integer_128();
    //TEST_shift_integer();
