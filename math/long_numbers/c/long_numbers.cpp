@@ -223,11 +223,11 @@ Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B)
     borrow = 0;
 
     for (i = 0; i < A.__len;i++) {
-        if (!A.__data[i])
-            continue;
-
+        //if (!A.__data[i])
+          //  continue;
+    	uint8_t __temp = A.__data[i];
         A.__data[i] -= borrow;
-        if (A.__data[i] < B.__data[i]) {
+        if (__temp < B.__data[i]) {
             borrow = 1;
             uint16_t ext_1 = A.__data[i];
             ext_1 += 0x100;
@@ -250,26 +250,33 @@ int MW_COUNT;
 template <uint16_t len_A, uint16_t len_B>
 DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
 {
-    MW_COUNT++;
-   //printf("\n !! ============= metoda_wielkanocna ========== !");
+	int __local_count;
+	//printf("\n metoda_wielkanocna ----------");
+	__local_count = MW_COUNT++;
 	int i;
-    DIV_RESULT<len_A> res;
-
-    //A.print_s("A");
-    //B.print_s("B");
-   // getc(stdin);
+    DIV_RESULT<len_A> res = { };
 
     Integer<len_A> __sub_1 = "1";
     Integer<len_B> __temp;
-    DIV_RESULT<len_A> __temp_res[32];
+    DIV_RESULT<len_A> __temp_res[32] = { };
     uint16_t __len_to_shift, __bits_to_shift[32];
-    if (len_A < len_B) {
+    if (A < B) {
         res.ret = "0";
-        res.mod = B;
+        res.mod = A;
+
+       // res.ret.print_s("ret =F");
+       // res.mod.print_s("mod =F");
         return res;
+    } else if (A == B) {
+    	res.ret = "1";
+		res.mod = "0";
+		return res;
+    } else if (A.__len_in_bits == B.__len_in_bits) {
+    	res.ret = "1";
+    	res.mod = A - B;
+    	return res;
     }
-  /*  if (A.__len_in_bits < B.__len_in_bits)
-        throw; */
+
     int __iteration__ = 0, __bits_added = 0, __mod_ladder_cout = 0;
     while (A > B) {
         __temp = B;
@@ -277,9 +284,9 @@ DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
         __temp <<= __len_to_shift;
 
         if (A > __temp) {
-            A = A - __temp;
+        	A = A - __temp;
         }
-        else {
+        else if (A < __temp) {
             uint16_t __pos = A.__len_in_bits - 1;
             Integer<len_A> __temp_internal;
             while (A < __temp) {
@@ -296,15 +303,18 @@ DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
             __temp_internal = __temp_internal >> 128;
             __mod_ladder_cout++;
             A = A - __temp;
+        } else if (A == __temp) {
+        	A = "0";
         }
 
 
         res.ret |= __len_to_shift;
+
     }
 
     for (i = 0; i < __mod_ladder_cout; i++) {
       if (A < __temp_res[i].mod) {
-         A = A + B;
+    	    A = A + B;
     		res.ret = res.ret - __sub_1;
     	}
 		A = A - __temp_res[i].mod;
@@ -312,6 +322,10 @@ DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B)
     }
 
     res.mod = A;
+   // res.ret.print_s("ret =");
+   // res.mod.print_s("mod =");
+
+
 
     return res;
 }
@@ -684,6 +698,20 @@ bool operator<(Integer<len_A> A, Integer<len_B> B)
 }
 
 template <uint16_t len>
+bool Integer<len>::operator==(Integer<len> A)
+{
+	int i;
+	if (this->__len_in_bits != A.__len_in_bits)
+		return false;
+
+	if (!memcmp(this->__data, A.__data, this->__len))
+		return true;
+	else
+		return false;
+}
+
+
+template <uint16_t len>
 Integer<len>& Integer<len>::operator&(Integer<len>&)
 {
 
@@ -794,6 +822,7 @@ template DIV_RESULT<128> metoda_wielkanocna(Integer<128> A, Integer<128> B);
 template Integer<128> operator/(Integer<128> A, Integer<128> B);
 
 template Integer<128> operator+(Integer<128> A, Integer<128> B);
+template Integer<128> operator-(Integer<128> A, Integer<128> B);
 
 template class Integer<256>;
 template Integer<256> operator*(const Integer<256>&& A, const Integer<256>& B);

@@ -40,6 +40,8 @@ public:
    /* < ---- *< Logical */
    Integer<len>& operator&(Integer<len>& mask);
    Integer<len>& operator|=(uint16_t pos);
+   /* < ---- *< Comparision */
+   bool operator==(Integer<len>);
 	/* <Len functions */
    void __set_len_in_bits();
    void copy_bits(Integer A, uint16_t start, uint16_t end);
@@ -79,6 +81,9 @@ DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B);
 
 template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B);
+
+template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B);
 
 using int16 = Integer<16>;
 using int32 = Integer<32>;

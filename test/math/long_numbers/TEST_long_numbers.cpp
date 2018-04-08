@@ -166,11 +166,36 @@ void TEST_cmp_integer()
 
 extern int MW_COUNT;
 
+#define PERF_DIV_
+
+
+void TEST_sub()
+{
+
+    int128 A = "0x32463246";
+    int128 B = "0xF785963";
+
+    uint64_t a = 0x32463246;
+    uint64_t b = 0xF785963;
+
+
+    A = A - B;
+    A.print_s("A");
+
+    printf("\n r = %lx", a - b);
+}
+
 void TEST_divide()
 {
-    int128 A = "0x8236";
-    int128 B = "0x219";
 
+	//int128 A = "0x40";
+	//int128 B = "0x10";
+/* To check
+    int128 A = "0xFE576234F13434";
+    int128 B = "0xFA1000213DE";
+*/
+    int128 A = "0x101010101010101";
+    int128 B = "0xFA10213DE";
    // int128 A = "0x1B";
    // int128 B = "0xF";
 
@@ -180,29 +205,40 @@ void TEST_divide()
 //	int128 A = "0x254";
 //	int128 B = "0x28";
 
-    uint64_t a = 0x8236;
-    uint64_t b = 0x219;
+    uint64_t a = 0x101010101010101;
+    uint64_t b = 0xFA10213DE;
 
     uint64_t r, m;
 
     uint64_t start = rdtsc();
     int i;
- //   for (i = 0; i < 1000000; i++) {
+#ifdef PERF_DIV
+    for (i = 0; i < 100000; i++) {
+#endif
         r = a / b;
- //   }
+
+#ifdef PERF_DIV
+    }
+#endif
     uint64_t end = rdtsc();
 
-    printf("\n cpu = %lu", end - start);
 
 
     DIV_RESULT<128> res;
 
     start = rdtsc();
-  //  for (i = 0; i < 1000000; i++)
+#ifdef PERF_DIV
+    for (i = 0; i < 100000; i++)
+#endif
         res = metoda_wielkanocna(A, B);
     end = rdtsc();
- //   printf("\n mw = %lu", end - start);
 
+#ifdef PERF_DIV
+    printf("\n cpu = %lu", end - start);
+    printf("\n mw = %lu", end - start);
+#endif
+
+    printf("\n r = %lx m = %lx", a / b, a % b);
     res.ret.print("TEST result RET");
     res.mod.print("TEST result MOD");
 
@@ -234,8 +270,9 @@ int main(int argc, char *argv[])
 {
     int i;
   //  TEST_cmp_integer();
-  //  TEST_divide();
-    SETUP();
+    TEST_divide();
+   // TEST_sub();
+  //  SETUP();
     return 0;
    //TEST_add_integer_128();
    //TEST_shift_integer();
