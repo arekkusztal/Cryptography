@@ -87,6 +87,18 @@ Integer<len> Integer<len>::operator=(Integer<len> A)
  *
  */
 
+
+void __padd128(uint8_t *a, uint8_t *b)
+{
+    asm volatile(
+          "movdqu %[in], %%xmm15;"
+          "aesenclast %%xmm10, %%xmm15;"
+          "movdqu %%xmm15, %[out]"
+           : [out] "=m" (a)
+           : [in] "m" (b)
+    );
+}
+
 template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
 {
@@ -96,18 +108,38 @@ Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
 
    carry = 0;
    i = 0;
-   __complement = 0;
    __max_of_two = A.__len >= B.__len ?
          A.__len : B.__len;
 
-   if (__builtin_expect(len_A < len_B, 0))
+ /*  if (__builtin_expect(len_A < len_B, 0))
       throw;
    if (__builtin_expect(len_A > len_B, 0)) {
       __complement = __max_of_two;
       __max_of_two = len_B >> 3;
+   } */
+
+   uint64_t *__data_ret = (uint64_t *)ret.__data;
+
+   while (i < __max_of_two) {
+       uint64_t *__r, *__a, *__b;
+       __r = (uint64_t *)&ret.__data[i];
+       __a = (uint64_t *)&A.__data[i];
+       __b = (uint64_t *)&B.__data[i];
+
+       *__r = *__a + *__b + carry;
+       if (__builtin_expect((*__a && *__b), 0)) {
+          if (*__r < *__a)
+             carry = 1;
+          else
+             carry = 0;
+       } else if ((*__a == UINT64_MAX || *__b == UINT64_MAX) && carry)
+          carry = 1;
+       else
+          carry = 0;
+       i += sizeof(*__r);
    }
 
-   while (i < __max_of_two)
+   /*while (i < __max_of_two)
    {
       ret.__data[i] = A.__data[i] + B.__data[i] + carry;
       if (__builtin_expect((A.__data[i] && B.__data[i]), 1)) {
@@ -120,9 +152,9 @@ Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
       else
          carry = 0;
       i++;
-   }
+   }*/
 
-   while (i < __complement)
+ /*  while (i < __complement)
    {
       ret.__data[i] = A.__data[i] + carry;
       if (__builtin_expect((A.__data[i]), 1)) {
@@ -133,7 +165,7 @@ Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
       } else if (A.__data[i] == 0xFF && carry)
          carry = 1;
       i++;
-   }
+   } */
 
    ret.__len = __complement ? __complement : __max_of_two;
    if (carry) {
@@ -743,6 +775,7 @@ template <uint16_t len>
 void Integer<len>::__set_len_in_bits()
 {
     int i;
+  //  while (1) {
     if (this->__len == 0) {
       this->__len_in_bits = 0;
       this->__data[0] = 0;
@@ -758,6 +791,7 @@ void Integer<len>::__set_len_in_bits()
     //this->__len_in_bits = ((this->__len - 1) << 3) + i + 1;
     this->__data[this->__len - 1] = 0;
     this->__len -= 1;
+   // }
     this->__set_len_in_bits();
 }
 

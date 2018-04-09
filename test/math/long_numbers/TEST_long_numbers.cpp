@@ -166,7 +166,51 @@ void TEST_cmp_integer()
 
 extern int MW_COUNT;
 
-#define PERF_DIV_
+#define PERF_DIV
+
+#define __A 0xFF242423111//0xFF4332463246
+#define __B 0xFF242423111//0xF785963454
+#define STR_EXPAND(tok) #tok
+#define STR(tok) STR_EXPAND(tok)
+
+void TEST_add()
+{
+
+    int128 A = STR(__A);
+    int128 B = STR(__B);
+
+    uint64_t a = 0;//__A;
+    uint64_t b = 0;//__B;
+
+    int i;
+
+
+    uint64_t start = rdtsc();
+#ifdef PERF_DIV
+    for (i = 0; i < 10000000; i++)
+#endif
+        A + B;
+
+    uint64_t end = rdtsc();
+    uint64_t diff_1 = end - start;
+
+    start = rdtsc();
+#ifdef PERF_DIV
+    for (i = 0; i < 10000000; i++)
+#endif
+        a + b;
+
+    end = rdtsc();
+    uint64_t diff_2 = end - start;
+
+    (A + B).print_s("A + B");
+    printf("\n a + b = %lx", a + b);
+
+    printf("\ndiff_1 = %lx", diff_1);
+    printf("\ndiff_2 = %lx", diff_2);
+    printf("\ndiff = %lx", diff_1 / diff_2);
+
+}
 
 
 void TEST_sub()
@@ -178,9 +222,17 @@ void TEST_sub()
     uint64_t a = 0x32463246;
     uint64_t b = 0xF785963;
 
+    int i;
+
+    uint64_t start = rdtsc();
 
     A = A - B;
+    uint64_t end = rdtsc();
+
+
+    start = rdtsc();
     A.print_s("A");
+    end = rdtsc();
 
     printf("\n r = %lx", a - b);
 }
@@ -269,12 +321,13 @@ void SETUP()
 int main(int argc, char *argv[])
 {
     int i;
+    TEST_add_integer();
   //  TEST_cmp_integer();
-    TEST_divide();
+    TEST_add();
+   // TEST_divide();
    // TEST_sub();
   //  SETUP();
     return 0;
-   //TEST_add_integer_128();
    //TEST_shift_integer();
    //TEST_cmp_integer();
    //TEST_mult_integer();
