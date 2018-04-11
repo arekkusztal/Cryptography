@@ -79,202 +79,7 @@ Integer<len> Integer<len>::operator=(Integer<len> A)
    this->__len_in_bits = A.__len_in_bits;
 }
 
-/*
- * ********** Arithmetic operators  **********
- */
-/*
- * @brief Add operator, works when len of A is equal or bigger than len of B
- *
- */
 
-
-void __padd128(uint8_t *a, uint8_t *b)
-{
-    asm volatile(
-          "movdqu %[in], %%xmm15;"
-          "aesenclast %%xmm10, %%xmm15;"
-          "movdqu %%xmm15, %[out]"
-           : [out] "=m" (a)
-           : [in] "m" (b)
-    );
-}
-
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B)
-{
-   Integer<len_A> ret;
-   uint16_t i, __max_of_two, __complement;
-   uint8_t carry;
-
-   carry = 0;
-   i = 0;
-   __max_of_two = A.__len >= B.__len ?
-         A.__len : B.__len;
-
- /*  if (__builtin_expect(len_A < len_B, 0))
-      throw;
-   if (__builtin_expect(len_A > len_B, 0)) {
-      __complement = __max_of_two;
-      __max_of_two = len_B >> 3;
-   } */
-
-   uint64_t *__data_ret = (uint64_t *)ret.__data;
-
-   while (i < __max_of_two) {
-       uint64_t *__r, *__a, *__b;
-       __r = (uint64_t *)&ret.__data[i];
-       __a = (uint64_t *)&A.__data[i];
-       __b = (uint64_t *)&B.__data[i];
-
-       *__r = *__a + *__b + carry;
-       if (__builtin_expect((*__a && *__b), 0)) {
-          if (*__r < *__a)
-             carry = 1;
-          else
-             carry = 0;
-       } else if ((*__a == UINT64_MAX || *__b == UINT64_MAX) && carry)
-          carry = 1;
-       else
-          carry = 0;
-       i += sizeof(*__r);
-   }
-
-   /*while (i < __max_of_two)
-   {
-      ret.__data[i] = A.__data[i] + B.__data[i] + carry;
-      if (__builtin_expect((A.__data[i] && B.__data[i]), 1)) {
-         if (ret.__data[i] < A.__data[i] || ret.__data[i] < B.__data[i])
-            carry = 1;
-         else
-            carry = 0;
-      } else if ((A.__data[i] == 0xFF || B.__data[i] == 0xFF) && carry)
-         carry = 1;
-      else
-         carry = 0;
-      i++;
-   }*/
-
- /*  while (i < __complement)
-   {
-      ret.__data[i] = A.__data[i] + carry;
-      if (__builtin_expect((A.__data[i]), 1)) {
-         if (ret.__data[i] < A.__data[i])
-            carry = 1;
-         else
-            carry = 0;
-      } else if (A.__data[i] == 0xFF && carry)
-         carry = 1;
-      i++;
-   } */
-
-   ret.__len = __complement ? __complement : __max_of_two;
-   if (carry) {
-      ret.__data[i] = 1;
-      ret.__len += 1;
-      if (ret.__len > (len_A >> 3)) {
-         ret.__len -= (len_A >> 3);
-      }
-   }
-   ret.__set_len_in_bits();
-
-   return ret;
-}
-
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A>& operator+=(Integer<len_A>& A, Integer<len_B> B)
-{
-   Integer<len_A> ret;
-   uint16_t i, __max_of_two, __complement;
-   uint8_t carry;
-
-   carry = 0;
-   i = 0;
-   __complement = 0;
-   __max_of_two = A.__len >= B.__len ?
-         A.__len : B.__len;
-
-   if (__builtin_expect(len_A < len_B, 0))
-      throw;
-   if (__builtin_expect(len_A > len_B, 0)) {
-      __complement = __max_of_two;
-      __max_of_two = len_B >> 3;
-   }
-
-   while (i < __max_of_two)
-   {
-      uint8_t __tmp_A = A.__data[i];
-      A.__data[i] = A.__data[i] + B.__data[i] + carry;
-      if (__builtin_expect((A.__data[i] && B.__data[i]), 1)) {
-         if (A.__data[i] < __tmp_A || A.__data[i] < B.__data[i])
-            carry = 1;
-         else
-            carry = 0;
-      } else if ((__tmp_A == 0xFF || B.__data[i] == 0xFF) && carry)
-         carry = 1;
-      else
-         carry = 0;
-      i++;
-   }
-
-   while (i < __complement)
-   {
-      uint8_t __tmp_A = A.__data[i];
-      A.__data[i] = A.__data[i] + carry;
-      if (__builtin_expect((A.__data[i]), 1)) {
-         if (A.__data[i] < __tmp_A)
-            carry = 1;
-         else
-            carry = 0;
-      } else if (__tmp_A == 0xFF && carry)
-         carry = 1;
-      i++;
-   }
-
-   A.__len = __complement ? __complement : __max_of_two;
-   if (carry) {
-      A.__data[i] = 1;
-      A.__len += 1;
-      if (A.__len > (len_A >> 3)) {
-         A.__len -= (len_A >> 3);
-      }
-   }
-   ret.__set_len_in_bits();
-
-   return A;
-}
-
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B)
-{
-    Integer<len_A> ret;
-    uint16_t i, k, __max_of_two;
-    uint8_t borrow, __b;
-    __max_of_two = A.__len >= B.__len ?		\
-          A.__len : B.__len;
-
-    borrow = 0;
-
-    for (i = 0; i < A.__len;i++) {
-        //if (!A.__data[i])
-          //  continue;
-    	uint8_t __temp = A.__data[i];
-        A.__data[i] -= borrow;
-        if (__temp < B.__data[i]) {
-            borrow = 1;
-            uint16_t ext_1 = A.__data[i];
-            ext_1 += 0x100;
-            ext_1 -= B.__data[i];
-            ret.__data[i] = ext_1;
-        }
-        else {
-            ret.__data[i] = A.__data[i] - B.__data[i];
-            borrow = 0;
-        }
-    }
-    ret.__len = A.__len;
-    ret.__set_len_in_bits();
-    return ret;
-}
 #define DEBUG_MW
 
 int MW_COUNT;
@@ -377,37 +182,37 @@ Integer<len_A> operator*(const Integer<len_A> &&A, const Integer<len_B>& B)
     return A * B;
 }
 
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator*(const Integer<len_A> &A, const Integer<len_B>& B)
+template <uint16_t len>
+Integer<len> Integer<len>::operator*(const Integer<len>& B)
 {
-   Integer<len_A> ret;
+   Integer<len> ret;
 
-   if (A.__len > karatsuba_treshold && B.__len > karatsuba_treshold) {
+   if (this->__len > karatsuba_treshold && B.__len > karatsuba_treshold) {
    //    printf("\nINFO: Entering Karatsuba A.len >> 1 = %hu", A.__len >> 1);
-       return karatsuba(A, B);
+       return karatsuba(*this, B);
    }
 
-   Integer<len_A> __temp, __shifted;
+   Integer<len> __temp, __shifted;
    uint16_t i, k, __min_of_two, __final_len;
    uint8_t __a_is_smaller;
 
    __temp.__len = 1;
    __temp.__len_in_bits = 8;
-   __final_len = ((A.__len_in_bits + B.__len_in_bits - 1) >> 3) + 1;
+   __final_len = ((this->__len_in_bits + B.__len_in_bits - 1) >> 3) + 1;
 
 
-   if (A.__len <= B.__len) {
+   if (this->__len <= B.__len) {
        __shifted = B;
        __a_is_smaller = true;
    }
    else {
-       __shifted = A;
+       __shifted = *this;
        __a_is_smaller = false;
    }
 
    if (__a_is_smaller) {
-       for (i = 0; i < A.__len << 3; i++) {
-           if ( (A.__data[i >> 3] >> (i & 0x7)) & 1) {
+       for (i = 0; i < this->__len << 3; i++) {
+           if ( (this->__data[i >> 3] >> (i & 0x7)) & 1) {
                __temp += __shifted;
 
            }
@@ -446,26 +251,24 @@ Integer<len_A> operator*(const Integer<len_A> &A, const Integer<len_B>& B)
 #endif
 
 #define KARATSUBA_BYTE_OFFSET 120
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> karatsuba(const Integer<len_A>& A, const Integer<len_B>& B)
+template <uint16_t len>
+Integer<len> Integer<len>::karatsuba(const Integer<len>& A, const Integer<len>& B)
 {
-    Integer<len_A> ret;
-    if (A.__len_in_bits + B.__len_in_bits > A.precision) {
+    Integer<len> ret;
+/*    if (A.__len_in_bits + B.__len_in_bits > A.precision) {
         printf("\nINFO: potential overflow = %hu", A.__len_in_bits + B.__len_in_bits);
         return ret;
     }
 
     uint16_t __chosen_one, __b;
 
-    Integer<len_A> Z_0, Z_1, Z_2;
-    Integer<len_A> x_0, x_1, y_0, y_1;
+    Integer<len> Z_0, Z_1, Z_2;
+    Integer<len> x_0, x_1, y_0, y_1;
 
     if (KARATSUBA_BYTE_OFFSET >= (A.__len)) {
      //   printf("\nINFO: Leaving Karatsuba A.__len/2 = %hu", A.__len >> 1);
         return A * B;
     }
-    /* TODO: test it */
-    /* __chosen_one = A.__len_in_bits - 1; */
     __chosen_one = (A.__len - KARATSUBA_BYTE_OFFSET) << 3;
     __b = __chosen_one << 1;
     x_0.copy_bits(A, __chosen_one, A.__len_in_bits);
@@ -483,7 +286,7 @@ Integer<len_A> karatsuba(const Integer<len_A>& A, const Integer<len_B>& B)
     DEBUG_PRINT(Z_0, "Z_0");
     Z_1 = (x_0 + y_0) * (x_1 + y_1) - Z_0 - Z_2;
     DEBUG_PRINT(Z_1, "Z_1");
-    ret = (Z_2 << __b) + (Z_1 << __chosen_one) + Z_0;
+    ret = (Z_2 << __b) + (Z_1 << __chosen_one) + Z_0; */
 
     return ret;
 }
@@ -836,44 +639,8 @@ void Integer<len>::copy_bits(Integer A, uint16_t start, uint16_t end)
 
 
 
-template class Integer<16>;
-template Integer<16> operator*(const Integer<16>&& A, const Integer<16>& B);
-template Integer<16> operator*(const Integer<16>& A, const Integer<16>& B);
-template Integer<16> karatsuba(const Integer<16>& A, const Integer<16>& B);
-
-template class Integer<32>;
-template Integer<32> operator*(const Integer<32>&& A, const Integer<32>& B);
-template Integer<32> operator*(const Integer<32>& A, const Integer<32>& B);
-template Integer<32> karatsuba(const Integer<32>& A, const Integer<32>& B);
-
-template class Integer<128>;
-template Integer<128> operator*(const Integer<128>&& A, const Integer<128>& B);
-template Integer<128> operator*(const Integer<128>& A, const Integer<128>& B);
-template Integer<128> karatsuba(const Integer<128>& A, const Integer<128>& B);
 template bool operator>(const Integer<128> A, const Integer<128> B);
 template bool operator<(const Integer<128> A, const Integer<128> B);
 template DIV_RESULT<128> metoda_wielkanocna(Integer<128> A, Integer<128> B);
 template Integer<128> operator/(Integer<128> A, Integer<128> B);
 
-template Integer<128> operator+(Integer<128> A, Integer<128> B);
-template Integer<128> operator-(Integer<128> A, Integer<128> B);
-
-template class Integer<256>;
-template Integer<256> operator*(const Integer<256>&& A, const Integer<256>& B);
-template Integer<256> operator*(const Integer<256>& A, const Integer<256>& B);
-template Integer<256> karatsuba(const Integer<256>& A, const Integer<256>& B);
-
-template class Integer<512>;
-template Integer<512> operator*(const Integer<512>&& A, const Integer<512>& B);
-template Integer<512> operator*(const Integer<512>& A, const Integer<512>& B);
-template Integer<512> karatsuba(const Integer<512>& A, const Integer<512>& B);
-
-template class Integer<4096>;
-template Integer<4096> operator*(const Integer<4096>&& A, const Integer<4096>& B);
-template Integer<4096> operator*(const Integer<4096>& A, const Integer<4096>& B);
-template Integer<4096> karatsuba(const Integer<4096>& A, const Integer<4096>& B);
-
-template class Integer<8192>;
-template Integer<8192> operator*(const Integer<8192>&& A, const Integer<8192>& B);
-template Integer<8192> operator*(const Integer<8192>& A, const Integer<8192>& B);
-template Integer<8192> karatsuba(const Integer<8192>& A, const Integer<8192>& B);

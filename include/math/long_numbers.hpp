@@ -33,6 +33,11 @@ public:
 	/* < ---- *< Assignement */
 	Integer<len> operator=(Integer<len>);
    /* < ---- *< Arithmetic */
+   Integer<len> operator+(const Integer<len>&);
+   Integer<len>& operator+=(const Integer<len>&);
+   Integer<len> operator-(const Integer<len>&);
+   Integer<len> operator*(const Integer<len>&);
+   Integer<len> karatsuba(const Integer<len>& A, const Integer<len>& B);
 
    /* < ---- *< Shift operators */
    Integer<len>& operator<<=(uint16_t shift);
@@ -79,13 +84,21 @@ bool operator<(Integer<len_A> A, Integer<len_B> B);
 template <uint16_t len_A, uint16_t len_B>
 DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B);
 
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B);
+/*template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B); */
 
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B);
+/*template <uint16_t len_A, uint16_t len_B>
+Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B); */
 
 void __padd128(uint8_t *a, uint8_t *b);
+
+template class Integer<16>;
+template class Integer<32>;
+template class Integer<128>;
+template class Integer<256>;
+template class Integer<512>;
+template class Integer<4096>;
+template class Integer<8192>;
 
 using int16 = Integer<16>;
 using int32 = Integer<32>;
