@@ -1,12 +1,11 @@
-SOURCES+=TEST_long_numbers
+TESTS-y+=TEST_long_numbers
 
-all: $(SOURCES)
+all: $(TESTS-y)
 
-$(SOURCES): SETUP
-
-.cpp:
-	g++ $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0 -fpermissive -std=c++11
-	$(S) echo ld: $@
+#$(TESTS-y): SETUP
+#.cpp:
+#	g++ $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0 -fpermissive -std=c++11
+#	$(S) echo ld: $@
 
 .PHONY: SETUP	
 SETUP:
@@ -18,3 +17,6 @@ SETUP:
 .PHONY: clean
 clean:
 	rm -f $(SOURCES)
+
+
+include $(CRYPTO_LIB)/build.src.mk

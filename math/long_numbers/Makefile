@@ -1,4 +1,4 @@
-SUBDIRS+=c
+SUBDIRS+=cpp
 SUBDIRS+=x86
 
 all: $(SUBDIRS)

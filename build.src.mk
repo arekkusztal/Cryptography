@@ -4,9 +4,18 @@ $(SOURCES-y): %.o : %.c
 	$(S)gcc -c $(CFLAGS) $< -o $(LIB_OBJ)/$@ -g -O0
 	$(S)echo cc: $@
 	
-$(SOURCESCPP-y): %.o : %.c
-	$(S)g++ -c $(CFLAGS) -fpermissive $< -o $(LIB_OBJ)/$@ -g -O0
-	$(S)echo cc: $@
+$(SOURCESCPP-y): %.o : %.cpp
+	g++ -c $(CFLAGS)  $< -o $(LIB_OBJ)/$@ -g -O0
+	$(S)echo g++: $@
+
+$(EXECPP-y): %.o : %.c
+	g++ -c $(CFLAGS) -fpermissive $< -o $(LIB_OBJ)/$@ -g -O0
+	$(S)echo g++: $@
+
+$(TESTS-y): SETUP
+.cpp:
+	g++ $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0 -fpermissive -std=c++11
+	$(S) echo ld: $@
 	
 .PHONY: $(SUBDIRS)
 $(SUBDIRS):
