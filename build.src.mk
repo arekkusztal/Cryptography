@@ -17,6 +17,6 @@ $(TESTS-y): SETUP
 	$(S)g++ $(CFLAGS) $(LIB_OBJ)/*.o $< -o $(TEST_BUILD)/$@ -g -O0 -fpermissive -std=c++11
 	$(S) echo ld: $@
 	
-.PHONY: $(SUBDIRS)
-$(SUBDIRS):
+.PHONY: $(SUBDIRS-y)
+$(SUBDIRS-y):
 	$(S)$(MAKE) -C $@ $(MFLAGS)

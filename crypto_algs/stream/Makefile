@@ -1,6 +1,6 @@
-SUBDIRS+=internals
+SUBDIRS-y+=internals
 
-all: $(SUBDIRS)	
+all: $(SUBDIRS-y)	
 	
 .PHONY:
 clean:

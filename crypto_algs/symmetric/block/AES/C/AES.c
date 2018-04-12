@@ -8,28 +8,6 @@
 #define AES_DEBUG
 #define KEY_EXPAND_2
 
-void rol(uint8_t *data, uint16_t bg)
-{
-	int i;
-
-	uint8_t temp[4];
-	for (i = bg; i < bg + 4; i++) {
-		temp[i - bg] = data[i & 3];
-	}
-	memcpy(data, temp, 4);
-}
-
-void ror(uint8_t *data, uint16_t bg)
-{
-	int i;
-
-	uint8_t temp[4];
-	for (i = bg; i < bg + 4; i++) {
-		temp[i - bg] = data[(4 - 2*bg + i) & 3];
-	}
-	memcpy(data, temp, 4);
-}
-
 void rijandel_mix(uint8_t *r) {
 
         uint8_t a[4];
@@ -123,7 +101,7 @@ void AES_decrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 		reverse_mix_columns(state);
 
 	for (i = 1; i < RIJNDAEL; i++) {
-		ror(&state[RIJNDAEL*i], i);
+		ror_4(&state[RIJNDAEL*i], i);
 	}
 
 	for (i = 0; i<16; i++) {
@@ -163,7 +141,7 @@ void AES_encrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 	}
 
 	for (i = 1; i < RIJNDAEL; i++) {
-		rol(&state[RIJNDAEL*i], i);
+		rol_4(&state[RIJNDAEL*i], i);
 	}
 
 	if (op != LAST) {

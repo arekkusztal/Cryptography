@@ -1,7 +1,7 @@
-SUBDIRS+=symmetric
-SUBDIRS+=asymmetric
+SUBDIRS-y+=symmetric
+SUBDIRS-y+=asymmetric
 
-all: $(SUBDIRS)	
+all: $(SUBDIRS-y)	
 	
 .PHONY:
 clean:

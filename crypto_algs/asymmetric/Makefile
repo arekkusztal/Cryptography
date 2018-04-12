@@ -1,5 +1,5 @@
-SUBDIRS+=RSA
+SUBDIRS-y+=RSA
 
-all: $(SUBDIRS)
+all: $(SUBDIRS-y)
 	
 include $(CRYPTO_LIB)/build.src.mk 

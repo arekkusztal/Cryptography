@@ -1,8 +1,8 @@
-SUBDIRS+=AES
-SUBDIRS+=DES
-SUBDIRS+=Twofish
+SUBDIRS-y+=AES
+SUBDIRS-y+=DES
+SUBDIRS-y+=Twofish
 
-all: $(SUBDIRS)	
+all: $(SUBDIRS-y)	
 	
 .PHONY:
 clean:

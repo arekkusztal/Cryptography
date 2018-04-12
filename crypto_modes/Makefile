@@ -1,5 +1,5 @@
-SUBDIRS+=block_modes
+SUBDIRS-y+=block_modes
 
-all: $(SUBDIRS)
+all: $(SUBDIRS-y)
 
 include $(CRYPTO_LIB)/build.src.mk 

@@ -1,6 +1,6 @@
-SUBDIRS+=Integer
-SUBDIRS+=x86
+SUBDIRS-y+=Integer
+SUBDIRS-y+=x86
 
-all: $(SUBDIRS)
+all: $(SUBDIRS-y)
 
 include $(CRYPTO_LIB)/build.src.mk 

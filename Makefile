@@ -1,10 +1,13 @@
-CFLAGS=-I$(PWD)/include -I$(PWD)/include/math
+CFLAGS=-I$(PWD)/include -I$(PWD)/include/math -Dx86
 BUILD=$(CRYPTO_LIB)/build
 LIB_OBJ=$(BUILD)/lib_obj
 MFLAGS=--no-print-directory
 TEST_BUILD=$(CRYPTO_LIB)/test/build
 LIB-X=lib
 S=@
+
+standard=y
+x86=n
 
 DIRS+=crypto_algs
 DIRS+=crypto_modes
@@ -24,6 +27,8 @@ export CFLAGS
 export LIB_OBJ
 export GCC
 export TEST_BUILD
+export standard
+export x86
 
 all: $(LIB-X)
 

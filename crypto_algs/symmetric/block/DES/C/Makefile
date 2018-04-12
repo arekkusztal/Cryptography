@@ -1,6 +1,6 @@
 SOURCES-y+=DES.o
 
-all: $(SUBDIRS)	
+all: $(SUBDIRS-y)	
 
 include $(CRYPTO_LIB)/build.src.mk
 

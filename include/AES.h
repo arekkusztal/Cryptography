@@ -34,7 +34,6 @@ extern uint8_t expansion[14][32];
 extern uint8_t s_box[256];
 extern uint8_t rcon[256];
 
-void rol(uint8_t *data, uint16_t bg);
 void rijandel_mix(uint8_t *r);
 void mix_columns(uint8_t *state);
 void rijndeal_mix_help(uint8_t *state, uint16_t off);

@@ -1,6 +1,6 @@
-SUBDIRS+=MD5
-SUBDIRS+=SHA1
+SUBDIRS-y+=MD5
+SUBDIRS-y+=SHA1
 
-all: $(SUBDIRS)	
+all: $(SUBDIRS-y)	
 	
 include $(CRYPTO_LIB)/build.src.mk 

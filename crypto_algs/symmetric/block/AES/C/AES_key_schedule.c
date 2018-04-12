@@ -16,7 +16,7 @@ void key_expansion(struct AES_context *ctx)
 		if (i % key_size == 0) {
 			memcpy(gw3, &in[i - 4], 4);
 
-			rol(gw3,1);
+			rol_4(gw3,1);
 
 			for (j = 0; j < 4; j++) {
 				gw3[j] = s_box[gw3[j]];
@@ -51,7 +51,7 @@ void key_expand(struct AES_context *ctx, uint8_t *out, uint8_t *in, uint16_t rco
 	uint8_t w[32];
 	memcpy(gw3, &in[ctx->key_size - 4], 4);
 
-	rol(gw3,1);
+	rol_4(gw3,1);
 
 	for (i = 0; i < 4; i++) {
 		gw3[i] = s_box[gw3[i]];

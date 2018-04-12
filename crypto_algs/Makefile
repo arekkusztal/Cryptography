@@ -1,8 +1,8 @@
-SUBDIRS+=symmetric
-SUBDIRS+=asymmetric
-SUBDIRS+=stream
+SUBDIRS-y+=symmetric
+SUBDIRS-y+=asymmetric
+SUBDIRS-y+=stream
 
-all: $(SUBDIRS)	
+all: $(SUBDIRS-y)	
 	
 .PHONY:
 clean:

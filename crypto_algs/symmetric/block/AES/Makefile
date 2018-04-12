@@ -1,7 +1,7 @@
-SUBDIRS+=C
-SUBDIRS+=x86
+SUBDIRS-y+=C
+SUBDIRS-y+=x86
 
-all: $(SUBDIRS)	
+all: $(SUBDIRS-y)	
 	
 .PHONY:
 clean:

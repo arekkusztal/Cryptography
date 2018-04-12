@@ -1,6 +1,6 @@
-SUBDIRS+=block
+SUBDIRS-y+=block
 
-all: $(SUBDIRS)	
+all: $(SUBDIRS-y)	
 	
 .PHONY:
 clean:

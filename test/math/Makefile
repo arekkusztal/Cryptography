@@ -1,5 +1,5 @@
-SUBDIRS+=long_numbers
+SUBDIRS-y+=long_numbers
 
-all: $(SUBDIRS)
+all: $(SUBDIRS-y)
 
 include $(CRYPTO_LIB)/build.src.mk 

@@ -81,6 +81,9 @@ struct AES_test_vector
 	} ciphertext;
 };
 
+void rol_4(uint8_t *data, uint16_t bg);
+void ror_4(uint8_t *data, uint16_t bg);
+
 #ifdef __cplusplus
 }
 #endif
