@@ -1,4 +1,4 @@
-SUBDIRS+=cpp
+SUBDIRS+=Integer
 SUBDIRS+=x86
 
 all: $(SUBDIRS)

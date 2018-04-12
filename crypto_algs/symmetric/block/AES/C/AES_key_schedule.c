@@ -40,11 +40,7 @@ void key_expansion(struct AES_context *ctx)
 			}
 			i+=4;
 		}
-
-
-
 	}
-
 }
 
 void key_expand(struct AES_context *ctx, uint8_t *out, uint8_t *in, uint16_t rcon)

@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include <CRYPTO_LIB_common.h>
-#include <long_numbers.hpp>
+#include <Integer.hpp>
 #include "TEST_long_numbers_test_vectors.h"
 
 #define INT_1	"1B0A"
@@ -282,7 +282,7 @@ void TEST_divide()
 #ifdef PERF_DIV
     for (i = 0; i < 100000; i++)
 #endif
-        res = metoda_wielkanocna(A, B);
+        res = A.metoda_wielkanocna(B);
     end = rdtsc();
 
 #ifdef PERF_DIV

@@ -1,4 +1,14 @@
-#include <long_numbers.hpp>
+#include <Integer.hpp>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <unistd.h>
+#include <iostream>
+
+#include <CRYPTO_LIB_common.h>
+#include <Arus_dev_kit.h>
 
 /*
  * ********** Arithmetic operators  **********
@@ -134,3 +144,69 @@ Integer<len>& Integer<len>::operator+=(const Integer<len>& B)
    return *this;
 }
 
+template <uint16_t len>
+Integer<len> Integer<len>::operator*(const Integer<len>& B)
+{
+   Integer<len> ret;
+
+   if (this->__len > karatsuba_treshold && B.__len > karatsuba_treshold) {
+   //    printf("\nINFO: Entering Karatsuba A.len >> 1 = %hu", A.__len >> 1);
+       return karatsuba(*this, B);
+   }
+
+   Integer<len> __temp, __shifted;
+   uint16_t i, k, __min_of_two, __final_len;
+   uint8_t __a_is_smaller;
+
+   __temp.__len = 1;
+   __temp.__len_in_bits = 8;
+   __final_len = ((this->__len_in_bits + B.__len_in_bits - 1) >> 3) + 1;
+
+
+   if (this->__len <= B.__len) {
+       __shifted = B;
+       __a_is_smaller = true;
+   }
+   else {
+       __shifted = *this;
+       __a_is_smaller = false;
+   }
+
+   if (__a_is_smaller) {
+       for (i = 0; i < this->__len << 3; i++) {
+           if ( (this->__data[i >> 3] >> (i & 0x7)) & 1) {
+               __temp += __shifted;
+
+           }
+           __shifted <<= 1;
+       }
+   }
+   else {
+        for (i = 0; i < B.__len << 3; i++) {
+            if ( (B.__data[i >> 3] >> (i & 0x7)) & 1) {
+                __temp += __shifted;
+            }
+            __shifted <<= 1;
+        }
+   }
+
+   ret = __temp;
+   ret.__len = __final_len;
+   ret.__set_len_in_bits();
+
+   if (ret.__len_in_bits > ret.precision) {
+       ret.__len_in_bits = ret.precision;
+       ret.__len = ret.precision >> 3;
+   }
+
+   return ret;
+}
+
+template <uint16_t len>
+Integer<len> Integer<len>::operator/(const Integer<len> &B)
+{
+   DIV_RESULT<len> res;
+   res = this->metoda_wielkanocna(B);
+
+   return res.ret;
+}

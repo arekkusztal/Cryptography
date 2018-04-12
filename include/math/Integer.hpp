@@ -15,6 +15,9 @@
 extern uint16_t karatsuba_treshold;
 using BNLib_int_size = uint16_t;
 
+template <uint16_t len_A>
+struct DIV_RESULT;
+
 template <uint16_t len>
 class Integer
 {
@@ -32,28 +35,37 @@ public:
 	/* < Operators */
 	/* < ---- *< Assignement */
 	Integer<len> operator=(Integer<len>);
-   /* < ---- *< Arithmetic */
-   Integer<len> operator+(const Integer<len>&);
-   Integer<len>& operator+=(const Integer<len>&);
-   Integer<len> operator-(const Integer<len>&);
-   Integer<len> operator*(const Integer<len>&);
-   Integer<len> karatsuba(const Integer<len>& A, const Integer<len>& B);
+	/* < ---- *< Arithmetic */
+	Integer<len> operator+(const Integer<len>&);
+	Integer<len>& operator+=(const Integer<len>&);
+	Integer<len> operator-(const Integer<len>&);
+	Integer<len> operator*(const Integer<len>&);
+	Integer<len> operator/(const Integer<len>&);
+	Integer<len> karatsuba(const Integer<len>& A, const Integer<len>& B);
+	DIV_RESULT<len> metoda_wielkanocna(const Integer<len>& B);
 
-   /* < ---- *< Shift operators */
-   Integer<len>& operator<<=(uint16_t shift);
-   Integer<len>& operator>>=(uint16_t shift);
-   /* < ---- *< Logical */
-   Integer<len>& operator&(Integer<len>& mask);
-   Integer<len>& operator|=(uint16_t pos);
-   /* < ---- *< Comparision */
-   bool operator==(Integer<len>);
+	/* < ---- *< Shift operators */
+	Integer<len>& operator<<=(uint16_t shift);
+	Integer<len> operator<<(uint16_t shift);
+	Integer<len>& operator>>=(uint16_t shift);
+	Integer<len> operator>>(uint16_t shift);
+	/* < ---- *< Logical */
+	Integer<len>& operator&(Integer<len>& mask);
+	Integer<len>& operator|=(uint16_t pos);
+	/* < ---- *< Comparision */
+	bool operator==(Integer<len>);
+	bool operator<(const Integer<len>&);
+	bool operator>(const Integer<len>&);
+
+	template<uint16_t __len>
+	Integer<__len> integer_cast(Integer<len>);
 	/* <Len functions */
-   void __set_len_in_bits();
-   void copy_bits(Integer A, uint16_t start, uint16_t end);
+	void __set_len_in_bits();
+	void copy_bits(Integer A, uint16_t start, uint16_t end);
 
 	/* < Debug funcs */
-   void print(const char * str);
-   void print_s(const char * str);
+	void print(const char * str);
+	void print_s(const char * str);
 };
 
 template <uint16_t len_A>
@@ -62,12 +74,6 @@ struct DIV_RESULT
     Integer<len_A> ret;
     Integer<len_A> mod;
 };
-
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator*(const Integer<len_A> &A, const Integer<len_B>& B);
-
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator*(const Integer<len_A> &&A, const Integer<len_B>& B);
 
 template <uint16_t len_A, uint16_t len_B>
 Integer<len_A> operator/(Integer<len_A> A, Integer<len_B> B);
@@ -80,17 +86,6 @@ bool operator>(Integer<len_A> A, Integer<len_B> B);
 
 template <uint16_t len_A, uint16_t len_B>
 bool operator<(Integer<len_A> A, Integer<len_B> B);
-
-template <uint16_t len_A, uint16_t len_B>
-DIV_RESULT<len_A> metoda_wielkanocna(Integer<len_A> A, Integer<len_B> B);
-
-/*template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator+(Integer<len_A> A, Integer<len_B> B); */
-
-/*template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator-(Integer<len_A> A, Integer<len_B> B); */
-
-void __padd128(uint8_t *a, uint8_t *b);
 
 template class Integer<16>;
 template class Integer<32>;

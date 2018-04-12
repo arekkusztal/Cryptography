@@ -198,6 +198,4 @@ void AES_encrypt_block(uint8_t *plaintext, struct CRYPTO_context *ctx)
 	}
 
 	AES_encrypt(plaintext, NULL, &ctx->expansion[AES_BLOCK_SZ * ctx->key_rounds], LAST);
-
-
 }
