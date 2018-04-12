@@ -316,18 +316,14 @@ void SETUP()
 
 }
 
-void rol_4_x86(uint8_t *data, uint16_t bg)
-{
-
-}
-
 #define INT int8192
 
 int main(int argc, char *argv[])
 {
     int i;
-    uint8_t s_1[4] = { 0x11, 0x22, 0x33, 0x44 };
-    rol_4(s_1, 4);
+    uint8_t s_1[4] = { 0x12, 0x32, 0x34, 0x45 };
+    hex_dump("s_1", s_1, 4, 4);
+   // rol_4(s_1, 1);
     hex_dump("s_1", s_1, 4, 4);
   //  TEST_add_integer();
   //  TEST_cmp_integer();

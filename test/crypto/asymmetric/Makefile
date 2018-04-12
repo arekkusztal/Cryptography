@@ -1,5 +1,4 @@
-SUBDIRS-y+=block
-SUBDIRS-y+=asymmetric
+SUBDIRS-y+=RSA
 
 all: $(SUBDIRS-y)
 

@@ -6,7 +6,7 @@
 
 #include <CRYPTO_LIB_common.h>
 
-void rol_4(uint8_t *data, uint16_t bg)
+void ror_4(uint8_t *data, uint16_t bg)
 {
 	int i;
 
@@ -17,7 +17,7 @@ void rol_4(uint8_t *data, uint16_t bg)
 	memcpy(data, temp, 4);
 }
 
-void ror_4(uint8_t *data, uint16_t bg)
+void rol_4(uint8_t *data, uint16_t bg)
 {
 	int i;
 

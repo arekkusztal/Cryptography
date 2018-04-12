@@ -1,3 +1,3 @@
-SOURCES-y+=RSA.o
+SOURCESCPP-y+=RSA.o
 
 include $(CRYPTO_LIB)/build.src.mk

@@ -101,7 +101,7 @@ void AES_decrypt(uint8_t *out, uint8_t *in, uint8_t *key_2,
 		reverse_mix_columns(state);
 
 	for (i = 1; i < RIJNDAEL; i++) {
-		ror_4(&state[RIJNDAEL*i], i);
+		rol_4(&state[RIJNDAEL*i], i);
 	}
 
 	for (i = 0; i<16; i++) {
