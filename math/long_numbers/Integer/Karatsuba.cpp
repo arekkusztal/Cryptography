@@ -22,7 +22,7 @@
 
 #define KARATSUBA_BYTE_OFFSET 120
 template <uint16_t len>
-Integer<len> Integer<len>::karatsuba(const Integer<len>& A, const Integer<len>& B)
+Integer<len> Integer<len>::karatsuba(const Integer<len>& B)
 {
     Integer<len> ret;
 /*    if (A.__len_in_bits + B.__len_in_bits > A.precision) {

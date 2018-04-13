@@ -173,46 +173,6 @@ extern int MW_COUNT;
 #define STR_EXPAND(tok) #tok
 #define STR(tok) STR_EXPAND(tok)
 
-void TEST_add()
-{
-
-    int128 A = STR(__A);
-    int128 B = STR(__B);
-
-    uint64_t a = 0;//__A;
-    uint64_t b = 0;//__B;
-
-    int i;
-
-
-    uint64_t start = rdtsc();
-#ifdef PERF_DIV
-    for (i = 0; i < 10000000; i++)
-#endif
-        A + B;
-
-    uint64_t end = rdtsc();
-    uint64_t diff_1 = end - start;
-
-    start = rdtsc();
-#ifdef PERF_DIV
-    for (i = 0; i < 10000000; i++)
-#endif
-        a + b;
-
-    end = rdtsc();
-    uint64_t diff_2 = end - start;
-
-    (A + B).print_s("A + B");
-    printf("\n a + b = %lx", a + b);
-
-    printf("\ndiff_1 = %lx", diff_1);
-    printf("\ndiff_2 = %lx", diff_2);
-    printf("\ndiff = %lx", diff_1 / diff_2);
-
-}
-
-
 void TEST_sub()
 {
 
@@ -236,6 +196,7 @@ void TEST_sub()
 
     printf("\n r = %lx", a - b);
 }
+
 
 void TEST_divide()
 {
@@ -293,8 +254,6 @@ void TEST_divide()
     printf("\n r = %lx m = %lx", a / b, a % b);
     res.ret.print("TEST result RET");
     res.mod.print("TEST result MOD");
-
-  //  printf("\n MW_COUNT = %d", MW_COUNT);
 }
 
 void TEST_copy_bits_func()
@@ -318,80 +277,35 @@ void SETUP()
 
 #define INT int8192
 
+void TEST_add()
+{
+    int128 A = STR(__A);
+    int128 B = STR(__B);
+
+    uint64_t a = __A;
+    uint64_t b = __B;
+
+    (A + B).print("A + B");
+    printf("\na + b %lx", a + b);
+
+}
+void TEST_increment()
+{
+    int128 A = STR(__A);
+
+    uint64_t a = __A;
+
+    A.print("A");
+    A++;
+    A.print("A++");
+    a++;
+    printf("\na++ %lx", a);
+
+}
+
 int main(int argc, char *argv[])
 {
     int i;
-    uint8_t s_1[4] = { 0x12, 0x32, 0x34, 0x45 };
-    hex_dump("s_1", s_1, 4, 4);
-   // rol_4(s_1, 1);
-    hex_dump("s_1", s_1, 4, 4);
-  //  TEST_add_integer();
-  //  TEST_cmp_integer();
-  //  TEST_add();
-   // TEST_divide();
-   // TEST_sub();
-  //  SETUP();
-    return 0;
-   //TEST_shift_integer();
-   //TEST_cmp_integer();
-   //TEST_mult_integer();
-   //TEST_add_integer();
-//    TEST_copy_bits_func();
-
- /*   int128 A = "0x10E";
-    int128 B = "0x105"; */
-    // 01 13 46
-    /*int128 A = "0x21C";
-    int128 B = "0x20A"; */
-	// 04 4D 18
-
-   /*int128 A = "0xB10";
-   int128 B = "0xB10"; */
-    // 7A 61 00
-
-    /*int128 A = "0xC1B10";
-    int128 B = "0xC1B10"; */
-    // 92 8C 5C 61 00
-
-    /*int128 A = "0x21321C1B10";
-    int128 B = "0x343C1B10"; */
-    // Error on online
-
-    INT R;
-    INT A = "0x23235435325FFF43543534252345423522345345345324534545523345235432534525232345675675475686568568"
-            "568456856856856868561321232133213212332132132123221321C1B11"
-            "0x23235435325FFF43543534252345423522345345345324534545523345235432534525232345675675475686568568"
-            "568456856856856868561321232133213212332132132123221321C1B1134324324";
-    INT B = "0x2323532345342543234534252345234544354353454354445453545435454534532552421332123123123132132123"
-            "231568568548568568568568456865865856865854422424324343C1B11"
-            "0x23235435325FFF43543534252345423522345345345324534545523345235432534525232345675675475686568568"
-            "568456856856856868561321232133213212332132132123221321C1B11";
-    //INT A = "0x4F12B4A38A345323";
-    //INT B = "0x12FFEAB53434BB11";
-
-    A.print_s("A");
-    B.print_s("B");
-
-    uint64_t k_start = rdtsc();
-    for (i = 0; i < 1000; i++) {
-        R = karatsuba(A, B);
-    }
-    uint64_t k_end = rdtsc();
-
-    R.print_s("karatsuba result");
-
-    karatsuba_treshold = 9999;
-    uint64_t r_start = rdtsc();
-    for (i = 0; i < 1000; i++) {
-        R = A * B;
-    }
-    uint64_t r_end = rdtsc();
-
-    R.print_s("result");
-
-    printf("\n");
-    printf("\nKaratsuba time = \t%lu", k_end - k_start);
-    printf("\nNormal time = \t\t%lu", r_end - r_start);
-    printf("\n");
+    TEST_increment();
     return 0;
 }

@@ -21,10 +21,11 @@ struct DIV_RESULT;
 template <uint16_t len>
 class Integer
 {
-public:
+private:
 	uint8_t __data[len] = { };
 	uint16_t __len = 0;
 	uint16_t __len_in_bits = 0;
+	void __set_len_in_bits();
 public:
 
 	const uint64_t precision = len;
@@ -37,11 +38,13 @@ public:
 	Integer<len> operator=(Integer<len>);
 	/* < ---- *< Arithmetic */
 	Integer<len> operator+(const Integer<len>&);
+	Integer<len>& operator++();
+	Integer<len>& operator++(int);
 	Integer<len>& operator+=(const Integer<len>&);
 	Integer<len> operator-(const Integer<len>&);
 	Integer<len> operator*(const Integer<len>&);
 	Integer<len> operator/(const Integer<len>&);
-	Integer<len> karatsuba(const Integer<len>& A, const Integer<len>& B);
+	Integer<len> karatsuba(const Integer<len>& B);
 	DIV_RESULT<len> metoda_wielkanocna(const Integer<len>& B);
 
 	/* < ---- *< Shift operators */
@@ -60,7 +63,6 @@ public:
 	template<uint16_t __len>
 	Integer<__len> integer_cast(Integer<len>);
 	/* <Len functions */
-	void __set_len_in_bits();
 	void copy_bits(Integer A, uint16_t start, uint16_t end);
 
 	/* < Debug funcs */
@@ -75,28 +77,12 @@ struct DIV_RESULT
     Integer<len_A> mod;
 };
 
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> operator/(Integer<len_A> A, Integer<len_B> B);
-
-template <uint16_t len_A, uint16_t len_B>
-Integer<len_A> karatsuba(const Integer<len_A>& A, const Integer<len_B>& B);
-
-template <uint16_t len_A, uint16_t len_B>
-bool operator>(Integer<len_A> A, Integer<len_B> B);
-
-template <uint16_t len_A, uint16_t len_B>
-bool operator<(Integer<len_A> A, Integer<len_B> B);
-
-template class Integer<16>;
-template class Integer<32>;
 template class Integer<128>;
 template class Integer<256>;
 template class Integer<512>;
 template class Integer<4096>;
 template class Integer<8192>;
 
-using int16 = Integer<16>;
-using int32 = Integer<32>;
 using int128 = Integer<128>;
 using int256 = Integer<256>;
 using int512 = Integer<512>;

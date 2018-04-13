@@ -70,7 +70,7 @@ Integer<len> Integer<len>::operator-(const Integer<len>& B)
     Integer<len> ret;
     uint16_t i, k, __max_of_two;
     uint8_t borrow, __b;
-    __max_of_two = this->__len >= B.__len ?		\
+    __max_of_two = this->__len >= B.__len ?
           this->__len : B.__len;
 
     borrow = 0;
@@ -102,6 +102,38 @@ Integer<len> Integer<len>::operator-(const Integer<len>& B)
     ret.__len = this->__len;
     ret.__set_len_in_bits();
     return ret;
+}
+
+template <uint16_t len>
+Integer<len>& Integer<len>::operator++()
+{
+	uint64_t __carry = 1;
+	uint16_t __pos = 0;
+	while (__carry) {
+		*(uint64_t *)&this->__data[__pos] += __carry;
+		if (!(*(uint64_t *)&this->__data[__pos])) {
+			__carry = 1;
+			__pos += sizeof(uint64_t);
+		} else
+			__carry = 0;
+	};
+	return *this;
+}
+
+template <uint16_t len>
+Integer<len>& Integer<len>::operator++(int)
+{
+	uint64_t __carry = 1;
+	uint16_t __pos = 0;
+	while (__carry) {
+		*(uint64_t *)&this->__data[__pos] += __carry;
+		if (!(*(uint64_t *)&this->__data[__pos])) {
+			__carry = 1;
+			__pos += sizeof(uint64_t);
+		} else
+			__carry = 0;
+	};
+	return *this;
 }
 
 template <uint16_t len>
@@ -151,7 +183,7 @@ Integer<len> Integer<len>::operator*(const Integer<len>& B)
 
    if (this->__len > karatsuba_treshold && B.__len > karatsuba_treshold) {
    //    printf("\nINFO: Entering Karatsuba A.len >> 1 = %hu", A.__len >> 1);
-       return karatsuba(*this, B);
+       return this->karatsuba(B);
    }
 
    Integer<len> __temp, __shifted;

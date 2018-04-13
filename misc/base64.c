@@ -4,24 +4,22 @@
 #include <string.h>
 #include <unistd.h>
 
-const char B[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+static const char B[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		"abcdefghijklmnopqrstuvwxyz0123456789+/";
-
-//uint8_t message[] = "1683 Vienna.";
-uint8_t message[] = "Tell me, O muse, of that ingenious hero, who travelled far and wide...";
 
 uint8_t *strtbase64(uint8_t *msg, uint32_t sz)
 {
 	int i, k;
+
+	printf("\n msg size = %u", sz);
 	uint8_t *out, *mess;
 	uint32_t tlen, diff;
 
 	diff = sz % 3;
 	sz = 4*sz/3;
-	tlen =  (sz & ~3) + 4*(!!(sz & 3));
+	tlen = (sz & ~3) + 4*(!!(sz & 3));
 
-
-	printf("\n %u \n %u",sz,diff);
+	printf("\n sz = %u \n diff = %u",sz,diff);
 	mess = malloc(tlen);
 	memset(mess, 0, tlen);
 
@@ -33,12 +31,12 @@ uint8_t *strtbase64(uint8_t *msg, uint32_t sz)
 
 	i = 0;
 	for (k =0; k < tlen; k++) {
-		if (k % 4 == 0 && k)
+		if (!(k & 3) && k)
 			i++;
-		uint32_t dword = *(uint32_t *)&mess[tlen - 4 -3*i];
-		uint8_t off = 26 - (k % 4)*6;
-		dword <<= 26 - off;
+		uint32_t dword = *(uint32_t *)&mess[ (tlen - 4) -3 * i];
+		dword <<= (k & 3) * 6;
 		dword >>= 26;
+		printf("\n Dword = %u B[] = %c", dword, B[dword]);
 		out[k] = B[dword];
 	}
 
