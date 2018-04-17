@@ -19,6 +19,7 @@ DIV_RESULT<len> Integer<len>::metoda_wielkanocna(const Integer<len>& B)
 {
 	int __local_count;
 	//printf("\n metoda_wielkanocna ----------");
+
 	__local_count = MW_COUNT++;
 	int i;
     DIV_RESULT<len> res = { };
@@ -66,7 +67,7 @@ DIV_RESULT<len> Integer<len>::metoda_wielkanocna(const Integer<len>& B)
                 __pos--;
 
             }
-            __temp_res[__mod_ladder_cout] = this->metoda_wielkanocna(B);
+            __temp_res[__mod_ladder_cout] = __temp_internal.metoda_wielkanocna(B);
             __temp_internal = __temp_internal >> 128;
             __mod_ladder_cout++;
             *this = *this - __temp;

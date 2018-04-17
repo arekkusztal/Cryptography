@@ -306,7 +306,10 @@ void TEST_increment()
 int main(int argc, char *argv[])
 {
     int i;
-    int128 A;
-    A.mod_exp(A);
+    int128 A = "0xF1F5";
+    int128 B = "0x13";
+
+    int128 R;
+    R.mod_exp(R);
     return 0;
 }
