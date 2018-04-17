@@ -306,10 +306,17 @@ void TEST_increment()
 int main(int argc, char *argv[])
 {
     int i;
-    int128 A = "0xF1F5";
+    int128 A = "0x1D"; // 146929 exp
     int128 B = "0x13";
 
-    int128 R;
-    R.mod_exp(R);
+/*
+    int128 a = "0x23571";
+    int128 b = "0x4C0";
+    //Suspected modulo vector */
+
+    int128 R = "0x21";
+
+    R = R.mod_exp(A, B);
+    R.print_s("result of mod exp");
     return 0;
 }

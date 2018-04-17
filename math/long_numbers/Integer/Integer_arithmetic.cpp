@@ -75,13 +75,12 @@ Integer<len> Integer<len>::operator-(const Integer<len>& B)
 
     borrow = 0;
 
-    for (i = 0; i < this->__len;i++) {
+    for (i = 0; i < this->__len; i++) {
         uint8_t __temp = this->__data[i];
         if (__temp) {
             __temp -= borrow;
         }
         else {
-
             if (B.__data[i]) {
                 ret.__data[i] = 0xFF - B.__data[i];
                 borrow = 1;
@@ -97,7 +96,7 @@ Integer<len> Integer<len>::operator-(const Integer<len>& B)
             ret.__data[i] = ext_1;
         }
         else {
-            ret.__data[i] = this->__data[i] - B.__data[i];
+            ret.__data[i] = this->__data[i] - B.__data[i] - borrow;
             borrow = 0;
         }
     }
@@ -255,41 +254,25 @@ Integer<len> Integer<len>::operator%(const Integer<len> &B)
 }
 
 template <uint16_t len>
-Integer<len> Integer<len>::mod_exp(const Integer<len>&B)
+Integer<len> Integer<len>::mod_exp(const Integer<len>& exp, const Integer<len>& mod)
 {
 	uint16_t i;
-	Integer<len> a = "0x5";
-	Integer<len> mod = "0x13";
-	Integer<len> exp = "75";
-	Integer<len> res;
+	Integer<len> res, first;
 
-	mod.print_s("Modulus");
-	res = a % mod;
-	res.print_s("res");
+	first = *this % mod;
 
-	res = ((res % mod) * (res % mod)) % mod;
-	res.print_s("res");
+	if (exp.__data[0] & 1) {
+		res = first;
+	}
 
-	res = ((res % mod) * (res % mod)) % mod;
-	res.print_s("res");
+	for (i = 1; i < exp.__len_in_bits; i++) {
+		first = ((first % mod) * (first % mod)) % mod;
+		if ((exp.__data[i >> 3] >> (i & 0x7)) & 1) {
+			res = res * first;
+		}
+	}
 
-
-	res = ((res % mod) * (res % mod)) % mod;
-	res.print_s("res");
-
-
-	res = ((res % mod) * (res % mod)) % mod;
-	res.print_s("res");
-
-
-	res = ((res % mod) * (res % mod)) % mod;
-	res.print_s("res");
-
-	res = ((res % mod) * (res % mod)) % mod;
-	res.print_s("res");
-
-
-	//res = res %
+	res = res % mod;
 
 	return res;
 }

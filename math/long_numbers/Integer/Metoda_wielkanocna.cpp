@@ -19,7 +19,6 @@ DIV_RESULT<len> Integer<len>::metoda_wielkanocna(const Integer<len>& B)
 {
 	int __local_count;
 	//printf("\n metoda_wielkanocna ----------");
-
 	__local_count = MW_COUNT++;
 	int i;
     DIV_RESULT<len> res = { };
