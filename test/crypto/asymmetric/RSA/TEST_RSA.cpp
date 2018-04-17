@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include <CRYPTO_LIB_common.h>
+#include <CRYPTO_LIB_RSA.hpp>
 #include <Integer.hpp>
 
 #include <unistd.h>
@@ -25,6 +26,9 @@ int random(uint8_t array, size_t size)
 
 int main(int argc, char *argv[])
 {
+
+	integer e = 7, phi = 20;
+	std::cout<< "Coprime = " << get_modinv(8, 20);
 
 	return 0;
 }

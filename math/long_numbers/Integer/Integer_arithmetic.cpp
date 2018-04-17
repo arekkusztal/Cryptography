@@ -77,16 +77,18 @@ Integer<len> Integer<len>::operator-(const Integer<len>& B)
 
     for (i = 0; i < this->__len;i++) {
         uint8_t __temp = this->__data[i];
-        if (!__temp)
+        if (__temp) {
             __temp -= borrow;
-        else
+        }
+        else {
+
             if (B.__data[i]) {
                 ret.__data[i] = 0xFF - B.__data[i];
                 borrow = 1;
                 continue;
             } else
                 continue;
-
+        }
         if (__temp < B.__data[i]) {
             borrow = 1;
             uint16_t ext_1 = this->__data[i];
@@ -241,4 +243,37 @@ Integer<len> Integer<len>::operator/(const Integer<len> &B)
    res = this->metoda_wielkanocna(B);
 
    return res.ret;
+}
+
+template <uint16_t len>
+Integer<len> Integer<len>::operator%(const Integer<len> &B)
+{
+   DIV_RESULT<len> res;
+   res = this->metoda_wielkanocna(B);
+
+   return res.mod;
+}
+
+template <uint16_t len>
+Integer<len> Integer<len>::mod_exp(const Integer<len>&B)
+{
+	uint16_t i;
+	Integer<len> a = "0x5";
+	Integer<len> mod = "0x13";
+	Integer<len> exp = "75";
+	Integer<len> res;
+
+	mod.print_s("Modulus");
+	res = a % mod;
+	res.print_s("res");
+
+	res = ((res % mod) * (res % mod)) % mod;
+	res.print_s("res");
+
+	res = ((res % mod) * (res % mod)) % mod;
+	res.print_s("res");
+
+	//res = res %
+
+	return res;
 }

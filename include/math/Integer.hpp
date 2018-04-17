@@ -44,7 +44,9 @@ public:
 	Integer<len> operator-(const Integer<len>&);
 	Integer<len> operator*(const Integer<len>&);
 	Integer<len> operator/(const Integer<len>&);
+	Integer<len> operator%(const Integer<len>&);
 	Integer<len> karatsuba(const Integer<len>& B);
+	Integer<len> mod_exp(const Integer<len>&B);
 	DIV_RESULT<len> metoda_wielkanocna(const Integer<len>& B);
 
 	/* < ---- *< Shift operators */

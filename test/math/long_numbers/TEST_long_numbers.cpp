@@ -306,6 +306,7 @@ void TEST_increment()
 int main(int argc, char *argv[])
 {
     int i;
-    TEST_increment();
+    int128 A;
+    A.mod_exp(A);
     return 0;
 }
