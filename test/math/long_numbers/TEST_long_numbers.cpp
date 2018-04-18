@@ -330,24 +330,27 @@ int modInverse(int a, int m)
 int main(int argc, char *argv[])
 {
 
-	int128_t a = "1";
-	int128_t b = "2";
+/*	int128_t a = "1";
+	int128_t b = "3";
 	int128_t c = "12";
-    (a - b + c).print_s("a - b + c");
-	printf("\n 1 - 3 = %x", 0x1 - 0x2 + 0x12);
-	return 0;
+    int128_t d = a - b;
+    d.print_s("d");
+
+	return 0; */
 
     int i;
-    int128_t A = "0x1D"; // 146929 exp
+    int128_t A = "0x75"; // 146929 exp
     int128_t B = "0x13";
 
-/*
-    int128 a = "0x23571";
-    int128 b = "0x4C0";
-    //Suspected modulo vector */
+    /*int128_t a = "0xEF10";
+    int128_t b = "0x13"; */
 
-    int128_t R = "0x21";
+    int128_t a = "0x23571";
+    int128_t b = "0x4C0";
+    //Suspected modulo vector
 
+    int128_t R = "0x5";
+   // R = a % b;
     R = R.mod_exp(A, B);
     R.print_s("result of mod exp");
     return 0;

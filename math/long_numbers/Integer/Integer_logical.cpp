@@ -40,22 +40,52 @@ template <uint16_t len, SIGNEDNESS sign>
 bool Integer<len, sign>::operator<(const Integer<len, sign>& B)
 {
     int i;
+    bool __unsigned;
+    bool ret;
+
     if (this->__len_in_bits < B.__len_in_bits)
         return true;
     else if (this->__len_in_bits > B.__len_in_bits)
         return false;
+
+
+    __unsigned = true;
+    ret = false;
+
+    if (sign == SIGNED) {
+    	if ( (this->__data[this->__len - 1] & 0x80) && (! (B.__data[this->__len - 1] & 0x80) ))
+    		return true;
+    	else if ( !(this->__data[this->__len - 1] & 0x80) && ((B.__data[this->__len - 1] & 0x80) ))
+    		return false;
+    	else if ( (this->__data[this->__len - 1] & 0x80) &&  (B.__data[this->__len - 1] & 0x80) )
+    		__unsigned = false;
+    }
+
+    if (this->__len_in_bits < B.__len_in_bits) {
+        ret = true;
+        goto __return;
+    }
+    else if (this->__len_in_bits > B.__len_in_bits) {
+        ret = false;
+        goto __return;
+    }
     else {
         i = this->__len - 1;
         while (i >= 0) {
-            if (this->__data[i] < B.__data[i])
-                return true;
-            else if (this->__data[i] > B.__data[i])
-                return false;
+            if (this->__data[i] < B.__data[i]) {
+                ret = true;
+                goto __return;
+            }
+            else if (this->__data[i] > B.__data[i]) {
+                ret = false;
+                goto __return;
+            }
             i--;
         }
-
     }
-    return false;
+
+__return:
+    return ret ;//& __unsigned;
 }
 
 template <uint16_t len, SIGNEDNESS sign>

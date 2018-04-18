@@ -90,8 +90,11 @@ Integer<len, sign> Integer<len, sign>::operator-(const Integer<len, sign>& B)
                 ret.__data[i] = 0xFF - B.__data[i];
                 borrow = 1;
                 continue;
-            } else
+            } else {
+            	if (borrow)
+            		ret.__data[i] = 0xFF;
                 continue;
+            }
         }
         if (__temp < B.__data[i]) {
             borrow = 1;
@@ -107,8 +110,6 @@ Integer<len, sign> Integer<len, sign>::operator-(const Integer<len, sign>& B)
     }
 
     ret.__len = __true_len;
-    for (i = __max_of_two; i < __true_len; i++)
-    	ret.__data[i] = 0xFF;
     ret.__set_len_in_bits();
     return ret;
 }
@@ -274,6 +275,7 @@ Integer<len, sign> Integer<len, sign>::mod_exp(const Integer<len, sign>& exp, co
 	}
 
 	for (i = 1; i < exp.__len_in_bits; i++) {
+		first.print_s("first");
 		first = ((first % mod) * (first % mod)) % mod;
 		if ((exp.__data[i >> 3] >> (i & 0x7)) & 1) {
 			res = res * first;
