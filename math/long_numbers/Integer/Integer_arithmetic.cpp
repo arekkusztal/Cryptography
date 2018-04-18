@@ -18,10 +18,10 @@
  *
  */
 
-template <uint16_t len>
-Integer<len> Integer<len>::operator+(const Integer<len>& B)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::operator+(const Integer<len, sign>& B)
 {
-   Integer<len> ret;
+   Integer<len, sign> ret;
    uint16_t i, __max_of_two, __complement;
    uint8_t carry;
 
@@ -64,18 +64,23 @@ Integer<len> Integer<len>::operator+(const Integer<len>& B)
    return ret;
 }
 
-template <uint16_t len>
-Integer<len> Integer<len>::operator-(const Integer<len>& B)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::operator-(const Integer<len, sign>& B)
 {
-    Integer<len> ret;
-    uint16_t i, k, __max_of_two;
+    Integer<len, sign> ret;
+    uint16_t i, k, __max_of_two, __true_len;
     uint8_t borrow, __b;
     __max_of_two = this->__len >= B.__len ?
           this->__len : B.__len;
 
+    if (*this < B) {
+    	__true_len = len >> 3;
+    } else
+    	__true_len = this->__len;
+
     borrow = 0;
 
-    for (i = 0; i < this->__len; i++) {
+    for (i = 0; i < __true_len; i++) {
         uint8_t __temp = this->__data[i];
         if (__temp) {
             __temp -= borrow;
@@ -100,13 +105,16 @@ Integer<len> Integer<len>::operator-(const Integer<len>& B)
             borrow = 0;
         }
     }
-    ret.__len = this->__len;
+
+    ret.__len = __true_len;
+    for (i = __max_of_two; i < __true_len; i++)
+    	ret.__data[i] = 0xFF;
     ret.__set_len_in_bits();
     return ret;
 }
 
-template <uint16_t len>
-Integer<len>& Integer<len>::operator++()
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign>& Integer<len, sign>::operator++()
 {
 	uint64_t __carry = 1;
 	uint16_t __pos = 0;
@@ -121,8 +129,8 @@ Integer<len>& Integer<len>::operator++()
 	return *this;
 }
 
-template <uint16_t len>
-Integer<len>& Integer<len>::operator++(int)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign>& Integer<len, sign>::operator++(int)
 {
 	uint64_t __carry = 1;
 	uint16_t __pos = 0;
@@ -137,8 +145,8 @@ Integer<len>& Integer<len>::operator++(int)
 	return *this;
 }
 
-template <uint16_t len>
-Integer<len>& Integer<len>::operator+=(const Integer<len>& B)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign>& Integer<len, sign>::operator+=(const Integer<len, sign>& B)
 {
    uint16_t i, __max_of_two;
    uint8_t carry;
@@ -177,17 +185,17 @@ Integer<len>& Integer<len>::operator+=(const Integer<len>& B)
    return *this;
 }
 
-template <uint16_t len>
-Integer<len> Integer<len>::operator*(const Integer<len>& B)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::operator*(const Integer<len, sign>& B)
 {
-   Integer<len> ret;
+   Integer<len, sign> ret;
 
    if (this->__len > karatsuba_treshold && B.__len > karatsuba_treshold) {
    //    printf("\nINFO: Entering Karatsuba A.len >> 1 = %hu", A.__len >> 1);
        return this->karatsuba(B);
    }
 
-   Integer<len> __temp, __shifted;
+   Integer<len, sign> __temp, __shifted;
    uint16_t i, k, __min_of_two, __final_len;
    uint8_t __a_is_smaller;
 
@@ -235,29 +243,29 @@ Integer<len> Integer<len>::operator*(const Integer<len>& B)
    return ret;
 }
 
-template <uint16_t len>
-Integer<len> Integer<len>::operator/(const Integer<len> &B)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::operator/(const Integer<len, sign> &B)
 {
-   DIV_RESULT<len> res;
+   DIV_RESULT<len, sign> res;
    res = this->metoda_wielkanocna(B);
 
    return res.ret;
 }
 
-template <uint16_t len>
-Integer<len> Integer<len>::operator%(const Integer<len> &B)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::operator%(const Integer<len, sign> &B)
 {
-   DIV_RESULT<len> res;
+   DIV_RESULT<len, sign> res;
    res = this->metoda_wielkanocna(B);
 
    return res.mod;
 }
 
-template <uint16_t len>
-Integer<len> Integer<len>::mod_exp(const Integer<len>& exp, const Integer<len>& mod)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::mod_exp(const Integer<len, sign>& exp, const Integer<len, sign>& mod)
 {
 	uint16_t i;
-	Integer<len> res, first;
+	Integer<len, sign> res, first;
 
 	first = *this % mod;
 

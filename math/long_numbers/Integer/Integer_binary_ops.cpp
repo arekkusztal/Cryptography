@@ -14,10 +14,10 @@
  * ********** Bit shift operators  **********
 */
 
-template <uint16_t len>
-Integer<len> Integer<len>::operator<<(uint16_t shift)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::operator<<(uint16_t shift)
 {
-   Integer<len> ret;
+   Integer<len, sign> ret;
    int i;
    uint16_t add_len, org_shift;
 
@@ -59,8 +59,8 @@ Integer<len> Integer<len>::operator<<(uint16_t shift)
    return ret;
 }
 
-template <uint16_t len>
-Integer<len>& Integer<len>::operator<<=(uint16_t shift)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign>& Integer<len, sign>::operator<<=(uint16_t shift)
 {
    int i;
    uint16_t add_len, org_shift;
@@ -103,10 +103,10 @@ Integer<len>& Integer<len>::operator<<=(uint16_t shift)
 }
 
 
-template <uint16_t len>
-Integer<len> Integer<len>::operator>>(uint16_t shift)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::operator>>(uint16_t shift)
 {
-   Integer<len> ret;
+   Integer<len, sign> ret;
    int i;
    uint16_t sub_len, org_shift;
 
@@ -155,8 +155,8 @@ Integer<len> Integer<len>::operator>>(uint16_t shift)
    return ret;
 }
 
-template <uint16_t len>
-Integer<len>& Integer<len>::operator>>=(uint16_t shift)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign>& Integer<len, sign>::operator>>=(uint16_t shift)
 {
    int i;
    uint16_t sub_len, org_shift;
@@ -204,15 +204,15 @@ Integer<len>& Integer<len>::operator>>=(uint16_t shift)
    __set_len_in_bits();
 }
 
-template <uint16_t len>
-Integer<len>& Integer<len>::operator&(Integer<len>&)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign>& Integer<len, sign>::operator&(Integer<len, sign>&)
 {
 
     return *this;
 }
 
-template <uint16_t len>
-Integer<len>& Integer<len>::operator|=(BNLib_int_size pos)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign>& Integer<len, sign>::operator|=(BNLib_int_size pos)
 {
     BNLib_int_size __byte_to_change;
     if (pos >= this->precision)

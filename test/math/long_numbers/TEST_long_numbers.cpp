@@ -32,10 +32,6 @@ public:
 template <uint16_t len_t>
 A<len_t>::A() { };
 
-using int256_t = A<256>;
-using int512_t = A<512>;
-using int1024_t = A<1024>;
-
 int TEST_add_integer_128()
 {
     return 0;
@@ -146,8 +142,8 @@ void TEST_karatsuba()
 
 void TEST_cmp_integer()
 {
-    int128 A = "0x336";
-    int128 B = "0x240";
+    int128_t A = "0x336";
+    int128_t B = "0x240";
 
     A.print_s("A");
     B.print_s("B");
@@ -176,8 +172,8 @@ extern int MW_COUNT;
 void TEST_sub()
 {
 
-    int128 A = "0x32463246";
-    int128 B = "0xF785963";
+	int128_t A = "0x32463246";
+	int128_t B = "0xF785963";
 
     uint64_t a = 0x32463246;
     uint64_t b = 0xF785963;
@@ -207,8 +203,8 @@ void TEST_divide()
     int128 A = "0xFE576234F13434";
     int128 B = "0xFA1000213DE";
 */
-    int128 A = "0x101010101010101";
-    int128 B = "0xFA10213DE";
+	int128_t A = "0x101010101010101";
+	int128_t B = "0xFA10213DE";
    // int128 A = "0x1B";
    // int128 B = "0xF";
 
@@ -237,7 +233,7 @@ void TEST_divide()
 
 
 
-    DIV_RESULT<128> res;
+    DIV_RESULT<128, SIGNED> res;
 
     start = rdtsc();
 #ifdef PERF_DIV
@@ -258,8 +254,8 @@ void TEST_divide()
 
 void TEST_copy_bits_func()
 {
-    int128 A = "0x75A";
-    int128 B;
+	int128_t A = "0x75A";
+    int128_t B;
     A.print_s("before");
     B.copy_bits(A, 1, 9);
     B.print_s("after");
@@ -279,8 +275,8 @@ void SETUP()
 
 void TEST_add()
 {
-    int128 A = STR(__A);
-    int128 B = STR(__B);
+	int128_t A = STR(__A);
+	int128_t B = STR(__B);
 
     uint64_t a = __A;
     uint64_t b = __B;
@@ -291,7 +287,7 @@ void TEST_add()
 }
 void TEST_increment()
 {
-    int128 A = STR(__A);
+	int128_t A = STR(__A);
 
     uint64_t a = __A;
 
@@ -302,19 +298,55 @@ void TEST_increment()
     printf("\na++ %lx", a);
 
 }
+/*
+int modInverse(int a, int m)
+{
+    int m0 = m;
+    int y = 0, x = 1;
+
+    if (m == 1)
+      return 0;
+
+    while (a > 1)
+    {
+        int q = a / m;
+        int t = m;
+
+
+        m = a % m;
+        a = t;
+        t = y;
+
+        y = x - q * y;
+        x = t;
+    }
+
+    if (x < 0)
+       x += m0;
+
+    return x;
+}*/
 
 int main(int argc, char *argv[])
 {
+
+	int128_t a = "1";
+	int128_t b = "2";
+	int128_t c = "12";
+    (a - b + c).print_s("a - b + c");
+	printf("\n 1 - 3 = %x", 0x1 - 0x2 + 0x12);
+	return 0;
+
     int i;
-    int128 A = "0x1D"; // 146929 exp
-    int128 B = "0x13";
+    int128_t A = "0x1D"; // 146929 exp
+    int128_t B = "0x13";
 
 /*
     int128 a = "0x23571";
     int128 b = "0x4C0";
     //Suspected modulo vector */
 
-    int128 R = "0x21";
+    int128_t R = "0x21";
 
     R = R.mod_exp(A, B);
     R.print_s("result of mod exp");

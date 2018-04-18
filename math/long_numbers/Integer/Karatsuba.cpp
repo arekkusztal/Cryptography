@@ -21,10 +21,10 @@
 #endif
 
 #define KARATSUBA_BYTE_OFFSET 120
-template <uint16_t len>
-Integer<len> Integer<len>::karatsuba(const Integer<len>& B)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::karatsuba(const Integer<len, sign>& B)
 {
-    Integer<len> ret;
+    Integer<len, sign> ret;
 /*    if (A.__len_in_bits + B.__len_in_bits > A.precision) {
         printf("\nINFO: potential overflow = %hu", A.__len_in_bits + B.__len_in_bits);
         return ret;

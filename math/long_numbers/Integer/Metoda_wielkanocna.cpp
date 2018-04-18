@@ -14,18 +14,18 @@
 
 int MW_COUNT;
 
-template <uint16_t len>
-DIV_RESULT<len> Integer<len>::metoda_wielkanocna(const Integer<len>& B)
+template <uint16_t len, SIGNEDNESS sign>
+DIV_RESULT<len, sign> Integer<len, sign>::metoda_wielkanocna(const Integer<len, sign>& B)
 {
 	int __local_count;
 	//printf("\n metoda_wielkanocna ----------");
 	__local_count = MW_COUNT++;
 	int i;
-    DIV_RESULT<len> res = { };
+    DIV_RESULT<len, sign> res = { };
 
-    Integer<len> __sub_1 = "1";
-    Integer<len> __temp;
-    DIV_RESULT<len> __temp_res[32] = { };
+    Integer<len, sign> __sub_1 = "1";
+    Integer<len, sign> __temp;
+    DIV_RESULT<len, sign> __temp_res[32] = { };
     uint16_t __len_to_shift, __bits_to_shift[32];
     if (*this < B) {
         res.ret = "0";
@@ -55,7 +55,7 @@ DIV_RESULT<len> Integer<len>::metoda_wielkanocna(const Integer<len>& B)
         }
         else if (*this < __temp) {
             uint16_t __pos = this->__len_in_bits - 1;
-            Integer<len> __temp_internal;
+            Integer<len, sign> __temp_internal;
             while (*this < __temp) {
                 if ( (!(this->__data[__pos >> 3] >> (__pos & 0x7) & 1))
                      && (__temp.__data[__pos >> 3] >> (__pos & 0x7) & 1))

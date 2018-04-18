@@ -14,8 +14,8 @@
  * ********** Misc member functions  **********
 */
 
-template <uint16_t len>
-void Integer<len>::__set_len_in_bits()
+template <uint16_t len, SIGNEDNESS sign>
+void Integer<len, sign>::__set_len_in_bits()
 {
     int i;
   //  while (1) {
@@ -38,22 +38,22 @@ void Integer<len>::__set_len_in_bits()
     this->__set_len_in_bits();
 }
 
-template<uint16_t len>
-template<uint16_t __len>
-Integer<__len> Integer<len>::integer_cast(Integer<len>)
+template <uint16_t len, SIGNEDNESS sign>
+template <uint16_t __len, SIGNEDNESS __sign>
+Integer<__len, __sign> Integer<len, sign>::integer_cast(Integer<len, sign>)
 {
-	Integer<len> ret;
+	Integer<len, sign> ret;
 	return ret;
 }
 
-template <uint16_t len>
-void Integer<len>::print(const char * str)
+template <uint16_t len, SIGNEDNESS sign>
+void Integer<len, sign>::print(const char * str)
 {
    hex_dump(str, this->__data, this->__len, 16);
 }
 
-template <uint16_t len>
-void Integer<len>::print_s(const char * str)
+template <uint16_t len, SIGNEDNESS sign>
+void Integer<len, sign>::print_s(const char * str)
 {
     int i;
     printf("\n<");
@@ -69,8 +69,8 @@ void Integer<len>::print_s(const char * str)
 
 }
 
-template <uint16_t len>
-void Integer<len>::copy_bits(Integer A, uint16_t start, uint16_t end)
+template <uint16_t len, SIGNEDNESS sign>
+void Integer<len, sign>::copy_bits(Integer A, uint16_t start, uint16_t end)
 {
    *this = A;
    *this <<= (A.precision - end);

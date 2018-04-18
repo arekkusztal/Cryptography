@@ -14,8 +14,8 @@
  * ********** Logical operators  **********
 */
 
-template <uint16_t len>
-bool Integer<len>::operator>(const Integer<len>& B)
+template <uint16_t len, SIGNEDNESS sign>
+bool Integer<len, sign>::operator>(const Integer<len, sign>& B)
 {
     int i;
     if (this->__len_in_bits > B.__len_in_bits)
@@ -36,8 +36,8 @@ bool Integer<len>::operator>(const Integer<len>& B)
     return false;
 }
 
-template <uint16_t len>
-bool Integer<len>::operator<(const Integer<len>& B)
+template <uint16_t len, SIGNEDNESS sign>
+bool Integer<len, sign>::operator<(const Integer<len, sign>& B)
 {
     int i;
     if (this->__len_in_bits < B.__len_in_bits)
@@ -58,8 +58,8 @@ bool Integer<len>::operator<(const Integer<len>& B)
     return false;
 }
 
-template <uint16_t len>
-bool Integer<len>::operator==(Integer<len> A)
+template <uint16_t len, SIGNEDNESS sign>
+bool Integer<len, sign>::operator==(Integer<len, sign> A)
 {
 	int i;
 	if (this->__len_in_bits != A.__len_in_bits)

@@ -13,8 +13,8 @@
 
 uint16_t karatsuba_treshold = 240;
 
-template <uint16_t len>
-Integer<len>::Integer(uint8_t *number)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign>::Integer(uint8_t *number)
 {
    uint16_t __len, i, prefix;
 
@@ -43,8 +43,8 @@ Integer<len>::Integer(uint8_t *number)
    __set_len_in_bits();
 }
 
-template <uint16_t len>
-Integer<len>::Integer(const char *number)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign>::Integer(const char *number)
 {
    uint16_t __len, i, prefix;
 
@@ -71,12 +71,13 @@ Integer<len>::Integer(const char *number)
    __set_len_in_bits();
 }
 
-template <uint16_t len>
-Integer<len> Integer<len>::operator=(Integer<len> A)
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::operator=(Integer<len, sign> A)
 {
    memset(this->__data, 0, this->precision >> 3);
    memcpy(this->__data, A.__data, A.__len + 1);
    this->__len = A.__len;
    this->__len_in_bits = A.__len_in_bits;
 }
+
 
