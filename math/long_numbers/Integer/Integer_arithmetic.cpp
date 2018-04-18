@@ -87,7 +87,7 @@ Integer<len, sign> Integer<len, sign>::operator-(const Integer<len, sign>& B)
         }
         else {
             if (B.__data[i]) {
-                ret.__data[i] = 0xFF - B.__data[i];
+                ret.__data[i] = __temp - B.__data[i];
                 borrow = 1;
                 continue;
             } else {
@@ -286,3 +286,38 @@ Integer<len, sign> Integer<len, sign>::mod_exp(const Integer<len, sign>& exp, co
 
 	return res;
 }
+
+
+template <uint16_t len, SIGNEDNESS sign>
+Integer<len, sign> Integer<len, sign>::mod_inv(const Integer<len, sign>& exp, const Integer<len, sign>& mod)
+{
+	Integer<len, sign> __a, q, __temp_mod, __mod;
+	Integer<len, sign> y = "0", x = "1";
+	Integer<len, sign> __one = "1";
+	Integer<len, sign> __zero = "1";
+
+	__mod = mod;
+	__a = exp;
+
+	if (__mod == x)
+		return y;
+
+	while (__a > __one)
+	{
+		q = __a / __mod;
+		__temp_mod = __mod;
+
+		__mod = __a % __mod;
+		__a = __temp_mod;
+		__temp_mod = y;
+
+		y = x - q * y;
+		x = __temp_mod;
+	}
+
+	if (x < __zero)
+		x += mod;
+
+	return x;
+}
+

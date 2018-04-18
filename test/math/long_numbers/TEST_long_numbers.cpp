@@ -298,7 +298,6 @@ void TEST_increment()
     printf("\na++ %lx", a);
 
 }
-/*
 int modInverse(int a, int m)
 {
     int m0 = m;
@@ -317,41 +316,22 @@ int modInverse(int a, int m)
         a = t;
         t = y;
 
+        printf("\n ---- x = %d", x);
+        printf("\n q = %d", q);
+        printf("\n y = %d", y);
         y = x - q * y;
+        printf("\n ==== y = %d", y);
         x = t;
     }
 
-    if (x < 0)
+    if (x < 0) {
        x += m0;
+    }
 
     return x;
-}*/
+}
 
 int main(int argc, char *argv[])
 {
 
-/*	int128_t a = "1";
-	int128_t b = "3";
-	int128_t c = "12";
-    int128_t d = a - b;
-    d.print_s("d");
-
-	return 0; */
-
-    int i;
-    int128_t A = "0x75"; // 146929 exp
-    int128_t B = "0x13";
-
-    /*int128_t a = "0xEF10";
-    int128_t b = "0x13"; */
-
-    int128_t a = "0x23571";
-    int128_t b = "0x4C0";
-    //Suspected modulo vector
-
-    int128_t R = "0x5";
-   // R = a % b;
-    R = R.mod_exp(A, B);
-    R.print_s("result of mod exp");
-    return 0;
 }
