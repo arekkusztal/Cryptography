@@ -53,6 +53,7 @@ public:
 	Integer<len, sign> operator%(const Integer<len, sign>&);
 	Integer<len, sign> karatsuba(const Integer<len, sign>&);
 	Integer<len, sign> mod_exp(const Integer<len, sign>&, const Integer<len, sign>&);
+	Integer<len, sign> mod_inv(const Integer<len, sign>&, const Integer<len, sign>&);
 	DIV_RESULT<len, sign> metoda_wielkanocna(const Integer<len, sign>&);
 
 	/* < ---- *< Shift operators */

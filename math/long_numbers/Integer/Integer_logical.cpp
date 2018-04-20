@@ -43,22 +43,24 @@ bool Integer<len, sign>::operator<(const Integer<len, sign>& B)
     bool __unsigned;
     bool ret;
 
-    if (this->__len_in_bits < B.__len_in_bits)
-        return true;
-    else if (this->__len_in_bits > B.__len_in_bits)
-        return false;
-
-
     __unsigned = true;
     ret = false;
 
     if (sign == SIGNED) {
-    	if ( (this->__data[this->__len - 1] & 0x80) && (! (B.__data[this->__len - 1] & 0x80) ))
+    	if ( (this->__data[this->__len - 1] & 0x80) && (! (B.__data[this->__len - 1] & 0x80) )) {
     		return true;
-    	else if ( !(this->__data[this->__len - 1] & 0x80) && ((B.__data[this->__len - 1] & 0x80) ))
+    	}
+    	else if ( !(this->__data[this->__len - 1] & 0x80) && ((B.__data[this->__len - 1] & 0x80) )) {
     		return false;
-    	else if ( (this->__data[this->__len - 1] & 0x80) &&  (B.__data[this->__len - 1] & 0x80) )
+    	}
+    	else if ( (this->__data[this->__len - 1] & 0x80) &&  (B.__data[this->__len - 1] & 0x80) ) {
     		__unsigned = false;
+    	}
+    } else {
+		if (this->__len_in_bits < B.__len_in_bits)
+			return true;
+		else if (this->__len_in_bits > B.__len_in_bits)
+			return false;
     }
 
     if (this->__len_in_bits < B.__len_in_bits) {

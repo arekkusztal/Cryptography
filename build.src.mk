@@ -5,11 +5,11 @@ $(SOURCES-y): %.o : %.c
 	$(S)echo gcc: $@
 	
 $(SOURCESCPP-y): %.o : %.cpp
-	$(S)g++ -c $(CFLAGS)  $< -o $(LIB_OBJ)/$@ -g -O0
+	$(S)g++ -c $(CFLAGS)  $< -o $(LIB_OBJ)/$@ -g -O0 -std=c++11
 	$(S)echo g++: $@
 
 $(EXECPP-y): %.o : %.c
-	$(S)g++ -c $(CFLAGS) -fpermissive $< -o $(LIB_OBJ)/$@ -g -O0
+	$(S)g++ -c $(CFLAGS) -fpermissive $< -o $(LIB_OBJ)/$@ -g -O0 -std=c++11
 	$(S)echo g++: $@
 
 $(TESTS-y): SETUP
