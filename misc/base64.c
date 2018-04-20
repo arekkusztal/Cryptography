@@ -69,14 +69,18 @@ char *base64_to_str(uint8_t *msg, uint32_t sz)
 		for (i = 0; i < sizeof(B); i++) {
 			if (B[i] == msg[k]) {
 				*(uint32_t *)&str[sz - 4 - (3 * l)] |= i << (26 - 6 * (k & 3));
+				//printf("\n i = %u", i);
 			}
 		}
 	}
+
+	hex_dump("str", str, sz, 16);
 
 	for (i = 0; i < __sz; i++) {
 		out_str[i] = str[sz - i - 1];
 	}
 
+	hex_dump("out_str", out_str, sz, 16);
 	free(str);
 	return out_str;
 }

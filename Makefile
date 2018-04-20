@@ -1,4 +1,5 @@
-CFLAGS=-I$(PWD)/include -I$(PWD)/include/math -Dx86
+INCLUDE=-I$(PWD)/include -I$(PWD)/include/math -I$(PWD)/include/x.509 -I$(PWD)/include/ASN.1
+CFLAGS=$(INCLUDE) -Dx86
 BUILD=$(CRYPTO_LIB)/build
 LIB_OBJ=$(BUILD)/lib_obj
 MFLAGS=--no-print-directory
@@ -15,6 +16,8 @@ DIRS+=math
 DIRS+=common
 DIRS+=misc
 DIRS+=hash
+DIRS+=x.509
+DIRS+=ASN.1
 DIRS+=test
 
 GCC=gcc
