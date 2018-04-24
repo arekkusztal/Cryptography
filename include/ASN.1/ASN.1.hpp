@@ -8,8 +8,67 @@
 #ifndef ASN_1_HPP_
 #define ASN_1_HPP_
 
+#include <stdint.h>
 
+#define ASN_1_SHORT_MAX 127
+#define ASN_1_DEF_SHORT 0
+#define ASN_1_DEF_LONG 0x80
 
+enum ASN_1_TAG_CLASS {
+	UNIVERSAL,
+	APPLICATION,
+	CONTEXT_SPECIFIC,
+	PRIVATE
+};
 
+enum ASN_1_PC {
+	PRIMITIVE,
+	CONSTRUCTED
+};
+
+#define ASN_1_SET_PC(arg) arg << 5
+#define ASN_1_SET_TAG(arg) arg << 6
+
+enum ASN_1_TYPES {
+	EOC = 0,
+	BOOLEAN,
+	INTEGER,
+	BIT_STRING,
+	OCTET_STRING,
+	NULL = 5,
+	OBJECT_IDENTIFIER,
+	OBJECT_DESCRIPTOR,
+	EXTERNAL,
+	REAL,
+	ENUMERATED = 10,
+	EMBEDDED_PDV,
+	UTF8_STRING,
+	RELATIVE_OID,
+	RSV,
+	RSV2 = 15,
+	SEQUENCE,
+	SET,
+	NUMERIC_STRING,
+	PRINTABLE_STRING,
+	T61_STRING = 20,
+	VIDEOTEX_STRING,
+	IA5STRING,
+	UTC_TIME,
+	GENERALIZED_TIME,
+	GRAPHIC_STRING = 25,
+	VISIBLE_STRING,
+	GENERAL_STRING,
+	UNIVERSAL_STRING,
+	CHARACTER_STRING,
+	BMP_STRING = 30
+};
+
+struct ASN_1_ID_octet {
+	enum ASN_1_TAG_CLASS tag;
+	enum ASN_1_PC pc;
+	enum ASN_1_TYPES type;
+};
+
+uint8_t *ASN_1_set(uint8_t *where, struct ASN_1_ID_octet, uint8_t *string, uint16_t len);
 
 #endif /* ASN_1_HPP_ */
