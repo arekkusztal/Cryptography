@@ -6,28 +6,28 @@
 
 void rev_memcpy(uint8_t *to, uint8_t *from, uint16_t len)
 {
-
+	uint16_t i;
+	for (i = 0; i < len; i++)
+		to[i] = from[len - 1 - i];
 }
 
 uint8_t *ASN_1_set(uint8_t *where, struct ASN_1_ID_octet octet, uint8_t *string, uint16_t len)
 {
-	uint8_t __size = 2;
+	uint8_t __num_of_octets = 2;
 
 	*where |= (ASN_1_SET_TAG(octet.tag));
 	*where |= (ASN_1_SET_PC(octet.pc));
 	*where |= octet.type;
 
 	if (len > ASN_1_SHORT_MAX) {
-		len -= 4;
-
 		where++;
 		*where |= ASN_1_DEF_LONG;
-		*where |= __size;
+		*where |= __num_of_octets;
 		where++;
-		//memcpy(where, (uint8_t *)&len, __size);
+		rev_memcpy(where, (uint8_t *)&len, __num_of_octets);
+		where += __num_of_octets;
 
 	} else {
-		len -= 2;
 		where++;
 		*where |= len;
 	}
