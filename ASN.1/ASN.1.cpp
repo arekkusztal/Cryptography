@@ -18,9 +18,9 @@ uint8_t *ASN_1_set(uint8_t *where, struct ASN_1_ID_octet octet, uint8_t *string,
 	*where |= (ASN_1_SET_TAG(octet.tag));
 	*where |= (ASN_1_SET_PC(octet.pc));
 	*where |= octet.type;
+	where++;
 
 	if (len > ASN_1_SHORT_MAX) {
-		where++;
 		*where |= ASN_1_DEF_LONG;
 		*where |= __num_of_octets;
 		where++;
@@ -28,8 +28,14 @@ uint8_t *ASN_1_set(uint8_t *where, struct ASN_1_ID_octet octet, uint8_t *string,
 		where += __num_of_octets;
 
 	} else {
-		where++;
 		*where |= len;
+		where++;
 	}
+
+	if (string != NULL) {
+		memcpy(where, string, len);
+		where+=len;
+	}
+
 	return where;
 }
