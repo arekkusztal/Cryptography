@@ -20,12 +20,23 @@ void TEST_fill_certificate(struct X_509_certificate& cert)
 {
 	cert.version = X_509_VERSION_3;
 	x_509_issue_serial_number(cert);
+	x_509_set_cert_signature_alg(cert, "sha224WithRSAEncryption");
+	struct X_509_unit issuer;
+	strcpy(issuer.company_name, "Company Name");
+	memcpy(issuer.country, "PL", 2);
+	strcpy(issuer.location, "Lodz");
+	strcpy(issuer.organization, "Company Name");
+	strcpy(issuer.organization_unit, "Security Lab");
+	strcpy(issuer.state, "Lodzkie");
+	struct X_509_unit subject;
+	x_509_set_issuer(cert, issuer);
 
 }
 
 int main()
 {
-	struct X_509_certificate TEST_certificate_1;
+	struct X_509_certificate TEST_certificate_1 = { };
+	TEST_fill_certificate(TEST_certificate_1);
 /*	uint8_t cert[CERT_SIZE] = { };
 	uint8_t *curr_ptr = cert;
 	struct ASN_1_ID_octet id_octet = { UNIVERSAL, CONSTRUCTED, SEQUENCE };
