@@ -31,6 +31,7 @@ void TEST_fill_certificate(struct X_509_certificate& cert)
 	struct X_509_unit subject;
 	x_509_set_issuer(cert, issuer);
 
+
 }
 
 int main()
