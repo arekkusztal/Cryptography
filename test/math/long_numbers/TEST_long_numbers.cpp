@@ -342,27 +342,34 @@ int main(int argc, char *argv[])
     int128_t A;
     int128_t B;
 
-    uint64_t a = 5, b = 7;
+    uint64_t a = 35, b = 8;
 
     sprintf(number, "%lx", (long unsigned int)a);
     sprintf(number2, "%lx", (long unsigned int)b);
 
-    printf("\n %s", number);
+ //   printf("\n %s", number);
 
     A = number;
     B = number2;
 
 
 
-    A.print_s("A");
+  //  A.print_s("A");
     int128_t R = A - B;
     uint64_t r = a - b;
     sprintf(number2, "%lx", (long unsigned int)r);
     R.print_s("R");
+    a = 3; b = 4;
+    sprintf(number, "%lx", (long unsigned int)a);
+    sprintf(number2, "%lx", (long unsigned int)b);
+    A = number;
+    B = number2;
+    R = A - B;
+    R.print_s("R");
 
-    printf("\n r data = %s", R.__data);
+ /*   printf("\n r data = %s", R.__data);
     printf("\n num data = %s", number2);
     int res = strcmp((const char *)R.__data, number2);
-    printf("\n res = %d", res);
+    printf("\n res = %d", res); */
 
 }
