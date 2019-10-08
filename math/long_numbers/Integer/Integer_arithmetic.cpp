@@ -80,30 +80,26 @@ Integer<len, sign> Integer<len, sign>::operator-(const Integer<len, sign>& B)
 
     for (i = 0; i < __true_len; i++) {
         uint8_t __temp = this->__data[i];
-        if (__temp) {
-            __temp -= borrow;
-        }
-        else {
+        if (!__temp) {
             if (B.__data[i]) {
                 ret.__data[i] = __temp - B.__data[i];
                 borrow = 1;
-                continue;
             } else {
             	if (borrow)
             		ret.__data[i] = 0xFF;
-                continue;
             }
-        }
-        if (__temp < B.__data[i] || (__temp == B.__data[i] && borrow)) {
-            borrow = 1;
-            uint16_t ext_1 = this->__data[i];
-            ext_1 += 0x100;
-            ext_1 -= B.__data[i];
-            ret.__data[i] = ext_1;
-        }
-        else {
-            ret.__data[i] = this->__data[i] - B.__data[i] - borrow;
-            borrow = 0;
+        } else {
+        	if (__temp < B.__data[i] || (__temp == B.__data[i] && borrow)) {
+				borrow = 1;
+				uint16_t ext_1 = this->__data[i];
+				ext_1 += 0x100;
+				ext_1 -= B.__data[i];
+				ret.__data[i] = ext_1;
+			}
+			else {
+				ret.__data[i] = this->__data[i] - B.__data[i] - borrow;
+				borrow = 0;
+			}
         }
     }
 
