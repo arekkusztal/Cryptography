@@ -14,7 +14,7 @@
  * ********** Arithmetic operators  **********
  */
 /*
- * @brief Add operator, works when len of A is equal or bigger than len of B
+ * @brief Add operator
  *
  */
 
@@ -30,28 +30,26 @@ Integer<len, sign> Integer<len, sign>::operator+(const Integer<len, sign>& B)
    __max_of_two = this->__len >= B.__len ?
          this->__len : B.__len;
 
-   uint64_t *__data_ret = (uint64_t *)ret.__data;
-
    while (i < __max_of_two) {
-       uint64_t *__r, *__a, *__b;
-       __r = (uint64_t *)&ret.__data[i];
-       __a = (uint64_t *)&this->__data[i];
-       __b = (uint64_t *)&B.__data[i];
+       uint8_t *__r, *__a, *__b;
+       __r = (uint8_t *)&ret.__data[i];
+       __a = (uint8_t *)&this->__data[i];
+       __b = (uint8_t *)&B.__data[i];
 
        *__r = *__a + *__b + carry;
-       if (__builtin_expect((*__a && *__b), 0)) {
-          if (*__r < *__a)
+       if (likely(*__a && *__b)) {
+          if (*__r < *__a  || *__r < *__b)
              carry = 1;
           else
              carry = 0;
-       } else if ((*__a == UINT64_MAX || *__b == UINT64_MAX) && carry)
+       } else if ((*__a == UINT8_MAX || *__b == UINT8_MAX) && carry)
           carry = 1;
        else
           carry = 0;
        i += sizeof(*__r);
    }
 
-   ret.__len = __complement ? __complement : __max_of_two;
+   ret.__len = __max_of_two;
    if (carry) {
       ret.__data[i] = 1;
       ret.__len += 1;
@@ -96,7 +94,7 @@ Integer<len, sign> Integer<len, sign>::operator-(const Integer<len, sign>& B)
                 continue;
             }
         }
-        if (__temp < B.__data[i]) {
+        if (__temp < B.__data[i] || (__temp == B.__data[i] && borrow)) {
             borrow = 1;
             uint16_t ext_1 = this->__data[i];
             ext_1 += 0x100;

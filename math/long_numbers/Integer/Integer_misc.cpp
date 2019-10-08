@@ -31,10 +31,14 @@ void Integer<len, sign>::__set_len_in_bits()
             return;
         }
     }
-    //this->__len_in_bits = ((this->__len - 1) << 3) + i + 1;
+
     this->__data[this->__len - 1] = 0;
     this->__len -= 1;
-   // }
+    if (this->__len == 0) {
+    	this->__len = 1;
+    	this->__len_in_bits = 0;
+    	return;
+    }
     this->__set_len_in_bits();
 }
 

@@ -22,6 +22,9 @@ void bit_dump_s(uint8_t *data, int size);
 
 uint32_t lrotate32(uint32_t data, uint8_t shift);
 
+#define likely(x)      __builtin_expect(!!(x), 1)
+#define unlikely(x)    __builtin_expect(!!(x), 0)
+
 #ifdef __cplusplus
 }
 #endif

@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <Arus_dev_kit.h>
 
 #include <iostream>
@@ -331,7 +332,37 @@ int modInverse(int a, int m)
     return x;
 }
 
+
+
 int main(int argc, char *argv[])
 {
+	char number[64] = { };
+	char number2[64] = { };
+
+    int128_t A;
+    int128_t B;
+
+    uint64_t a = 5, b = 7;
+
+    sprintf(number, "%lx", (long unsigned int)a);
+    sprintf(number2, "%lx", (long unsigned int)b);
+
+    printf("\n %s", number);
+
+    A = number;
+    B = number2;
+
+
+
+    A.print_s("A");
+    int128_t R = A - B;
+    uint64_t r = a - b;
+    sprintf(number2, "%lx", (long unsigned int)r);
+    R.print_s("R");
+
+    printf("\n r data = %s", R.__data);
+    printf("\n num data = %s", number2);
+    int res = strcmp((const char *)R.__data, number2);
+    printf("\n res = %d", res);
 
 }

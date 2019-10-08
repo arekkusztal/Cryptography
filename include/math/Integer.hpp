@@ -26,7 +26,7 @@ struct DIV_RESULT;
 template <uint16_t len, SIGNEDNESS sign>
 class Integer
 {
-private:
+public:
 	uint8_t __data[len] = { };
 	uint16_t __len = 0;
 	uint16_t __len_in_bits = 0;
