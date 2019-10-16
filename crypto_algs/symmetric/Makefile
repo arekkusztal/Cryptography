@@ -1,4 +1,5 @@
 SUBDIRS-y+=block
+SUBDIRS-y+=stream
 
 all: $(SUBDIRS-y)	
 	

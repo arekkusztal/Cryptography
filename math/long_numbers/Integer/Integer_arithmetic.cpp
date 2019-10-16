@@ -38,7 +38,7 @@ Integer<len, sign> Integer<len, sign>::operator+(const Integer<len, sign>& B)
 
        *__r = *__a + *__b + carry;
        if (likely(*__a && *__b)) {
-          if (*__r < *__a  || *__r < *__b)
+          if (*__r <= *__a  || *__r <= *__b)
              carry = 1;
           else
              carry = 0;

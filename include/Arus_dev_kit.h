@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#define HEX_ME(arg) (arg - (arg < 58 ? 48 : 55))
+#define HEX_ME(arg) (arg - ((arg < 58) ? 48 : 55))
 
 void hex_dump(const char *def, uint8_t *data, uint16_t len,
 		uint16_t br);

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
@@ -61,9 +62,10 @@ Integer<len, sign>::Integer(const char *number)
        * TODO
        * check if number[] is hex
        */
+	   char c = toupper(number[__len - i - 1]);
       __data[(i & (~1)) >> 1] += (i & 1) ?
-            (HEX_ME(number[__len - i - 1]) << 4) :
-               HEX_ME(number[__len - i - 1]);
+            (HEX_ME(c) << 4) :
+               HEX_ME(c);
       i++;
    }
 

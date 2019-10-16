@@ -336,40 +336,44 @@ int modInverse(int a, int m)
 
 int main(int argc, char *argv[])
 {
+	int i = 0, j = 0;
+
 	char number[64] = { };
 	char number2[64] = { };
+	char r_number[64] = { };
 
     int128_t A;
     int128_t B;
+    int128_t R, R2;
 
-    uint64_t a = 35, b = 8;
+    uint64_t a, b = 775, r;
 
-    sprintf(number, "%lx", (long unsigned int)a);
-    sprintf(number2, "%lx", (long unsigned int)b);
+    for (i = 0; i < 10000; i++) {
+    	for (j = 0; j < 10000; j++) {
+			a = i;
+			b = j;
+			sprintf(number, "%lx", (long unsigned int)a);
+			sprintf(number2, "%lx", (long unsigned int)b);
 
- //   printf("\n %s", number);
+			A = number;
+			B = number2;
+			R = A + B;
+			r = a + b;
 
-    A = number;
-    B = number2;
+			sprintf(r_number, "%lx", (long unsigned int)r);
 
+			R2 = r_number;
+			if (!(R == R2)) {
+				printf("\nFAILURE");
+			}
 
+	//		R.print("R");
+		//	R2.print("R2");
 
-  //  A.print_s("A");
-    int128_t R = A - B;
-    uint64_t r = a - b;
-    sprintf(number2, "%lx", (long unsigned int)r);
-    R.print_s("R");
-    a = 3; b = 4;
-    sprintf(number, "%lx", (long unsigned int)a);
-    sprintf(number2, "%lx", (long unsigned int)b);
-    A = number;
-    B = number2;
-    R = A - B;
-    R.print_s("R");
-
- /*   printf("\n r data = %s", R.__data);
-    printf("\n num data = %s", number2);
-    int res = strcmp((const char *)R.__data, number2);
-    printf("\n res = %d", res); */
+			memset(number, 0, 64);
+			memset(number2, 0, 64);
+			memset(r_number, 0, 64);
+    	}
+    }
 
 }
